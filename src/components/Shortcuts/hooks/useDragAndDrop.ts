@@ -1,7 +1,13 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import type { ShortcutEntry, ShortcutItem } from '@/types';
 import { isShortcutFolder } from '@/types';
 import { getGridSpan, TEXT_HEIGHT } from '../utils/gridUtils';
+import {
+  calculateDragOffset,
+  setupDragData,
+  createThrottledPositionUpdater,
+  canSwap,
+} from '../utils/dragUtils';
 
 interface UseDragAndDropProps {
   items: ShortcutEntry[];
@@ -30,6 +36,16 @@ export function useDragAndDrop({
   
   const lastSwapTime = useRef<number>(0);
   const dragOffset = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  
+  // 使用 RAF 节流的位置更新器
+  const positionUpdater = useRef(createThrottledPositionUpdater(setDragPosition));
+  
+  // 清理 RAF
+  useEffect(() => {
+    return () => {
+      positionUpdater.current.cancel();
+    };
+  }, []);
 
   const getDraggedItemSize = useCallback(() => {
     const item = itemsMap.get(draggedId || '');
@@ -43,27 +59,21 @@ export function useDragAndDrop({
   }, [draggedId, itemsMap, unit, gap]);
 
   const handleDragStart = (e: React.DragEvent, entry: ShortcutEntry) => {
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    dragOffset.current = {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    };
-    
+    dragOffset.current = calculateDragOffset(e, e.currentTarget as HTMLElement);
     setDraggedId(entry.id);
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', entry.id);
-    
-    const img = new Image();
-    img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-    e.dataTransfer.setDragImage(img, 0, 0);
+    setupDragData(e, entry.id);
   };
 
   const handleDrag = (e: React.DragEvent) => {
     if (e.clientX === 0 && e.clientY === 0) return;
-    setDragPosition({ x: e.clientX, y: e.clientY });
+    // 使用 RAF 节流，避免每帧都触发状态更新
+    positionUpdater.current.updatePosition(e.clientX, e.clientY);
   };
 
   const handleDragEnd = () => {
+    // 取消未执行的 RAF
+    positionUpdater.current.cancel();
+    
     const newItems = sortOrder
       .map(id => itemsMap.get(id))
       .filter((item): item is ShortcutEntry => item !== undefined);
@@ -84,8 +94,8 @@ export function useDragAndDrop({
     
     setDragOverId(targetId);
     
-    const now = Date.now();
-    if (now - lastSwapTime.current < 200) return;
+    // 使用节流检查，避免过于频繁的交换
+    if (!canSwap(lastSwapTime.current)) return;
     
     const draggedItem = itemsMap.get(draggedId);
     const targetItem = itemsMap.get(targetId);
@@ -99,7 +109,7 @@ export function useDragAndDrop({
     const newIndex = sortOrder.indexOf(targetId);
     
     if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
-      lastSwapTime.current = now;
+      lastSwapTime.current = Date.now();
       const newOrder = [...sortOrder];
       newOrder.splice(oldIndex, 1);
       newOrder.splice(newIndex, 0, draggedId);

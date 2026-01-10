@@ -1,6 +1,12 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { ShortcutEntry, ShortcutItem, ShortcutFolder } from '@/types';
 import { isShortcutFolder } from '@/types';
+import {
+  calculateDragOffset,
+  setupDragData,
+  createThrottledPositionUpdater,
+  canSwap,
+} from '../utils/dragUtils';
 
 interface UseFolderDragProps {
   items: ShortcutEntry[];
@@ -28,29 +34,30 @@ export function useFolderDrag({
   
   const folderLastSwapTime = useRef<number>(0);
   const dragOffset = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  
+  // 使用 RAF 节流的位置更新器
+  const positionUpdater = useRef(createThrottledPositionUpdater(setDragPosition));
+  
+  // 清理 RAF
+  useEffect(() => {
+    return () => {
+      positionUpdater.current.cancel();
+    };
+  }, []);
 
   const handleFolderItemDragStart = (e: React.DragEvent, item: ShortcutItem, folderId: string) => {
     e.stopPropagation();
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    dragOffset.current = {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    };
+    dragOffset.current = calculateDragOffset(e, e.currentTarget as HTMLElement);
     
     setDraggedFolderItem(item);
     setDragFromFolder(folderId);
-    
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', item.id);
-    
-    const img = new Image();
-    img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-    e.dataTransfer.setDragImage(img, 0, 0);
+    setupDragData(e, item.id);
   };
 
   const handleFolderItemDrag = (e: React.DragEvent) => {
     if (e.clientX === 0 && e.clientY === 0) return;
-    setDragPosition({ x: e.clientX, y: e.clientY });
+    // 使用 RAF 节流，避免每帧都触发状态更新
+    positionUpdater.current.updatePosition(e.clientX, e.clientY);
   };
 
   const handleFolderItemDragOver = (e: React.DragEvent, targetId: string) => {
@@ -61,15 +68,15 @@ export function useFolderDrag({
     
     setFolderDragOverId(targetId);
     
-    const now = Date.now();
-    if (now - folderLastSwapTime.current < 200) return;
+    // 使用节流检查，避免过于频繁的交换
+    if (!canSwap(folderLastSwapTime.current)) return;
     
     const currentItems = openFolder.items;
     const draggedIndex = currentItems.findIndex(i => i.id === draggedFolderItem.id);
     const targetIndex = currentItems.findIndex(i => i.id === targetId);
     
     if (draggedIndex !== -1 && targetIndex !== -1 && draggedIndex !== targetIndex) {
-      folderLastSwapTime.current = now;
+      folderLastSwapTime.current = Date.now();
       
       const newFolderItems = [...currentItems];
       newFolderItems.splice(draggedIndex, 1);
@@ -129,20 +136,20 @@ export function useFolderDrag({
       setSortOrder(newOrder);
       onShortcutsChange?.(newItems);
       
-      const updatedFolder = newItems.find(i => i.id === dragFromFolder);
-      if (updatedFolder && isShortcutFolder(updatedFolder)) {
-        setOpenFolder(updatedFolder);
-      }
-      
+      // 关闭文件夹弹窗
       setOpenFolder(null);
     }
     
+    // 取消未执行的 RAF
+    positionUpdater.current.cancel();
     setDraggedFolderItem(null);
     setDragFromFolder(null);
     setDragPosition(null);
   };
 
   const handleFolderItemDragEnd = () => {
+    // 取消未执行的 RAF
+    positionUpdater.current.cancel();
     setDraggedFolderItem(null);
     setDragFromFolder(null);
     setDragPosition(null);

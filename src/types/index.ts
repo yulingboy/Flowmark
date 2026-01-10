@@ -1,6 +1,12 @@
 // 快捷方式尺寸类型：1x1, 1x2, 2x1, 2x2, 2x4
 export type ShortcutSize = '1x1' | '1x2' | '2x1' | '2x2' | '2x4';
 
+// 位置信息
+export interface Position {
+  x: number;
+  y: number;
+}
+
 // 快捷入口项目
 export interface ShortcutItem {
   id: string;
@@ -8,6 +14,7 @@ export interface ShortcutItem {
   url: string;
   icon: string;
   size?: ShortcutSize; // 默认 1x1
+  position?: Position; // 自由定位
 }
 
 // 快捷入口文件夹
@@ -17,6 +24,7 @@ export interface ShortcutFolder {
   items: ShortcutItem[];
   isFolder: true;
   size?: ShortcutSize; // 默认 1x1
+  position?: Position; // 自由定位
 }
 
 // 快捷入口条目（卡片或文件夹）

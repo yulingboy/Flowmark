@@ -41,11 +41,12 @@ export function ShortcutFolder({ folder, onOpen, className = '', isDropTarget = 
       <div 
         className="w-full flex-1 rounded-2xl overflow-hidden group-hover:scale-105 transition-all"
         style={{
-          backgroundColor: isDropTarget ? 'rgba(59, 130, 246, 0.5)' : 'rgba(255, 255, 255, 0.25)',
+          backgroundColor: isDropTarget ? 'rgba(16, 185, 129, 0.35)' : 'rgba(255, 255, 255, 0.25)',
           backdropFilter: 'blur(8px)',
           padding: '16px',
-          boxShadow: isDropTarget ? '0 0 0 3px rgba(59, 130, 246, 0.8)' : 'none',
-          transform: isDropTarget ? 'scale(1.05)' : undefined,
+          boxShadow: isDropTarget ? '0 0 0 2px rgba(16, 185, 129, 0.8), 0 0 16px rgba(16, 185, 129, 0.4)' : 'none',
+          transform: isDropTarget ? 'scale(1.08)' : undefined,
+          transition: 'all 0.2s ease-out',
         }}
       >
         {previewItems.length > 0 ? (
