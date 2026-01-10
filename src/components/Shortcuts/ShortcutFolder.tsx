@@ -4,6 +4,7 @@ interface ShortcutFolderProps {
   folder: ShortcutFolderType;
   onOpen?: (folder: ShortcutFolderType) => void;
   className?: string;
+  isDropTarget?: boolean;
 }
 
 // 根据文件夹尺寸计算预览网格
@@ -20,7 +21,7 @@ function getPreviewConfig(size: ShortcutSize = '1x1') {
   }
 }
 
-export function ShortcutFolder({ folder, onOpen, className = '' }: ShortcutFolderProps) {
+export function ShortcutFolder({ folder, onOpen, className = '', isDropTarget = false }: ShortcutFolderProps) {
   const size = folder.size || '1x1';
   const { cols, rows, maxItems } = getPreviewConfig(size);
   
@@ -38,11 +39,13 @@ export function ShortcutFolder({ folder, onOpen, className = '' }: ShortcutFolde
     >
       {/* 文件夹卡片 - 使用内联样式确保 padding 生效 */}
       <div 
-        className="w-full flex-1 rounded-2xl overflow-hidden group-hover:scale-105 transition-transform"
+        className="w-full flex-1 rounded-2xl overflow-hidden group-hover:scale-105 transition-all"
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.25)',
+          backgroundColor: isDropTarget ? 'rgba(59, 130, 246, 0.5)' : 'rgba(255, 255, 255, 0.25)',
           backdropFilter: 'blur(8px)',
           padding: '16px',
+          boxShadow: isDropTarget ? '0 0 0 3px rgba(59, 130, 246, 0.8)' : 'none',
+          transform: isDropTarget ? 'scale(1.05)' : undefined,
         }}
       >
         {previewItems.length > 0 ? (
