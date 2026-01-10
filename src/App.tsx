@@ -1,9 +1,9 @@
-import { Clock } from './components/Clock/Clock';
-import { Search } from './components/Search/Search';
-import { ShortcutsContainer } from './components/Shortcuts';
-import { Background } from './components/Background/Background';
-import type { ShortcutEntry } from './types';
-import { createShortcutFolder } from './types';
+import { Clock } from '@/components/Clock/Clock';
+import { Search } from '@/components/Search/Search';
+import { ShortcutsContainer } from '@/components/Shortcuts';
+import { Background } from '@/components/Background/Background';
+import type { ShortcutEntry } from '@/types';
+import { createShortcutFolder } from '@/types';
 
 // 默认快捷入口数据
 const defaultShortcuts: ShortcutEntry[] = [

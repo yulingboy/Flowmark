@@ -1,4 +1,4 @@
-import type { SearchEngine } from '../types';
+import type { SearchEngine } from '@/types';
 
 // 搜索引擎 URL 模板
 const SEARCH_ENGINES: Record<SearchEngine, string> = {

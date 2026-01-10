@@ -1,4 +1,4 @@
-import type { ShortcutItem } from '../../types';
+import type { ShortcutItem } from '@/types';
 
 interface ShortcutCardProps {
   item: ShortcutItem;

@@ -1,4 +1,4 @@
-import type { ShortcutFolder as ShortcutFolderType, ShortcutSize } from '../../types';
+import type { ShortcutFolder as ShortcutFolderType, ShortcutSize } from '@/types';
 
 interface ShortcutFolderProps {
   folder: ShortcutFolderType;

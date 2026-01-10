@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { formatTime, formatDate, getWeekday, getLunarDate } from '../utils/clock';
-import type { ClockData } from '../types';
+import { formatTime, formatDate, getWeekday, getLunarDate } from '@/utils/clock';
+import type { ClockData } from '@/types';
 
 export function useClock(): ClockData {
   const [clockData, setClockData] = useState<ClockData>(() => {

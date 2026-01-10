@@ -1,6 +1,6 @@
 import { useState, type KeyboardEvent } from 'react';
-import { performSearch, SEARCH_ENGINE_ICONS } from '../../utils/search';
-import type { SearchEngine } from '../../types';
+import { performSearch, SEARCH_ENGINE_ICONS } from '@/utils/search';
+import type { SearchEngine } from '@/types';
 
 interface SearchProps {
   placeholder?: string;
