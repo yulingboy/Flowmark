@@ -8,6 +8,7 @@ interface DragHandlersOptions {
   setItems: React.Dispatch<React.SetStateAction<ShortcutEntry[]>>;
   itemsMap: Map<string, ShortcutEntry>;
   columns: number;
+  rows: number;
   unit: number;
   gap: number;
   setActiveId: (id: string | null) => void;
@@ -21,6 +22,7 @@ export function createDragHandlers({
   setItems,
   itemsMap,
   columns,
+  rows,
   unit,
   gap,
   setActiveId,
@@ -140,8 +142,9 @@ export function createDragHandlers({
     const manager = new GridManager(columns, unit, gap);
     manager.initFromItems(items, draggedItemId);
     
-    const targetCol = Math.max(0, targetGrid.col);
-    const targetRow = Math.max(0, targetGrid.row);
+    // 限制目标位置在容器范围内
+    const targetCol = Math.max(0, Math.min(targetGrid.col, columns - colSpan));
+    const targetRow = Math.max(0, Math.min(targetGrid.row, rows - rowSpan));
     const canPlaceAtTarget = manager.canPlace(targetCol, targetRow, colSpan, rowSpan);
     
     // 如果目标位置被占用，返回原位置

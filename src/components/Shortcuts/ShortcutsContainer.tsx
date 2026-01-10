@@ -5,7 +5,6 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { restrictToParentElement } from '@dnd-kit/modifiers';
 import { useState } from 'react';
 import { DraggableItem } from './DraggableItem';
 import { ShortcutCard } from './ShortcutCard';
@@ -69,6 +68,7 @@ export function ShortcutsContainer({
     setItems,
     itemsMap,
     columns,
+    rows,
     unit,
     gap,
     setActiveId,
@@ -102,7 +102,6 @@ export function ShortcutsContainer({
     <div className={`relative ${className}`}>
       <DndContext
         sensors={sensors}
-        modifiers={[restrictToParentElement]}
         onDragStart={handleDragStart}
         onDragMove={handleDragMove}
         onDragEnd={handleDragEnd}
