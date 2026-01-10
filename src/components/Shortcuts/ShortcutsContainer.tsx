@@ -5,6 +5,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
+import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { useState } from 'react';
 import { DraggableItem } from './DraggableItem';
 import { ShortcutCard } from './ShortcutCard';
@@ -102,6 +103,7 @@ export function ShortcutsContainer({
     <div className={`relative ${className}`}>
       <DndContext
         sensors={sensors}
+        modifiers={[restrictToWindowEdges]}
         onDragStart={handleDragStart}
         onDragMove={handleDragMove}
         onDragEnd={handleDragEnd}
