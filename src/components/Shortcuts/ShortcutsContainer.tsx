@@ -11,7 +11,7 @@ import { ShortcutCard } from './ShortcutCard';
 import { ShortcutFolder } from './ShortcutFolder';
 import { FolderPopup } from './FolderPopup';
 import { getItemSize } from './utils/gridUtils';
-import { useShortcutItems, useContainerSize } from './hooks/useShortcutItems';
+import { useShortcutItems } from './hooks/useShortcutItems';
 import { createDragHandlers } from './hooks/useDragHandlers';
 import { createFolderHandlers } from './hooks/useFolderHandlers';
 import type { ShortcutEntry, ShortcutFolder as ShortcutFolderType } from '@/types';
@@ -22,6 +22,7 @@ interface ShortcutsContainerProps {
   onShortcutsChange?: (shortcuts: ShortcutEntry[]) => void;
   className?: string;
   columns?: number;
+  rows?: number;
   unit?: number;
   gap?: number;
 }
@@ -30,7 +31,8 @@ export function ShortcutsContainer({
   shortcuts,
   onShortcutsChange,
   className = '',
-  columns = 10,
+  columns = 4,
+  rows = 3,
   unit = 64,
   gap = 16,
 }: ShortcutsContainerProps) {
@@ -91,13 +93,9 @@ export function ShortcutsContainer({
     onShortcutsChange,
   });
 
-  // 计算容器尺寸
-  const containerSize = useContainerSize(
-    items, 
-    unit, 
-    gap, 
-    (item) => getItemSize(item, unit, gap)
-  );
+  // 计算容器尺寸（基于配置的行列数）
+  const containerWidth = columns * unit + (columns - 1) * gap;
+  const containerHeight = rows * unit + (rows - 1) * gap;
 
   return (
     <div className={`relative ${className}`}>
@@ -110,9 +108,8 @@ export function ShortcutsContainer({
         <div
           style={{
             position: 'relative',
-            width: containerSize.width,
-            height: containerSize.height,
-            minHeight: 300,
+            width: containerWidth,
+            height: containerHeight,
           }}
         >
           {items.map((entry) => {

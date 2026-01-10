@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import { Clock } from '@/components/Clock/Clock';
 import { Search } from '@/components/Search/Search';
 import { ShortcutsContainer } from '@/components/Shortcuts';
 import { Background } from '@/components/Background/Background';
+import { SettingsButton, SettingsPanel } from '@/components/Settings';
+import { useSettingsStore } from '@/stores/settingsStore';
 import type { ShortcutEntry } from '@/types';
 import { createShortcutFolder } from '@/types';
 
@@ -23,23 +26,52 @@ const defaultShortcuts: ShortcutEntry[] = [
   ], '开发工具', '2x2'),
 ];
 
-// 默认背景图（使用 Unsplash 的山景图）
-const defaultBackground = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80';
-
 function App() {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const backgroundUrl = useSettingsStore((state) => state.backgroundUrl);
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start pt-8 gap-4">
+    <div 
+      style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        paddingTop: '100px',
+        gap: '24px'
+      }}
+    >
       {/* 背景 */}
-      <Background imageUrl={defaultBackground} />
+      <Background imageUrl={backgroundUrl} />
+
+      {/* 设置按钮 */}
+      <SettingsButton
+        onClick={() => setIsSettingsOpen(true)}
+        className="fixed top-4 right-4"
+      />
+
+      {/* 设置面板 */}
+      <SettingsPanel
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
 
       {/* 时钟 */}
       <Clock />
 
       {/* 搜索框 */}
-      <Search placeholder="搜索内容" searchEngine="bing" />
+      <Search placeholder="搜索内容" />
 
       {/* 快捷入口 */}
-      <ShortcutsContainer shortcuts={defaultShortcuts} className="mt-1" />
+      <div style={{ marginTop: '32px' }}>
+        <ShortcutsContainer 
+          shortcuts={defaultShortcuts} 
+          columns={12}
+          rows={4}
+          unit={72}
+          gap={20}
+        />
+      </div>
     </div>
   );
 }
