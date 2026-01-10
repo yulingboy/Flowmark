@@ -138,14 +138,20 @@ export function createDragHandlers({
       }
     }
 
+    // 检查目标网格位置是否在容器范围内
+    const isOutOfBounds = 
+      targetGrid.col < 0 || 
+      targetGrid.row < 0 || 
+      targetGrid.col + colSpan > columns || 
+      targetGrid.row + rowSpan > rows;
+
     // 检查目标网格位置是否可用
     const manager = new GridManager(columns, unit, gap);
     manager.initFromItems(items, draggedItemId);
     
-    // 限制目标位置在容器范围内
     const targetCol = Math.max(0, Math.min(targetGrid.col, columns - colSpan));
     const targetRow = Math.max(0, Math.min(targetGrid.row, rows - rowSpan));
-    const canPlaceAtTarget = manager.canPlace(targetCol, targetRow, colSpan, rowSpan);
+    const canPlaceAtTarget = !isOutOfBounds && manager.canPlace(targetCol, targetRow, colSpan, rowSpan);
     
     // 如果目标位置被占用，返回原位置
     if (!canPlaceAtTarget) {
