@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Clock } from '@/components/Clock/Clock';
 import { Search } from '@/components/Search/Search';
 import { ShortcutsContainer } from '@/components/Shortcuts';
@@ -28,7 +28,19 @@ const defaultShortcuts: ShortcutEntry[] = [
 
 function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const backgroundUrl = useSettingsStore((state) => state.backgroundUrl);
+  const { backgroundUrl, showClock, showSearch, showShortcuts, autoFocusSearch } = useSettingsStore();
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  // 自动聚焦搜索框
+  useEffect(() => {
+    if (autoFocusSearch && showSearch) {
+      // 延迟聚焦，确保组件已渲染
+      const timer = setTimeout(() => {
+        searchRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [autoFocusSearch, showSearch]);
 
   return (
     <div 
@@ -57,21 +69,23 @@ function App() {
       />
 
       {/* 时钟 */}
-      <Clock />
+      {showClock && <Clock />}
 
       {/* 搜索框 */}
-      <Search placeholder="搜索内容" />
+      {showSearch && <Search placeholder="搜索内容" inputRef={searchRef} />}
 
       {/* 快捷入口 */}
-      <div style={{ marginTop: '32px' }}>
-        <ShortcutsContainer 
-          shortcuts={defaultShortcuts} 
-          columns={12}
-          rows={4}
-          unit={72}
-          gap={20}
-        />
-      </div>
+      {showShortcuts && (
+        <div style={{ marginTop: '32px' }}>
+          <ShortcutsContainer 
+            shortcuts={defaultShortcuts} 
+            columns={12}
+            rows={4}
+            unit={72}
+            gap={20}
+          />
+        </div>
+      )}
     </div>
   );
 }

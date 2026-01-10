@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSettingsStore } from '@/stores/settingsStore';
 
 interface BackgroundProps {
   imageUrl: string;
@@ -7,6 +8,7 @@ interface BackgroundProps {
 
 export function Background({ imageUrl, className = '' }: BackgroundProps) {
   const [hasError, setHasError] = useState(false);
+  const { backgroundBlur, backgroundOverlay } = useSettingsStore();
 
   return (
     <div className={`fixed inset-0 -z-10 ${className}`}>
@@ -15,6 +17,7 @@ export function Background({ imageUrl, className = '' }: BackgroundProps) {
           src={imageUrl}
           alt="background"
           className="w-full h-full object-cover"
+          style={{ filter: `blur(${backgroundBlur / 10}px)` }}
           onError={() => setHasError(true)}
         />
       ) : (
@@ -22,7 +25,10 @@ export function Background({ imageUrl, className = '' }: BackgroundProps) {
         <div className="w-full h-full bg-gradient-to-br from-blue-900 via-purple-900 to-slate-900" />
       )}
       {/* 叠加层，增强文字可读性 */}
-      <div className="absolute inset-0 bg-black/20" />
+      <div 
+        className="absolute inset-0" 
+        style={{ backgroundColor: `rgba(0, 0, 0, ${backgroundOverlay / 100})` }}
+      />
     </div>
   );
 }

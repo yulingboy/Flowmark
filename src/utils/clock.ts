@@ -31,13 +31,33 @@ const LUNAR_INFO = [
 ];
 
 /**
- * 格式化时间为 HH:MM:SS
+ * 格式化时间
+ * @param date 日期对象
+ * @param showSeconds 是否显示秒
+ * @param show24Hour 是否24小时制
  */
-export function formatTime(date: Date): string {
-  const hours = String(date.getHours()).padStart(2, '0');
+export function formatTime(date: Date, showSeconds = true, show24Hour = true): string {
+  let hours = date.getHours();
   const minutes = String(date.getMinutes()).padStart(2, '0');
   const seconds = String(date.getSeconds()).padStart(2, '0');
-  return `${hours}:${minutes}:${seconds}`;
+  
+  if (!show24Hour) {
+    hours = hours % 12 || 12;
+  }
+  
+  const hoursStr = String(hours).padStart(2, '0');
+  
+  if (showSeconds) {
+    return `${hoursStr}:${minutes}:${seconds}`;
+  }
+  return `${hoursStr}:${minutes}`;
+}
+
+/**
+ * 格式化年份
+ */
+export function formatYear(date: Date): string {
+  return `${date.getFullYear()}年`;
 }
 
 /**

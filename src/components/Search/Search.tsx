@@ -5,19 +5,29 @@ import { useSettingsStore } from '@/stores/settingsStore';
 interface SearchProps {
   placeholder?: string;
   className?: string;
+  inputRef?: React.RefObject<HTMLInputElement | null>;
 }
 
 export function Search({
   placeholder = '搜索内容',
   className = '',
+  inputRef,
 }: SearchProps) {
-  const { searchEngine, searchHistory, addSearchHistory, clearSearchHistory } = useSettingsStore();
+  const { 
+    searchEngine, 
+    searchHistory, 
+    searchInNewTab,
+    searchHistoryEnabled,
+    addSearchHistory, 
+    clearSearchHistory 
+  } = useSettingsStore();
   
   const [query, setQuery] = useState('');
   const [showHistory, setShowHistory] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const internalInputRef = useRef<HTMLInputElement>(null);
+  const actualInputRef = inputRef || internalInputRef;
 
   // 点击外部关闭历史记录
   useEffect(() => {
@@ -33,7 +43,7 @@ export function Search({
   const handleSearch = () => {
     if (!query.trim()) return;
     addSearchHistory(query.trim());
-    performSearch(query, searchEngine);
+    performSearch(query, searchEngine, searchInNewTab);
     setShowHistory(false);
   };
 
@@ -63,7 +73,7 @@ export function Search({
   const handleHistoryClick = (item: string) => {
     setQuery(item);
     setShowHistory(false);
-    inputRef.current?.focus();
+    actualInputRef.current?.focus();
   };
 
   const handleClearHistory = (e: React.MouseEvent) => {
@@ -85,7 +95,7 @@ export function Search({
         />
         {/* 搜索输入框 */}
         <input
-          ref={inputRef}
+          ref={actualInputRef}
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -113,7 +123,7 @@ export function Search({
       </div>
 
       {/* 搜索历史下拉 */}
-      {showHistory && searchHistory.length > 0 && (
+      {showHistory && searchHistoryEnabled && searchHistory.length > 0 && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg overflow-hidden z-10">
           <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100">
             <span className="text-xs text-gray-500">搜索历史</span>

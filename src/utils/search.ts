@@ -26,10 +26,14 @@ export function generateSearchUrl(query: string, engine: SearchEngine = 'bing'):
 }
 
 /**
- * 执行搜索（在新标签页打开）
+ * 执行搜索
  */
-export function performSearch(query: string, engine: SearchEngine = 'bing'): void {
+export function performSearch(query: string, engine: SearchEngine = 'bing', newTab = true): void {
   if (!query.trim()) return;
   const url = generateSearchUrl(query, engine);
-  window.open(url, '_blank');
+  if (newTab) {
+    window.open(url, '_blank');
+  } else {
+    window.location.href = url;
+  }
 }
