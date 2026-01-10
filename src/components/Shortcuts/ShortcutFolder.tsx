@@ -65,6 +65,8 @@ export function ShortcutFolder({ folder, onOpen, className = '', isDropTarget = 
                   src={item.icon}
                   alt={item.name}
                   className="w-full h-full object-cover"
+                  loading="eager"
+                  draggable={false}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
