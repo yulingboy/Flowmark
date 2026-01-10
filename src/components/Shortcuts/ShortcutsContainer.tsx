@@ -399,6 +399,7 @@ export function ShortcutsContainer({
     const folder = itemsMap.get(folderId);
     const folderPos = folder?.position || { x: 0, y: 0 };
     
+    // 先从文件夹中移除该项目
     const newItems = items.map(i => {
       if (i.id === folderId && isShortcutFolder(i)) {
         return { ...i, items: i.items.filter(fi => fi.id !== item.id) };
@@ -406,13 +407,40 @@ export function ShortcutsContainer({
       return i;
     });
     
-    // 在文件夹附近放置拖出的项目
+    // 使用 GridManager 找到文件夹附近的空位
+    const manager = new GridManager(columns, unit, gap);
+    manager.initFromItems(newItems); // 不排除任何项目
+    
+    // 从文件夹右边开始找空位
+    const folderGrid = pixelToGrid(folderPos.x, folderPos.y, unit, gap);
+    const { colSpan, rowSpan } = getGridSpan(item.size || '1x1');
+    
+    // 尝试在文件夹右边找位置
+    let targetPos = manager.findNearestAvailable(
+      folderGrid.col + 1, 
+      folderGrid.row, 
+      colSpan, 
+      rowSpan
+    );
+    
+    // 如果右边没有，从文件夹位置开始找最近的空位
+    if (!targetPos) {
+      targetPos = manager.findNearestAvailable(
+        folderGrid.col, 
+        folderGrid.row, 
+        colSpan, 
+        rowSpan
+      );
+    }
+    
+    const finalPos = targetPos 
+      ? gridToPixel(targetPos.col, targetPos.row, unit, gap)
+      : { x: folderPos.x + unit + gap, y: folderPos.y };
+    
+    // 在空位放置拖出的项目
     const itemWithPos: ShortcutItem = {
       ...item,
-      position: {
-        x: folderPos.x + unit + gap,
-        y: folderPos.y,
-      },
+      position: finalPos,
     };
     
     newItems.push(itemWithPos);

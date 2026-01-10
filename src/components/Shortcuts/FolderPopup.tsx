@@ -1,21 +1,4 @@
-import {
-  DndContext,
-  DragOverlay,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragStartEvent,
-  type DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  rectSortingStrategy,
-  arrayMove,
-  useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import type { ShortcutFolder as ShortcutFolderType, ShortcutItem } from '@/types';
 
 interface FolderPopupProps {
@@ -28,72 +11,9 @@ interface FolderPopupProps {
 // 弹窗网格配置
 const POPUP_COLS = 8;
 const POPUP_ROWS = 4;
-const POPUP_ICON_SIZE = 64;
-const POPUP_GAP = 24;
-const TEXT_HEIGHT = 20;
-
-// 文件夹内的可排序项目
-function SortableFolderItem({ 
-  item, 
-  index,
-  isDragging,
-}: { 
-  item: ShortcutItem; 
-  index: number;
-  isDragging: boolean;
-}) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: item.id });
-
-  // 计算位置
-  const col = index % POPUP_COLS;
-  const row = Math.floor(index / POPUP_COLS);
-  const x = col * (POPUP_ICON_SIZE + POPUP_GAP);
-  const y = row * (POPUP_ICON_SIZE + TEXT_HEIGHT + POPUP_GAP);
-
-  const style = {
-    position: 'absolute' as const,
-    left: x,
-    top: y,
-    width: POPUP_ICON_SIZE,
-    height: POPUP_ICON_SIZE + TEXT_HEIGHT,
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.3 : 1,
-    touchAction: 'none',
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      onClick={() => window.open(item.url, '_blank')}
-      className="flex flex-col items-center gap-1 cursor-pointer group"
-    >
-      <div 
-        className="rounded-2xl overflow-hidden bg-white shadow group-hover:scale-105 transition-transform"
-        style={{ width: `${POPUP_ICON_SIZE}px`, height: `${POPUP_ICON_SIZE}px` }}
-      >
-        <img
-          src={item.icon}
-          alt={item.name}
-          className="w-full h-full object-cover"
-          draggable={false}
-        />
-      </div>
-      <span className="text-gray-700 text-xs truncate w-full text-center">
-        {item.name}
-      </span>
-    </div>
-  );
-}
+const POPUP_ICON_SIZE = 72;
+const POPUP_GAP = 20;
+const TEXT_HEIGHT = 24;
 
 export function FolderPopup({
   folder,
@@ -101,60 +21,14 @@ export function FolderPopup({
   onItemsChange,
   onItemDragOut,
 }: FolderPopupProps) {
-  const [activeId, setActiveId] = useState<string | null>(null);
   const [folderItems, setFolderItems] = useState<ShortcutItem[]>(folder.items);
-
-  // 配置拖拽传感器
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    })
-  );
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // 计算弹窗尺寸
   const popupWidth = POPUP_COLS * POPUP_ICON_SIZE + (POPUP_COLS + 1) * POPUP_GAP;
   const popupHeight = POPUP_ROWS * (POPUP_ICON_SIZE + TEXT_HEIGHT) + (POPUP_ROWS + 1) * POPUP_GAP;
-  
-  // 内容区域尺寸
-  const contentWidth = POPUP_COLS * POPUP_ICON_SIZE + (POPUP_COLS - 1) * POPUP_GAP;
-  const contentHeight = POPUP_ROWS * (POPUP_ICON_SIZE + TEXT_HEIGHT) + (POPUP_ROWS - 1) * POPUP_GAP;
-
-  // 获取当前拖拽的元素
-  const activeItem = activeId ? folderItems.find(i => i.id === activeId) : null;
-
-  // 拖拽开始
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
-  };
-
-  // 拖拽结束
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    setActiveId(null);
-
-    if (!over) {
-      // 拖出弹窗
-      const item = folderItems.find(i => i.id === active.id);
-      if (item) {
-        onItemDragOut(item);
-      }
-      return;
-    }
-
-    // 文件夹内排序
-    if (active.id !== over.id) {
-      const oldIndex = folderItems.findIndex(i => i.id === active.id);
-      const newIndex = folderItems.findIndex(i => i.id === over.id);
-      
-      if (oldIndex !== -1 && newIndex !== -1) {
-        const newItems = arrayMove(folderItems, oldIndex, newIndex);
-        setFolderItems(newItems);
-        onItemsChange(newItems);
-      }
-    }
-  };
 
   // 点击背景关闭
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -163,91 +37,167 @@ export function FolderPopup({
     }
   };
 
-  const itemIds = folderItems.map(i => i.id);
+  // 拖拽开始
+  const handleDragStart = (e: React.DragEvent, item: ShortcutItem) => {
+    setDraggedId(item.id);
+    e.dataTransfer.effectAllowed = 'move';
+    // 设置拖拽图片为当前元素
+    const target = e.currentTarget as HTMLElement;
+    e.dataTransfer.setDragImage(target, POPUP_ICON_SIZE / 2, POPUP_ICON_SIZE / 2);
+  };
+
+  // 拖拽经过
+  const handleDragOver = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+    if (draggedId && draggedId !== targetId) {
+      setDragOverId(targetId);
+    }
+  };
+
+  // 拖拽离开
+  const handleDragLeave = () => {
+    setDragOverId(null);
+  };
+
+  // 放置 - 交换位置
+  const handleDrop = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+    setDragOverId(null);
+
+    if (!draggedId || draggedId === targetId) return;
+
+    const draggedIndex = folderItems.findIndex(i => i.id === draggedId);
+    const targetIndex = folderItems.findIndex(i => i.id === targetId);
+
+    if (draggedIndex !== -1 && targetIndex !== -1) {
+      const newItems = [...folderItems];
+      [newItems[draggedIndex], newItems[targetIndex]] = [newItems[targetIndex], newItems[draggedIndex]];
+      setFolderItems(newItems);
+      onItemsChange(newItems);
+    }
+  };
+
+  // 拖拽结束
+  const handleDragEnd = (e: React.DragEvent) => {
+    // 检查是否拖出了容器
+    if (containerRef.current && draggedId) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const { clientX, clientY } = e;
+      
+      if (
+        clientX < rect.left || 
+        clientX > rect.right || 
+        clientY < rect.top || 
+        clientY > rect.bottom
+      ) {
+        // 拖出容器
+        const item = folderItems.find(i => i.id === draggedId);
+        if (item) {
+          onItemDragOut(item);
+        }
+      }
+    }
+
+    setDraggedId(null);
+    setDragOverId(null);
+  };
+
+  // 点击打开链接
+  const handleClick = (item: ShortcutItem) => {
+    window.open(item.url, '_blank');
+  };
 
   return (
     <div
-      className="fixed inset-0 flex flex-col items-center justify-center z-50"
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(30px)' }}
+      className="fixed inset-0 flex flex-col items-center justify-center z-50 p-8"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', backdropFilter: 'blur(12px)' }}
       onClick={handleBackdropClick}
     >
       {/* 文件夹名称 */}
-      <div className="mb-6">
-        <span className="text-white text-sm font-normal">
+      <div className="mb-4">
+        <h2 className="text-white text-2xl font-semibold tracking-wide">
           {folder.name || '新文件夹'}
-        </span>
+        </h2>
       </div>
       
       {/* 弹窗内容 */}
       <div
-        className="rounded-3xl"
+        ref={containerRef}
+        className="rounded-3xl shadow-2xl"
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.65)',
-          backdropFilter: 'blur(20px)',
+          backgroundColor: 'rgba(255, 255, 255, 0.75)',
+          backdropFilter: 'blur(40px)',
           padding: `${POPUP_GAP}px`,
           width: `${popupWidth}px`,
           height: `${popupHeight}px`,
+          border: '1px solid rgba(255, 255, 255, 0.5)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {folderItems.length > 0 ? (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: `repeat(${POPUP_COLS}, ${POPUP_ICON_SIZE}px)`,
+              gridTemplateRows: `repeat(${POPUP_ROWS}, ${POPUP_ICON_SIZE + TEXT_HEIGHT}px)`,
+              gap: `${POPUP_GAP}px`,
+            }}
           >
-            <SortableContext items={itemIds} strategy={rectSortingStrategy}>
-              <div
-                style={{
-                  position: 'relative',
-                  width: contentWidth,
-                  height: contentHeight,
-                }}
-              >
-                {folderItems.slice(0, POPUP_COLS * POPUP_ROWS).map((item, index) => (
-                  <SortableFolderItem
-                    key={item.id}
-                    item={item}
-                    index={index}
-                    isDragging={activeId === item.id}
-                  />
-                ))}
-              </div>
-            </SortableContext>
+            {folderItems.slice(0, POPUP_COLS * POPUP_ROWS).map((item) => {
+              const isDragging = draggedId === item.id;
+              const isDragOver = dragOverId === item.id;
 
-            {/* 拖拽预览 */}
-            <DragOverlay>
-              {activeItem ? (
+              return (
                 <div
-                  className="flex flex-col items-center gap-1"
-                  style={{ 
-                    width: POPUP_ICON_SIZE, 
-                    height: POPUP_ICON_SIZE + TEXT_HEIGHT,
-                    opacity: 0.9,
-                    transform: 'scale(1.02)',
+                  key={item.id}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, item)}
+                  onDragOver={(e) => handleDragOver(e, item.id)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, item.id)}
+                  onDragEnd={handleDragEnd}
+                  onClick={() => !isDragging && handleClick(item)}
+                  className="flex flex-col items-center gap-1.5 cursor-pointer group select-none"
+                  style={{
+                    opacity: isDragging ? 0.4 : 1,
+                    transform: isDragOver ? 'scale(1.15)' : 'scale(1)',
+                    transition: 'all 0.2s ease-out',
                   }}
                 >
                   <div 
-                    className="rounded-2xl overflow-hidden bg-white shadow"
-                    style={{ width: `${POPUP_ICON_SIZE}px`, height: `${POPUP_ICON_SIZE}px` }}
+                    className="rounded-2xl overflow-hidden bg-white shadow-md group-hover:shadow-xl group-hover:scale-110 transition-all duration-200"
+                    style={{ 
+                      width: `${POPUP_ICON_SIZE}px`, 
+                      height: `${POPUP_ICON_SIZE}px`,
+                      outline: isDragOver ? '3px solid rgba(16, 185, 129, 0.8)' : 'none',
+                      outlineOffset: '3px',
+                    }}
                   >
                     <img
-                      src={activeItem.icon}
-                      alt={activeItem.name}
-                      className="w-full h-full object-cover"
+                      src={item.icon}
+                      alt={item.name}
+                      className="w-full h-full object-cover pointer-events-none"
+                      draggable={false}
                     />
                   </div>
-                  <span className="text-gray-700 text-xs truncate w-full text-center">
-                    {activeItem.name}
+                  <span 
+                    className="text-gray-800 text-sm font-medium truncate text-center pointer-events-none"
+                    style={{ width: POPUP_ICON_SIZE }}
+                  >
+                    {item.name}
                   </span>
                 </div>
-              ) : null}
-            </DragOverlay>
-          </DndContext>
+              );
+            })}
+          </div>
         ) : (
-          <div className="text-gray-400 text-center py-8 text-sm">
-            空文件夹
+          <div className="flex items-center justify-center p-12">
+            <div className="text-center">
+              <svg className="w-16 h-16 text-gray-300 mx-auto mb-3" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+              </svg>
+              <p className="text-gray-500 text-base font-medium">空文件夹</p>
+            </div>
           </div>
         )}
       </div>
