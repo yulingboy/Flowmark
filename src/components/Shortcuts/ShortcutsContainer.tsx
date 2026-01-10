@@ -20,7 +20,7 @@ function getGridSpan(size: ShortcutSize = '1x1') {
 
 const TEXT_HEIGHT = 20;
 
-// 计算元素在网格中的位置（简化版：假设都是 1x1）
+// 计算元素在网格中的位置
 function calculatePositions(
   order: string[],
   itemsMap: Map<string, ShortcutEntry>,
@@ -30,8 +30,32 @@ function calculatePositions(
 ): Map<string, { x: number; y: number; width: number; height: number }> {
   const posMap = new Map<string, { x: number; y: number; width: number; height: number }>();
   
-  let col = 0;
-  let row = 0;
+  // 使用二维数组跟踪网格占用情况
+  const grid: boolean[][] = [];
+  const getCell = (row: number, col: number) => grid[row]?.[col] ?? false;
+  const setCell = (row: number, col: number, value: boolean) => {
+    if (!grid[row]) grid[row] = [];
+    grid[row][col] = value;
+  };
+  
+  // 找到可以放置元素的位置
+  const findPosition = (colSpan: number, rowSpan: number): { col: number; row: number } => {
+    for (let row = 0; ; row++) {
+      for (let col = 0; col <= columns - colSpan; col++) {
+        let canPlace = true;
+        for (let r = 0; r < rowSpan && canPlace; r++) {
+          for (let c = 0; c < colSpan && canPlace; c++) {
+            if (getCell(row + r, col + c)) {
+              canPlace = false;
+            }
+          }
+        }
+        if (canPlace) {
+          return { col, row };
+        }
+      }
+    }
+  };
   
   for (const id of order) {
     const item = itemsMap.get(id);
@@ -40,24 +64,21 @@ function calculatePositions(
     const size = item.size || '1x1';
     const { colSpan, rowSpan } = getGridSpan(size);
     
-    // 如果当前行放不下，换行
-    if (col + colSpan > columns) {
-      col = 0;
-      row++;
+    const { col, row } = findPosition(colSpan, rowSpan);
+    
+    // 标记占用的格子
+    for (let r = 0; r < rowSpan; r++) {
+      for (let c = 0; c < colSpan; c++) {
+        setCell(row + r, col + c, true);
+      }
     }
     
     posMap.set(id, {
       x: col * (unit + gap),
-      y: row * (unit + gap),
+      y: row * (unit + gap + TEXT_HEIGHT),
       width: colSpan * unit + (colSpan - 1) * gap,
       height: rowSpan * unit + (rowSpan - 1) * gap + TEXT_HEIGHT,
     });
-    
-    col += colSpan;
-    if (col >= columns) {
-      col = 0;
-      row++;
-    }
   }
   
   return posMap;
@@ -79,9 +100,12 @@ export function ShortcutsContainer({
   const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
   const [dragFromFolder, setDragFromFolder] = useState<string | null>(null); // 从哪个文件夹拖出
   const [draggedFolderItem, setDraggedFolderItem] = useState<ShortcutItem | null>(null); // 从文件夹拖出的项
+  const [folderDragOverId, setFolderDragOverId] = useState<string | null>(null); // 文件夹内拖拽悬停的项（保留用于未来扩展）
+  void folderDragOverId; // 避免未使用警告
   
   const containerRef = useRef<HTMLDivElement>(null);
   const lastSwapTime = useRef<number>(0);
+  const folderLastSwapTime = useRef<number>(0);
   const dragOffset = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
   // 创建 id -> item 的映射
@@ -243,6 +267,7 @@ export function ShortcutsContainer({
 
   // 从文件夹内拖拽开始
   const handleFolderItemDragStart = (e: React.DragEvent, item: ShortcutItem, folderId: string) => {
+    e.stopPropagation();
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     dragOffset.current = {
       x: e.clientX - rect.left,
@@ -265,8 +290,71 @@ export function ShortcutsContainer({
     setDragPosition({ x: e.clientX, y: e.clientY });
   };
 
-  const handleFolderItemDragEnd = () => {
-    // 如果拖到了弹窗外面，将图标移出文件夹
+  // 文件夹内项目拖拽悬停 - 交换位置
+  const handleFolderItemDragOver = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!draggedFolderItem || targetId === draggedFolderItem.id || !openFolder) return;
+    
+    setFolderDragOverId(targetId);
+    
+    const now = Date.now();
+    if (now - folderLastSwapTime.current < 200) return;
+    
+    // 在文件夹内交换位置
+    const currentItems = openFolder.items;
+    const draggedIndex = currentItems.findIndex(i => i.id === draggedFolderItem.id);
+    const targetIndex = currentItems.findIndex(i => i.id === targetId);
+    
+    if (draggedIndex !== -1 && targetIndex !== -1 && draggedIndex !== targetIndex) {
+      folderLastSwapTime.current = now;
+      
+      // 创建新的排序
+      const newFolderItems = [...currentItems];
+      newFolderItems.splice(draggedIndex, 1);
+      newFolderItems.splice(targetIndex, 0, draggedFolderItem);
+      
+      // 更新 openFolder 状态
+      const updatedFolder = { ...openFolder, items: newFolderItems };
+      setOpenFolder(updatedFolder);
+      
+      // 同步更新 items 状态
+      const newItems = items.map(item => {
+        if (item.id === openFolder.id && isShortcutFolder(item)) {
+          return updatedFolder;
+        }
+        return item;
+      });
+      setItems(newItems);
+    }
+  };
+
+  // 弹窗内放置 - 保存排序
+  const handlePopupDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // 在弹窗内放下，保存当前排序
+    if (draggedFolderItem && openFolder) {
+      onShortcutsChange?.(items);
+    }
+    
+    setDraggedFolderItem(null);
+    setDragFromFolder(null);
+    setDragPosition(null);
+    setFolderDragOverId(null);
+  };
+
+  const handlePopupDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  // 背景区域放置 - 移出文件夹
+  const handleBackdropDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    
     if (draggedFolderItem && dragFromFolder) {
       // 从文件夹中移除
       const newItems = items.map(item => {
@@ -294,11 +382,22 @@ export function ShortcutsContainer({
       if (updatedFolder && isShortcutFolder(updatedFolder)) {
         setOpenFolder(updatedFolder);
       }
+      
+      // 关闭弹窗
+      setOpenFolder(null);
     }
     
     setDraggedFolderItem(null);
     setDragFromFolder(null);
     setDragPosition(null);
+  };
+
+  const handleFolderItemDragEnd = () => {
+    // 清理状态，实际移出逻辑在 handleBackdropDrop 中处理
+    setDraggedFolderItem(null);
+    setDragFromFolder(null);
+    setDragPosition(null);
+    setFolderDragOverId(null);
   };
 
   // 计算容器尺寸
@@ -426,11 +525,27 @@ export function ShortcutsContainer({
         const popupWidth = popupCols * popupIconSize + (popupCols + 1) * popupGap;
         const popupHeight = popupRows * (popupIconSize + textHeight) + (popupRows + 1) * popupGap;
         
+        // 计算每个项目的位置
+        const getItemPosition = (index: number) => {
+          const col = index % popupCols;
+          const row = Math.floor(index / popupCols);
+          return {
+            x: col * (popupIconSize + popupGap),
+            y: row * (popupIconSize + textHeight + popupGap),
+          };
+        };
+        
+        // 内容区域尺寸（不含 padding）
+        const contentWidth = popupCols * popupIconSize + (popupCols - 1) * popupGap;
+        const contentHeight = popupRows * (popupIconSize + textHeight) + (popupRows - 1) * popupGap;
+        
         return (
           <div
             className="fixed inset-0 flex flex-col items-center justify-center z-50"
             style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(30px)' }}
             onClick={handleCloseFolder}
+            onDrop={handleBackdropDrop}
+            onDragOver={(e) => e.preventDefault()}
           >
             {/* 文件夹名称 */}
             <div className="mb-6">
@@ -450,42 +565,59 @@ export function ShortcutsContainer({
                 height: `${popupHeight}px`,
               }}
               onClick={(e) => e.stopPropagation()}
+              onDrop={handlePopupDrop}
+              onDragOver={handlePopupDragOver}
             >
               {openFolder.items.length > 0 ? (
                 <div
                   style={{
-                    display: 'grid',
-                    gridTemplateColumns: `repeat(${popupCols}, ${popupIconSize}px)`,
-                    gridAutoRows: `${popupIconSize + textHeight}px`,
-                    gap: `${popupGap}px`,
+                    position: 'relative',
+                    width: contentWidth,
+                    height: contentHeight,
                   }}
                 >
-                  {openFolder.items.slice(0, popupCols * popupRows).map((item) => (
-                    <div
-                      key={item.id}
-                      draggable
-                      onDragStart={(e) => handleFolderItemDragStart(e, item, openFolder.id)}
-                      onDrag={handleFolderItemDrag}
-                      onDragEnd={handleFolderItemDragEnd}
-                      onClick={() => window.open(item.url, '_blank')}
-                      className="flex flex-col items-center gap-1 cursor-pointer group"
-                      style={{ opacity: draggedFolderItem?.id === item.id ? 0.3 : 1 }}
-                    >
-                      <div 
-                        className="rounded-2xl overflow-hidden bg-white shadow group-hover:scale-105 transition-transform"
-                        style={{ width: `${popupIconSize}px`, height: `${popupIconSize}px` }}
+                  {openFolder.items.slice(0, popupCols * popupRows).map((item, index) => {
+                    const pos = getItemPosition(index);
+                    const isDragging = draggedFolderItem?.id === item.id;
+                    
+                    return (
+                      <div
+                        key={item.id}
+                        draggable
+                        onDragStart={(e) => handleFolderItemDragStart(e, item, openFolder.id)}
+                        onDrag={handleFolderItemDrag}
+                        onDragEnd={handleFolderItemDragEnd}
+                        onDragOver={(e) => handleFolderItemDragOver(e, item.id)}
+                        onClick={() => window.open(item.url, '_blank')}
+                        className="flex flex-col items-center gap-1 cursor-pointer group"
+                        style={{ 
+                          position: 'absolute',
+                          left: 0,
+                          top: 0,
+                          width: popupIconSize,
+                          height: popupIconSize + textHeight,
+                          transform: `translate(${pos.x}px, ${pos.y}px)`,
+                          transition: draggedFolderItem ? 'transform 0.2s ease-out' : 'none',
+                          opacity: isDragging ? 0.3 : 1,
+                          zIndex: isDragging ? 0 : 1,
+                        }}
                       >
-                        <img
-                          src={item.icon}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                        />
+                        <div 
+                          className="rounded-2xl overflow-hidden bg-white shadow group-hover:scale-105 transition-transform"
+                          style={{ width: `${popupIconSize}px`, height: `${popupIconSize}px` }}
+                        >
+                          <img
+                            src={item.icon}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <span className="text-gray-700 text-xs truncate w-full text-center">
+                          {item.name}
+                        </span>
                       </div>
-                      <span className="text-gray-700 text-xs truncate w-full text-center">
-                        {item.name}
-                      </span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-gray-400 text-center py-8 text-sm">
