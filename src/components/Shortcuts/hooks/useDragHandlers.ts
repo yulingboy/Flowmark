@@ -33,6 +33,8 @@ export function createDragHandlers({
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
     setAnimatingItemId(null);
+    // 防止拖拽时出现滚动条
+    document.body.style.overflow = 'hidden';
   };
 
   // 拖拽移动 - 检测是否悬停在文件夹上
@@ -84,6 +86,8 @@ export function createDragHandlers({
     
     setActiveId(null);
     setDragOverFolderId(null);
+    // 恢复滚动条
+    document.body.style.overflow = '';
 
     const draggedItem = itemsMap.get(draggedItemId);
     if (!draggedItem) return;
@@ -216,9 +220,19 @@ export function createDragHandlers({
     }
   };
 
+  // 拖拽取消
+  const handleDragCancel = () => {
+    setActiveId(null);
+    setDragOverFolderId(null);
+    setAnimatingItemId(null);
+    // 恢复滚动条
+    document.body.style.overflow = '';
+  };
+
   return {
     handleDragStart,
     handleDragMove,
     handleDragEnd,
+    handleDragCancel,
   };
 }

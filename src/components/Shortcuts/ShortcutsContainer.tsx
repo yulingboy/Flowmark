@@ -63,7 +63,7 @@ export function ShortcutsContainer({
   const activeItemSize = activeItem ? getItemSize(activeItem, unit, gap) : null;
 
   // 创建拖拽处理函数
-  const { handleDragStart, handleDragMove, handleDragEnd } = createDragHandlers({
+  const { handleDragStart, handleDragMove, handleDragEnd, handleDragCancel } = createDragHandlers({
     items,
     setItems,
     itemsMap,
@@ -104,6 +104,7 @@ export function ShortcutsContainer({
         onDragStart={handleDragStart}
         onDragMove={handleDragMove}
         onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
       >
         <div
           style={{
