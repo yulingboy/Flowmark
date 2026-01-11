@@ -2,11 +2,13 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { ShortcutItem, ShortcutSize, PluginCardItem } from '@/types';
 import { isShortcutFolder, isPluginCard } from '@/types';
+import { GRID } from '@/constants';
 
 import { SHORTCUTS_LIMIT } from './types';
 import type { ShortcutsState } from './types';
 import { validateAndRepairShortcuts } from './validation';
 import { createFolder, defaultShortcuts } from './defaults';
+import { GridManager, getGridSpan, gridToPixel } from '../utils/gridUtils';
 
 export const useShortcutsStore = create<ShortcutsState>()(
   persist(
@@ -38,10 +40,33 @@ export const useShortcutsStore = create<ShortcutsState>()(
 
       addPluginCard: (pluginId, name, icon, size = '2x2') => {
         const state = get();
+        // 检查是否已存在相同插件
         if (state.shortcuts.some(s => isPluginCard(s) && s.pluginId === pluginId)) return false;
+        // 检查数量限制
         if (state.shortcuts.length >= SHORTCUTS_LIMIT) return false;
         
-        const pluginCard: PluginCardItem = { id: `plugin-${pluginId}`, pluginId, name, icon, size, isPlugin: true };
+        // 使用 GridManager 检查是否有足够空间
+        const gridManager = new GridManager(GRID.COLUMNS, GRID.ROWS, GRID.UNIT, GRID.GAP);
+        gridManager.initFromItems(state.shortcuts);
+        
+        const { colSpan, rowSpan } = getGridSpan(size);
+        const position = gridManager.findNearestAvailable(0, 0, colSpan, rowSpan);
+        
+        // 如果找不到可用位置，返回 false
+        if (!position) return false;
+        
+        // 将网格坐标转换为像素坐标
+        const pixelPosition = gridToPixel(position.col, position.row, GRID.UNIT, GRID.GAP);
+        
+        const pluginCard: PluginCardItem = { 
+          id: `plugin-${pluginId}`, 
+          pluginId, 
+          name, 
+          icon, 
+          size, 
+          position: pixelPosition,
+          isPlugin: true 
+        };
         set({ shortcuts: [...state.shortcuts, pluginCard] });
         return true;
       },

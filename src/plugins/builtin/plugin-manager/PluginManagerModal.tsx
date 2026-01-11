@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { pluginManager } from '../../core/pluginManager';
 import { useShortcutsStore } from '@/features/shortcuts';
 import { isPluginCard } from '../../types';
@@ -10,7 +11,7 @@ const PluginIcon = ({ className = '' }: { className?: string }) => (
   </svg>
 );
 
-function PluginItem({ plugin }: { plugin: Plugin }) {
+function PluginItem({ plugin, onError }: { plugin: Plugin; onError: (msg: string) => void }) {
   const shortcuts = useShortcutsStore(state => state.shortcuts);
   const addPluginCard = useShortcutsStore(state => state.addPluginCard);
   const deleteItem = useShortcutsStore(state => state.deleteItem);
@@ -21,12 +22,15 @@ function PluginItem({ plugin }: { plugin: Plugin }) {
     if (isOnDesktop) {
       deleteItem(`plugin-${plugin.metadata.id}`);
     } else {
-      addPluginCard(
+      const success = addPluginCard(
         plugin.metadata.id,
         plugin.metadata.name,
         plugin.metadata.icon || '🔌',
         plugin.defaultSize || '2x2'
       );
+      if (!success) {
+        onError('桌面空间不足，无法添加插件');
+      }
     }
   };
 
@@ -62,9 +66,22 @@ function PluginItem({ plugin }: { plugin: Plugin }) {
 
 export function PluginManagerModal() {
   const plugins = pluginManager.getPlugins().filter(p => p.metadata.id !== 'plugin-manager');
+  const [error, setError] = useState<string | null>(null);
+
+  const handleError = (msg: string) => {
+    setError(msg);
+    setTimeout(() => setError(null), 3000);
+  };
 
   return (
-    <div className="p-6 min-h-full">
+    <div className="p-6 min-h-full relative">
+      {/* 错误提示 */}
+      {error && (
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-lg text-sm shadow-lg z-10">
+          {error}
+        </div>
+      )}
+      
       {plugins.length === 0 ? (
         <div className="text-center text-gray-400 py-16">
           <PluginIcon className="w-16 h-16 mx-auto mb-3 text-gray-300" />
@@ -73,7 +90,7 @@ export function PluginManagerModal() {
       ) : (
         <div className="grid grid-cols-3 gap-4">
           {plugins.map(plugin => (
-            <PluginItem key={plugin.metadata.id} plugin={plugin} />
+            <PluginItem key={plugin.metadata.id} plugin={plugin} onError={handleError} />
           ))}
         </div>
       )}
