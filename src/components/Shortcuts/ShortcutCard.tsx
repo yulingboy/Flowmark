@@ -46,16 +46,16 @@ export function ShortcutCard({ item, onClick, className = '' }: ShortcutCardProp
             }}
           />
           
-          {/* 打开方式标识 - 右下角 */}
-          <div className="absolute bottom-1 right-1">
+          {/* 打开方式标识 - 右下角贴边 */}
+          <div className="absolute bottom-0 right-0">
             {isPopupMode ? (
-              <div className="w-5 h-5 rounded-md bg-purple-500/90 flex items-center justify-center shadow-sm" title="弹窗打开">
+              <div className="w-5 h-5 rounded-tl-md bg-purple-500 flex items-center justify-center" title="弹窗打开">
                 <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                 </svg>
               </div>
             ) : (
-              <div className="w-5 h-5 rounded-md bg-blue-500/90 flex items-center justify-center shadow-sm" title="新标签页打开">
+              <div className="w-5 h-5 rounded-tl-md bg-blue-500 flex items-center justify-center" title="新标签页打开">
                 <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
