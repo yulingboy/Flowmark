@@ -23,7 +23,6 @@ interface ShortcutsContainerProps {
   onShortcutsChange?: (shortcuts: ShortcutEntry[]) => void;
   onEditShortcut?: (item: ShortcutItem) => void;
   onDeleteShortcut?: (item: ShortcutItem) => void;
-  onResizeShortcut?: (item: ShortcutItem, size: ShortcutSize) => void;
   className?: string;
   columns?: number;
   rows?: number;
@@ -36,7 +35,6 @@ export function ShortcutsContainer({
   onShortcutsChange,
   onEditShortcut,
   onDeleteShortcut,
-  onResizeShortcut,
   className = '',
   columns = 4,
   rows = 3,
@@ -101,6 +99,18 @@ export function ShortcutsContainer({
     onShortcutsChange,
   });
 
+  // 调整标签大小（在内部处理，保留位置信息）
+  const handleResizeShortcut = (item: ShortcutItem, size: ShortcutSize) => {
+    const newItems = items.map(s => {
+      if (s.id === item.id && !isShortcutFolder(s)) {
+        return { ...s, size };
+      }
+      return s;
+    });
+    setItems(newItems);
+    onShortcutsChange?.(newItems);
+  };
+
   // 计算容器尺寸（基于配置的行列数）
   const containerWidth = columns * unit + (columns - 1) * gap;
   const containerHeight = rows * unit + (rows - 1) * gap;
@@ -137,7 +147,7 @@ export function ShortcutsContainer({
                 onOpen={handleFolderOpen}
                 onEdit={onEditShortcut}
                 onDelete={onDeleteShortcut}
-                onResize={onResizeShortcut}
+                onResize={handleResizeShortcut}
                 isDropTarget={isDropTarget}
                 isDragging={isDragging}
                 shouldAnimate={animatingItemId === entry.id}
