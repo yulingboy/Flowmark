@@ -44,13 +44,22 @@ export const STATUS_NAMES: Record<PomodoroStatus, string> = {
   paused: '已暂停',
 };
 
-/** 状态颜色 */
+/** 状态颜色 - 简约风格 */
 export const STATUS_COLORS: Record<PomodoroStatus, string> = {
-  idle: 'from-gray-500 to-gray-600',
-  working: 'from-red-500 to-orange-500',
-  shortBreak: 'from-green-500 to-teal-500',
-  longBreak: 'from-blue-500 to-indigo-500',
-  paused: 'from-yellow-500 to-amber-500',
+  idle: 'bg-black/20',
+  working: 'bg-black/20',
+  shortBreak: 'bg-black/20',
+  longBreak: 'bg-black/20',
+  paused: 'bg-black/20',
+};
+
+/** 状态强调色 */
+export const STATUS_ACCENT: Record<PomodoroStatus, string> = {
+  idle: '#6b7280',
+  working: '#ef4444',
+  shortBreak: '#22c55e',
+  longBreak: '#3b82f6',
+  paused: '#eab308',
 };
 
 /** 格式化时间 */

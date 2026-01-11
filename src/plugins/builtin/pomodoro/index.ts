@@ -10,7 +10,7 @@ export const pomodoroPlugin: Plugin = {
     version: '1.0.0',
     description: '番茄工作法计时器，帮助你专注工作',
     author: 'Built-in',
-    icon: '🍅'
+    icon: 'timer'
   },
 
   supportedSizes: ['1x1', '2x2', '2x4'],
