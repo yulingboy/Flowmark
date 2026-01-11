@@ -22,10 +22,12 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@tailwindcss/vite": "^4.1.18",
     "antd": "^6.1.4",
+    "lucide-react": "^0.562.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-draggable": "^4.5.0",
     "tailwindcss": "^4.1.18",
+    "tyme4ts": "^1.4.0",
     "zustand": "^5.0.9"
   },
   "devDependencies": {
