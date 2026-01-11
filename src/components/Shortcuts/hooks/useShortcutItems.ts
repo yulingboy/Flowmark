@@ -63,20 +63,4 @@ export function useShortcutItems({ shortcuts, columns, unit, gap }: UseShortcutI
   };
 }
 
-// 计算容器尺寸
-export function useContainerSize(
-  items: ShortcutEntry[], 
-  _unit: number, 
-  gap: number,
-  getItemSize: (item: ShortcutEntry) => { width: number; height: number }
-) {
-  let maxX = 800;
-  let maxY = 400;
-  items.forEach((item) => {
-    const pos = item.position || { x: 0, y: 0 };
-    const size = getItemSize(item);
-    maxX = Math.max(maxX, pos.x + size.width + gap);
-    maxY = Math.max(maxY, pos.y + size.height + gap);
-  });
-  return { width: maxX, height: maxY };
-}
+

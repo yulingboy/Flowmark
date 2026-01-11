@@ -49,19 +49,3 @@ export interface ClockData {
 
 // 搜索引擎类型
 export type SearchEngine = 'bing' | 'google' | 'baidu';
-
-// 创建文件夹的工厂函数（默认名称为"新文件夹"）
-export function createShortcutFolder(
-  id: string,
-  items: ShortcutItem[] = [],
-  name: string = '新文件夹',
-  size: ShortcutSize = '1x1'
-): ShortcutFolder {
-  return {
-    id,
-    name,
-    items,
-    isFolder: true,
-    size,
-  };
-}
