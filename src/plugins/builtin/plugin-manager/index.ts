@@ -9,7 +9,8 @@ export const pluginManagerPlugin: Plugin = {
     name: '插件市场',
     version: '1.0.0',
     description: '发现更多插件',
-    author: 'Built-in'
+    author: 'Built-in',
+    icon: 'package'
   },
   
   supportedSizes: ['1x1', '2x2'],
@@ -18,8 +19,8 @@ export const pluginManagerPlugin: Plugin = {
   // 系统插件，不可删除
   isSystem: true,
   
-  // 更大的弹窗
-  modalSize: { width: 720, height: 560 },
+  // 更紧凑的弹窗
+  modalSize: { width: 420, height: 400 },
   
   renderCard: (_api, size) => React.createElement(PluginManagerCard, { size }),
   renderModal: () => React.createElement(PluginManagerModal)

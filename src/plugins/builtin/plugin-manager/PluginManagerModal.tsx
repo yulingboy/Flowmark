@@ -1,4 +1,5 @@
-import { Card, Button, Empty, message } from 'antd';
+import { Button, Empty } from 'antd';
+import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import { pluginManager } from '../../core/pluginManager';
 import { useShortcutsStore } from '@/features/shortcuts';
 import { isPluginCard } from '../../types';
@@ -14,52 +15,36 @@ function PluginItem({ plugin }: { plugin: Plugin }) {
   const handleToggle = () => {
     if (isOnDesktop) {
       deleteItem(`plugin-${plugin.metadata.id}`);
-      message.success('已移除插件');
     } else {
-      const success = addPluginCard(
+      addPluginCard(
         plugin.metadata.id,
         plugin.metadata.name,
-        plugin.metadata.icon || '🔌',
+        plugin.metadata.icon || 'puzzle',
         plugin.defaultSize || '2x2',
         plugin.supportedSizes as PluginSize[]
       );
-      if (success) {
-        message.success('已添加插件');
-      } else {
-        message.warning('桌面空间不足，无法添加插件');
-      }
     }
   };
 
   return (
-    <Card
-      hoverable
-      cover={
-        <div className="h-32 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-          <span className="text-6xl">{plugin.metadata.icon || '🔌'}</span>
-        </div>
-      }
-      styles={{ body: { padding: 16 } }}
-    >
-      <Card.Meta
-        title={<span className="text-center block">{plugin.metadata.name}</span>}
-        description={
-          plugin.metadata.description && (
-            <p className="text-xs text-gray-400 text-center line-clamp-2">
-              {plugin.metadata.description}
-            </p>
-          )
-        }
-      />
+    <div className="flex items-center justify-between gap-3 p-3 bg-white rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
+      <div className="flex-1 min-w-0">
+        <h3 className="text-sm font-medium truncate">{plugin.metadata.name}</h3>
+        {plugin.metadata.description && (
+          <p className="text-xs text-gray-400 truncate mt-0.5">
+            {plugin.metadata.description}
+          </p>
+        )}
+      </div>
       <Button
-        block
+        size="small"
         type={isOnDesktop ? 'default' : 'primary'}
+        icon={isOnDesktop ? <MinusOutlined /> : <PlusOutlined />}
         onClick={handleToggle}
-        className="mt-3"
       >
         {isOnDesktop ? '移除' : '添加'}
       </Button>
-    </Card>
+    </div>
   );
 }
 
@@ -68,15 +53,15 @@ export function PluginManagerModal() {
 
   if (plugins.length === 0) {
     return (
-      <div className="p-6 min-h-full flex items-center justify-center">
+      <div className="h-full flex items-center justify-center">
         <Empty description="暂无可用插件" />
       </div>
     );
   }
 
   return (
-    <div className="p-6 min-h-full">
-      <div className="grid grid-cols-3 gap-4">
+    <div className="h-full p-3 overflow-y-auto bg-gray-50">
+      <div className="flex flex-col gap-2">
         {plugins.map(plugin => (
           <PluginItem key={plugin.metadata.id} plugin={plugin} />
         ))}
