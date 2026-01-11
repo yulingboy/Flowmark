@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Clock } from '@/components/Clock/Clock';
 import { Search } from '@/components/Search/Search';
-import { ShortcutsContainer, AddShortcutModal, BatchEditToolbar } from '@/components/Shortcuts';
+import { ShortcutsContainer, AddShortcutModal, AddFolderModal, BatchEditToolbar } from '@/components/Shortcuts';
 import { Background } from '@/components/Background/Background';
-import { SettingsButton, SettingsPanel } from '@/components/Settings';
+import { SettingsButton, SettingsPanel, WallpaperModal } from '@/components/Settings';
 import { ContextMenu } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -51,11 +51,13 @@ const SettingsIcon = () => (
 function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAddShortcutOpen, setIsAddShortcutOpen] = useState(false);
+  const [isAddFolderOpen, setIsAddFolderOpen] = useState(false);
+  const [isWallpaperOpen, setIsWallpaperOpen] = useState(false);
   const [editingShortcut, setEditingShortcut] = useState<ShortcutItem | null>(null);
   const [contextMenu, setContextMenu] = useState({ isOpen: false, x: 0, y: 0 });
   
   const { backgroundUrl, showClock, showSearch, showShortcuts, autoFocusSearch } = useSettingsStore();
-  const { shortcuts, setShortcuts, updateShortcut, addShortcut, deleteShortcut, batchEditMode, toggleBatchEdit } = useShortcutsStore();
+  const { shortcuts, setShortcuts, updateShortcut, addShortcut, addFolder, deleteShortcut, batchEditMode, toggleBatchEdit } = useShortcutsStore();
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -80,8 +82,8 @@ function App() {
 
   const contextMenuItems: ContextMenuItem[] = [
     { icon: <AddIcon />, label: '添加标签', onClick: () => setIsAddShortcutOpen(true) },
-    { icon: <FolderIcon />, label: '新文件夹', onClick: () => console.log('新文件夹') },
-    { icon: <WallpaperIcon />, label: '更换壁纸', onClick: () => console.log('更换壁纸'), rightIcon: <RefreshIcon /> },
+    { icon: <FolderIcon />, label: '新文件夹', onClick: () => setIsAddFolderOpen(true) },
+    { icon: <WallpaperIcon />, label: '更换壁纸', onClick: () => setIsWallpaperOpen(true), rightIcon: <RefreshIcon /> },
     { icon: <EditIcon />, label: '批量编辑', onClick: () => toggleBatchEdit() },
     { icon: <SettingsIcon />, label: '设置', onClick: () => setIsSettingsOpen(true) },
   ];
@@ -95,6 +97,8 @@ function App() {
       <ContextMenu isOpen={contextMenu.isOpen} position={{ x: contextMenu.x, y: contextMenu.y }} items={contextMenuItems}
         onClose={() => setContextMenu(prev => ({ ...prev, isOpen: false }))} />
       <AddShortcutModal isOpen={isAddShortcutOpen} onClose={handleCloseModal} onSave={handleSaveShortcut} editItem={editingShortcut} />
+      <AddFolderModal isOpen={isAddFolderOpen} onClose={() => setIsAddFolderOpen(false)} onSave={addFolder} />
+      <WallpaperModal isOpen={isWallpaperOpen} onClose={() => setIsWallpaperOpen(false)} />
       
       {showClock && <Clock />}
       {showSearch && <Search placeholder="搜索内容" inputRef={searchRef} />}

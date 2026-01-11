@@ -33,6 +33,7 @@ interface ShortcutsState {
   // Actions
   setShortcuts: (shortcuts: ShortcutEntry[]) => void;
   addShortcut: (shortcut: Omit<ShortcutItem, 'id'>) => void;
+  addFolder: (name: string) => void;
   updateShortcut: (id: string, data: Partial<ShortcutItem>) => void;
   deleteShortcut: (id: string) => void;
   resizeShortcut: (id: string, size: ShortcutSize) => void;
@@ -64,6 +65,10 @@ export const useShortcutsStore = create<ShortcutsState>()(
           id: `shortcut-${Date.now()}`,
           size: shortcut.size || '1x1',
         }],
+      })),
+
+      addFolder: (name) => set((state) => ({
+        shortcuts: [...state.shortcuts, createShortcutFolder(`folder-${Date.now()}`, [], name, '2x2')],
       })),
 
       updateShortcut: (id, data) => set((state) => ({
