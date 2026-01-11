@@ -19,8 +19,7 @@ export const pluginManagerPlugin: Plugin = {
   // 系统插件，不可删除
   isSystem: true,
   
-  // 更紧凑的弹窗
-  modalSize: { width: 420, height: 400 },
+  modalSize: { width: 640, height: 480 },
   
   renderCard: (_api, size) => React.createElement(PluginManagerCard, { size }),
   renderModal: () => React.createElement(PluginManagerModal)
