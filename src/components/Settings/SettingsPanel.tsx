@@ -1,7 +1,8 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
-import { Menu } from 'antd';
+import { useState, useRef } from 'react';
+import { Modal, Menu } from 'antd';
 import { SettingOutlined, SearchOutlined, PictureOutlined, ClockCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { createPortal } from 'react-dom';
+import Draggable from 'react-draggable';
+import type { DraggableData, DraggableEvent } from 'react-draggable';
 import { GeneralSettings } from './tabs/GeneralSettings';
 import { SearchSettings } from './tabs/SearchSettings';
 import { WallpaperSettings } from './tabs/WallpaperSettings';
@@ -25,61 +26,21 @@ const menuItems = [
 
 export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
   const [activeTab, setActiveTab] = useState<SettingsTab>('general');
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const dragStartRef = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
+  const [disabled, setDisabled] = useState(true);
+  const [bounds, setBounds] = useState({ left: 0, top: 0, bottom: 0, right: 0 });
+  const draggleRef = useRef<HTMLDivElement>(null!);
 
-  // 重置位置
-  useEffect(() => {
-    if (isOpen) setPosition({ x: 0, y: 0 });
-  }, [isOpen]);
-
-  // 拖拽处理
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsDragging(true);
-    dragStartRef.current = { x: e.clientX, y: e.clientY, posX: position.x, posY: position.y };
-  }, [position]);
-
-  useEffect(() => {
-    if (!isDragging) return;
-    const handleMouseMove = (e: MouseEvent) => {
-      setPosition({
-        x: dragStartRef.current.posX + (e.clientX - dragStartRef.current.x),
-        y: dragStartRef.current.posY + (e.clientY - dragStartRef.current.y),
-      });
-    };
-    const handleMouseUp = () => setIsDragging(false);
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging]);
-
-  // 键盘和点击外部关闭
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    const handleClickOutside = (e: MouseEvent) => {
-      if (!isDragging && panelRef.current && !panelRef.current.contains(e.target as Node)) {
-        onClose();
-      }
-    };
-    if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen, onClose, isDragging]);
-
-  if (!isOpen) return null;
+  const onStart = (_event: DraggableEvent, uiData: DraggableData) => {
+    const { clientWidth, clientHeight } = window.document.documentElement;
+    const targetRect = draggleRef.current?.getBoundingClientRect();
+    if (!targetRect) return;
+    setBounds({
+      left: -targetRect.left + uiData.x,
+      right: clientWidth - (targetRect.right - uiData.x),
+      top: -targetRect.top + uiData.y,
+      bottom: clientHeight - (targetRect.bottom - uiData.y),
+    });
+  };
 
   const tabContent: Record<SettingsTab, React.ReactNode> = {
     general: <GeneralSettings />,
@@ -89,47 +50,48 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
     about: <AboutSettings />,
   };
 
-  return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div
-        ref={panelRef}
-        className="bg-white rounded-2xl shadow-2xl w-[720px] h-[520px] flex flex-col overflow-hidden"
-        style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
-      >
-        {/* Header - 可拖拽 */}
+  return (
+    <Modal
+      title={
         <div
-          className="flex items-center justify-between px-6 py-4 border-b border-gray-200 cursor-move select-none"
-          onMouseDown={handleMouseDown}
+          style={{ width: '100%', cursor: 'move' }}
+          onMouseOver={() => disabled && setDisabled(false)}
+          onMouseOut={() => setDisabled(true)}
+          onFocus={() => {}}
+          onBlur={() => {}}
         >
-          <h2 className="text-base font-semibold text-gray-800">
-            {menuItems.find(t => t.key === activeTab)?.label}
-          </h2>
-          <button
-            onClick={onClose}
-            onMouseDown={(e) => e.stopPropagation()}
-            className="p-1 rounded-full border-none bg-transparent cursor-pointer hover:bg-gray-100"
-          >
-            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          {menuItems.find(t => t.key === activeTab)?.label}
         </div>
-
-        {/* Body */}
-        <div className="flex flex-1 overflow-hidden">
-          <Menu
-            mode="inline"
-            selectedKeys={[activeTab]}
-            items={menuItems}
-            onClick={({ key }) => setActiveTab(key as SettingsTab)}
-            style={{ width: 180, height: '100%', borderRight: '1px solid #f0f0f0' }}
-          />
-          <div className="flex-1 p-6 overflow-y-auto">
-            {tabContent[activeTab]}
-          </div>
+      }
+      open={isOpen}
+      onCancel={onClose}
+      footer={null}
+      width={720}
+      styles={{ body: { padding: 0, height: 480 } }}
+      destroyOnHidden
+      modalRender={(modal) => (
+        <Draggable
+          disabled={disabled}
+          bounds={bounds}
+          nodeRef={draggleRef}
+          onStart={onStart}
+        >
+          <div ref={draggleRef}>{modal}</div>
+        </Draggable>
+      )}
+    >
+      <div className="flex h-[480px]">
+        <Menu
+          mode="inline"
+          selectedKeys={[activeTab]}
+          items={menuItems}
+          onClick={({ key }) => setActiveTab(key as SettingsTab)}
+          style={{ width: 180, height: '100%', borderRight: '1px solid #f0f0f0' }}
+        />
+        <div className="flex-1 p-6 overflow-y-auto">
+          {tabContent[activeTab]}
         </div>
       </div>
-    </div>,
-    document.body
+    </Modal>
   );
 }
