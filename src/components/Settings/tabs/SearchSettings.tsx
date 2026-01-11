@@ -1,5 +1,5 @@
 import { Button, Switch } from 'antd';
-import { useSettingsStore } from '@/stores/settingsStore';
+import { useSearchStore } from '@/stores/settings/searchStore';
 import { SEARCH_ENGINE_ICONS } from '@/utils/search';
 import { SettingRow } from '../SettingRow';
 import type { SearchEngine } from '@/types';
@@ -14,7 +14,7 @@ export function SearchSettings() {
   const {
     searchEngine, searchInNewTab, autoFocusSearch, showSearchSuggestions, searchHistoryEnabled,
     updateSearchEngine, updateSearchInNewTab, updateAutoFocusSearch, updateShowSearchSuggestions, updateSearchHistoryEnabled, clearSearchHistory,
-  } = useSettingsStore();
+  } = useSearchStore();
 
   return (
     <div>

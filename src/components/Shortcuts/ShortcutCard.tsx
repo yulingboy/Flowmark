@@ -5,7 +5,7 @@ import { IframeModal, ContextMenu } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
 import { EditOutlined, DeleteOutlined, FolderOutlined, RightOutlined } from '@ant-design/icons';
 import { OpenTabIcon, LayoutIcon, OpenModeIndicator } from '@/components/common/icons';
-import { useShortcutsStore } from '@/stores/shortcutsStore';
+import { useShortcutsStore } from '@/stores/shortcuts';
 
 interface ShortcutCardProps {
   item: ShortcutItem;

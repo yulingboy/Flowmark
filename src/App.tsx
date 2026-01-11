@@ -9,8 +9,10 @@ import { ContextMenu, ErrorBoundary } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
 import { PlusSquareOutlined, FolderOutlined, ReloadOutlined, EditOutlined, SettingOutlined } from '@ant-design/icons';
 import { WallpaperIcon } from '@/components/common/icons';
-import { useSettingsStore } from '@/stores/settingsStore';
-import { useShortcutsStore } from '@/stores/shortcutsStore';
+import { useGeneralStore } from '@/stores/settings/generalStore';
+import { useBackgroundStore } from '@/stores/settings/backgroundStore';
+import { useSearchStore } from '@/stores/settings/searchStore';
+import { useShortcutsStore } from '@/stores/shortcuts';
 import { registerBuiltinPlugins } from '@/plugins/builtin';
 
 import type { ShortcutItem } from '@/types';
@@ -28,8 +30,10 @@ function App() {
   const [editingShortcut, setEditingShortcut] = useState<ShortcutItem | null>(null);
   const [contextMenu, setContextMenu] = useState({ isOpen: false, x: 0, y: 0 });
   
-  const { backgroundUrl, showClock, showSearch, showShortcuts, autoFocusSearch } = useSettingsStore();
-  const { shortcuts, setShortcuts, updateShortcut, addShortcut, addFolder, deleteShortcut, batchEditMode, toggleBatchEdit } = useShortcutsStore();
+  const { backgroundUrl } = useBackgroundStore();
+  const { showClock, showSearch, showShortcuts } = useGeneralStore();
+  const { autoFocusSearch } = useSearchStore();
+  const { shortcuts, setShortcuts, updateShortcut, addShortcut, addFolder, deleteItem, batchEditMode, toggleBatchEdit } = useShortcutsStore();
   const searchRef = useRef<HTMLInputElement>(null);
 
   // 预加载背景图片
@@ -90,7 +94,7 @@ function App() {
 
   const handleEditShortcut = (item: ShortcutItem) => { setEditingShortcut(item); setIsAddShortcutOpen(true); };
   const handleCloseModal = () => { setIsAddShortcutOpen(false); setEditingShortcut(null); };
-  const handleDeleteShortcut = (item: ShortcutItem) => { deleteShortcut(item.id); message.success('快捷方式已删除'); };
+  const handleDeleteShortcut = (item: ShortcutItem) => { deleteItem(item.id); message.success('快捷方式已删除'); };
   const handleContextMenu = (e: React.MouseEvent) => { 
     e.preventDefault(); 
     // 如果有弹窗打开，不显示右键菜单

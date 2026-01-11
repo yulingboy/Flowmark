@@ -2,7 +2,7 @@ import { useDraggable } from '@dnd-kit/core';
 import { ShortcutCard } from './ShortcutCard';
 import { ShortcutFolder } from './ShortcutFolder';
 import { PluginCard } from '@/plugins';
-import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, ShortcutSize, Position, GridItem, PluginCardItem } from '@/types';
+import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, ShortcutSize, Position, GridItem } from '@/types';
 import { isShortcutFolder, isPluginCard } from '@/types';
 
 interface DraggableItemProps {
@@ -12,10 +12,8 @@ interface DraggableItemProps {
   onOpen?: (folder: ShortcutFolderType) => void;
   onEdit?: (item: ShortcutItem) => void;
   onDelete?: (item: ShortcutItem) => void;
-  onResize?: (item: ShortcutItem, size: ShortcutSize) => void;
-  onResizeFolder?: (folder: ShortcutFolderType, size: ShortcutSize) => void;
-  onResizePluginCard?: (item: PluginCardItem, size: ShortcutSize) => void;
-  onRemovePluginCard?: (item: PluginCardItem) => void;
+  onResize?: (item: GridItem, size: ShortcutSize) => void;
+  onRemove?: (item: GridItem) => void;
   isDropTarget: boolean;
   isDragging: boolean;
   shouldAnimate: boolean;
@@ -32,9 +30,7 @@ export function DraggableItem({
   onEdit,
   onDelete,
   onResize,
-  onResizeFolder,
-  onResizePluginCard,
-  onRemovePluginCard,
+  onRemove,
   isDropTarget,
   isDragging,
   shouldAnimate,
@@ -44,7 +40,7 @@ export function DraggableItem({
 }: DraggableItemProps) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: entry.id,
-    disabled: batchEditMode, // 只在批量编辑模式禁用拖拽，popup 模式通过 PointerSensor 的 distance 区分点击和拖拽
+    disabled: batchEditMode,
   });
 
   const style = {
@@ -67,14 +63,14 @@ export function DraggableItem({
         <ShortcutFolder
           folder={entry}
           onOpen={onOpen}
-          onResize={onResizeFolder}
+          onResize={(folder, s) => onResize?.(folder, s)}
           isDropTarget={isDropTarget}
         />
       ) : isPluginCard(entry) ? (
         <PluginCard
           item={entry}
-          onResize={onResizePluginCard}
-          onRemove={onRemovePluginCard}
+          onResize={(item, s) => onResize?.(item, s)}
+          onRemove={(item) => onRemove?.(item)}
           batchEditMode={batchEditMode}
           isSelected={isSelected}
           onToggleSelect={onToggleSelect}
@@ -84,7 +80,7 @@ export function DraggableItem({
           item={entry} 
           onEdit={onEdit}
           onDelete={onDelete}
-          onResize={onResize}
+          onResize={(item, s) => onResize?.(item, s)}
           batchEditMode={batchEditMode}
           isSelected={isSelected}
           onToggleSelect={onToggleSelect}

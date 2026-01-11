@@ -4,7 +4,7 @@ import { ContextMenu } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
 import { DeleteOutlined } from '@ant-design/icons';
 import { LayoutIcon, UnfoldIcon, EmptyFolderIcon } from '@/components/common/icons';
-import { useShortcutsStore } from '@/stores/shortcutsStore';
+import { useShortcutsStore } from '@/stores/shortcuts';
 
 interface ShortcutFolderProps {
   folder: ShortcutFolderType;
@@ -33,7 +33,7 @@ export function ShortcutFolder({ folder, onOpen, onResize, className = '', isDro
     isOpen: false, x: 0, y: 0,
   });
   const dissolveFolder = useShortcutsStore((state) => state.dissolveFolder);
-  const deleteShortcut = useShortcutsStore((state) => state.deleteShortcut);
+  const deleteItem = useShortcutsStore((state) => state.deleteItem);
 
   const size = folder.size || '1x1';
   const { cols, rows, maxItems } = getPreviewConfig(size);
@@ -66,7 +66,7 @@ export function ShortcutFolder({ folder, onOpen, onResize, className = '', isDro
     {
       icon: <DeleteOutlined />,
       label: '删除卡片',
-      onClick: () => deleteShortcut(folder.id),
+      onClick: () => deleteItem(folder.id),
     },
   ];
 

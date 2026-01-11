@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { Button, Slider, Input } from 'antd';
 import { CheckOutlined } from '@ant-design/icons';
-import { useSettingsStore } from '@/stores/settingsStore';
+import { useBackgroundStore } from '@/stores/settings/backgroundStore';
 import { PRESET_WALLPAPERS } from '@/constants';
 
 export function WallpaperSettings() {
   const { 
     backgroundUrl, backgroundBlur, backgroundOverlay,
     updateBackgroundUrl, updateBackgroundBlur, updateBackgroundOverlay, resetBackground 
-  } = useSettingsStore();
+  } = useBackgroundStore();
   const [showOnlineWallpapers, setShowOnlineWallpapers] = useState(false);
 
   return (

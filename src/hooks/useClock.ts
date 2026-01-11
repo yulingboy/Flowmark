@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { formatTime, formatDate, formatYear, getWeekday, getLunarDate } from '@/utils/clock';
-import { useSettingsStore } from '@/stores/settingsStore';
+import { useClockStore } from '@/stores/settings/clockStore';
+import { usePageVisibility } from './usePageVisibility';
 import type { ClockData } from '@/types';
 
 interface ExtendedClockData extends ClockData {
@@ -23,7 +24,10 @@ export function useClock(): ExtendedClockData {
     showYear,
     clockColor,
     clockFontSize,
-  } = useSettingsStore();
+  } = useClockStore();
+  
+  const isVisible = usePageVisibility();
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   
   const [clockData, setClockData] = useState<ClockData & { year: string }>(() => {
     const now = new Date();
@@ -36,22 +40,35 @@ export function useClock(): ExtendedClockData {
     };
   });
 
-  useEffect(() => {
-    const updateClock = () => {
-      const now = new Date();
-      setClockData({
-        time: formatTime(now, showSeconds, show24Hour),
-        date: formatDate(now),
-        year: formatYear(now),
-        weekday: getWeekday(now),
-        lunar: getLunarDate(now),
-      });
-    };
-
-    updateClock();
-    const interval = setInterval(updateClock, 1000);
-    return () => clearInterval(interval);
+  const updateClock = useCallback(() => {
+    const now = new Date();
+    setClockData({
+      time: formatTime(now, showSeconds, show24Hour),
+      date: formatDate(now),
+      year: formatYear(now),
+      weekday: getWeekday(now),
+      lunar: getLunarDate(now),
+    });
   }, [showSeconds, show24Hour]);
+
+  useEffect(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    
+    if (isVisible) {
+      updateClock();
+      intervalRef.current = setInterval(updateClock, 1000);
+    }
+    
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [isVisible, updateClock]);
 
   return { 
     ...clockData, 

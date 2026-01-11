@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSettingsStore } from '@/stores/settingsStore';
+import { useBackgroundStore } from '@/stores/settings/backgroundStore';
 
 interface BackgroundProps {
   imageUrl: string;
@@ -8,7 +8,7 @@ interface BackgroundProps {
 
 export function Background({ imageUrl, className = '' }: BackgroundProps) {
   const [hasError, setHasError] = useState(false);
-  const { backgroundBlur, backgroundOverlay } = useSettingsStore();
+  const { backgroundBlur, backgroundOverlay } = useBackgroundStore();
 
   return (
     <div className={`fixed inset-0 -z-10 ${className}`}>

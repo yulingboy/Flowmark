@@ -1,12 +1,12 @@
 ﻿import { useState, useEffect } from 'react';
 import { Radio, ColorPicker, Button, Switch } from 'antd';
-import { useSettingsStore } from '@/stores/settingsStore';
+import { useClockStore } from '@/stores/settings/clockStore';
 
 export function DateTimeSettings() {
   const { 
     showSeconds, show24Hour, showLunar, showDate, showWeekday, showYear, clockColor, clockFontSize,
     updateShowSeconds, updateShow24Hour, updateShowLunar, updateShowDate, updateShowWeekday, updateShowYear, updateClockColor, updateClockFontSize,
-  } = useSettingsStore();
+  } = useClockStore();
 
   const [previewTime, setPreviewTime] = useState('');
   const [previewDate, setPreviewDate] = useState('');

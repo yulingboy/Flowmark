@@ -2,7 +2,7 @@ import type { PluginSize } from '../../types';
 import { useWeather } from './useWeather';
 
 export function WeatherCard({ size }: { size: PluginSize }) {
-  const { weather, loading, error, refresh, config } = useWeather();
+  const { weather, loading, error, refresh, config, cacheAge } = useWeather();
 
   if (loading && !weather) {
     return (
@@ -15,8 +15,8 @@ export function WeatherCard({ size }: { size: PluginSize }) {
   if (error && !weather) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
-        <span className="text-sm">{error}</span>
-        <button onClick={refresh} className="text-xs text-blue-400 mt-1">重试</button>
+        <span className="text-sm text-center px-2">{error}</span>
+        <button onClick={refresh} className="text-xs text-blue-400 mt-1 hover:text-blue-500">重试</button>
       </div>
     );
   }
@@ -41,6 +41,8 @@ export function WeatherCard({ size }: { size: PluginSize }) {
         </span>
         <span className="text-sm text-gray-500">{weather.city}</span>
         <span className="text-xs text-gray-400">{weather.condition}</span>
+        {cacheAge && <span className="text-xs text-gray-300">{cacheAge}</span>}
+        {error && <span className="text-xs text-orange-400">{error}</span>}
       </div>
     );
   }
@@ -61,6 +63,17 @@ export function WeatherCard({ size }: { size: PluginSize }) {
         <div>湿度: {weather.humidity}%</div>
         <div>风速: {weather.wind}</div>
         <div>{weather.condition}</div>
+      </div>
+      <div className="mt-2 flex items-center justify-between text-xs text-gray-400">
+        {cacheAge && <span>{cacheAge}</span>}
+        {error && <span className="text-orange-400">{error}</span>}
+        <button 
+          onClick={refresh} 
+          className="text-blue-400 hover:text-blue-500"
+          disabled={loading}
+        >
+          {loading ? '更新中...' : '刷新'}
+        </button>
       </div>
     </div>
   );

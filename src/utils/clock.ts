@@ -113,9 +113,22 @@ function getLunarMonthDays(year: number, month: number): number {
 }
 
 /**
- * 公历转农历
+ * 公历转农历（带缓存）
  */
+// 农历日期缓存
+const lunarCache = new Map<string, string>();
+
+function getLunarCacheKey(date: Date): string {
+  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+}
+
 export function getLunarDate(date: Date): string {
+  const cacheKey = getLunarCacheKey(date);
+  
+  // 检查缓存
+  const cached = lunarCache.get(cacheKey);
+  if (cached) return cached;
+  
   const baseDate = new Date(1900, 0, 31);
   let offset = Math.floor((date.getTime() - baseDate.getTime()) / 86400000);
 
@@ -161,5 +174,14 @@ export function getLunarDate(date: Date): string {
   const monthName = LUNAR_MONTHS[lunarMonth - 1] + '月';
   const dayName = LUNAR_DAYS[lunarDay - 1] || `${lunarDay}`;
 
-  return `${monthName}${dayName}`;
+  const result = `${monthName}${dayName}`;
+  
+  // 存入缓存（限制缓存大小）
+  if (lunarCache.size > 100) {
+    const firstKey = lunarCache.keys().next().value;
+    if (firstKey) lunarCache.delete(firstKey);
+  }
+  lunarCache.set(cacheKey, result);
+  
+  return result;
 }

@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { Modal, Tabs, Input, Button, Slider } from 'antd';
 import { UploadOutlined, CheckOutlined } from '@ant-design/icons';
-import { useSettingsStore } from '@/stores/settingsStore';
+import { useBackgroundStore } from '@/stores/settings/backgroundStore';
 import { PRESET_WALLPAPERS } from '@/constants';
 
 interface WallpaperModalProps {
@@ -13,7 +13,7 @@ export function WallpaperModal({ isOpen, onClose }: WallpaperModalProps) {
   const { 
     backgroundUrl, backgroundBlur, backgroundOverlay,
     updateBackgroundUrl, updateBackgroundBlur, updateBackgroundOverlay, resetBackground 
-  } = useSettingsStore();
+  } = useBackgroundStore();
   const [customUrl, setCustomUrl] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 

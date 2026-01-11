@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from 'antd';
 import type { ShortcutSize } from '@/types';
@@ -13,6 +13,7 @@ export interface ContextMenuItem {
   currentLayout?: ShortcutSize;
   onLayoutSelect?: (size: ShortcutSize) => void;
   submenuItems?: { id: string; label: string; onClick: () => void }[];
+  disabled?: boolean;
 }
 
 interface ContextMenuProps {
@@ -20,11 +21,72 @@ interface ContextMenuProps {
   position: { x: number; y: number };
   items: ContextMenuItem[];
   onClose: () => void;
+  ariaLabel?: string;
 }
 
-export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuProps) {
+export function ContextMenu({ isOpen, position, items, onClose, ariaLabel = '上下文菜单' }: ContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const [activeSubmenu, setActiveSubmenu] = useState<number | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+  const [menuPosition, setMenuPosition] = useState(position);
+
+  // 获取可选择的菜单项索引
+  const selectableIndices = items
+    .map((item, index) => ({ item, index }))
+    .filter(({ item }) => item.type !== 'layout' && !item.disabled)
+    .map(({ index }) => index);
+
+  // 键盘导航
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (!isOpen) return;
+
+    switch (e.key) {
+      case 'Escape':
+        e.preventDefault();
+        onClose();
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedIndex(prev => {
+          const currentPos = selectableIndices.indexOf(prev);
+          const nextPos = currentPos < selectableIndices.length - 1 ? currentPos + 1 : 0;
+          return selectableIndices[nextPos] ?? -1;
+        });
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedIndex(prev => {
+          const currentPos = selectableIndices.indexOf(prev);
+          const nextPos = currentPos > 0 ? currentPos - 1 : selectableIndices.length - 1;
+          return selectableIndices[nextPos] ?? -1;
+        });
+        break;
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        if (selectedIndex >= 0 && selectedIndex < items.length) {
+          const item = items[selectedIndex];
+          if (item && !item.disabled && item.type !== 'layout') {
+            item.onClick();
+            onClose();
+          }
+        }
+        break;
+      case 'ArrowRight':
+        if (selectedIndex >= 0 && items[selectedIndex]?.type === 'submenu') {
+          e.preventDefault();
+          setActiveSubmenu(selectedIndex);
+        }
+        break;
+      case 'ArrowLeft':
+        if (activeSubmenu !== null) {
+          e.preventDefault();
+          setActiveSubmenu(null);
+        }
+        break;
+    }
+  }, [isOpen, items, selectedIndex, selectableIndices, activeSubmenu, onClose]);
+
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -33,9 +95,6 @@ export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuPro
       }
     };
     const handleScroll = () => onClose();
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
 
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
@@ -47,9 +106,17 @@ export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuPro
       document.removeEventListener('scroll', handleScroll, true);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, handleKeyDown]);
 
-  // 调整位置，防止超出屏幕
+  // 重置选中状态
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedIndex(-1);
+      setActiveSubmenu(null);
+    }
+  }, [isOpen]);
+
+  // 调整位置，防止超出屏幕（带翻转逻辑）
   useEffect(() => {
     if (isOpen && menuRef.current) {
       const menu = menuRef.current;
@@ -59,13 +126,27 @@ export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuPro
 
       let x = position.x;
       let y = position.y;
-      if (x + rect.width > vw) x = vw - rect.width - 10;
-      if (y + rect.height > vh) y = vh - rect.height - 10;
+      
+      // 水平翻转：如果右边放不下，翻转到左边
+      if (x + rect.width > vw) {
+        x = Math.max(10, position.x - rect.width);
+      }
+      
+      // 垂直翻转：如果下边放不下，翻转到上边
+      if (y + rect.height > vh) {
+        y = Math.max(10, position.y - rect.height);
+      }
 
-      menu.style.left = `${x}px`;
-      menu.style.top = `${y}px`;
+      setMenuPosition({ x, y });
     }
   }, [isOpen, position]);
+
+  // 聚焦菜单以接收键盘事件
+  useEffect(() => {
+    if (isOpen && menuRef.current) {
+      menuRef.current.focus();
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -78,18 +159,21 @@ export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuPro
   ];
 
   const renderMenuItem = (item: ContextMenuItem, index: number) => {
+    const isSelected = selectedIndex === index;
+    const itemId = `context-menu-item-${index}`;
+
     if (item.type === 'layout') {
       const layoutSizes = item.layoutOptions 
         ? allLayoutSizes.filter(l => item.layoutOptions!.includes(l.size))
         : allLayoutSizes;
       
       return (
-        <div key={index} className="px-4 py-3">
+        <div key={index} className="px-4 py-3" role="presentation">
           <div className="flex items-center gap-3 mb-2">
             <span className="w-5 h-5 text-gray-600 flex items-center justify-center">{item.icon}</span>
             <span className="text-gray-800 text-sm">{item.label}</span>
           </div>
-          <div className="flex gap-2 ml-8">
+          <div className="flex gap-2 ml-8" role="group" aria-label="布局选项">
             {layoutSizes.map(({ size, cols, rows }) => (
               <Button 
                 key={size} 
@@ -98,6 +182,7 @@ export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuPro
                 onClick={() => { item.onLayoutSelect?.(size); onClose(); }}
                 className="!w-8 !h-8 !p-0"
                 title={size}
+                aria-pressed={item.currentLayout === size}
               >
                 <div className="grid gap-0.5" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }}>
                   {Array.from({ length: cols * rows }).map((_, i) => (
@@ -111,37 +196,56 @@ export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuPro
       );
     }
 
+
     if (item.type === 'submenu' && item.submenuItems) {
       return (
-        <div key={index} className="relative"
-          onMouseEnter={() => setActiveSubmenu(index)}
+        <div 
+          key={index} 
+          className="relative"
+          role="menuitem"
+          id={itemId}
+          aria-haspopup="true"
+          aria-expanded={activeSubmenu === index}
+          aria-disabled={item.disabled}
+          onMouseEnter={() => { setActiveSubmenu(index); setSelectedIndex(index); }}
           onMouseLeave={(e) => {
             const relatedTarget = e.relatedTarget as HTMLElement;
             if (relatedTarget?.closest('.submenu-panel')) return;
             setActiveSubmenu(null);
-          }}>
-          <div className="w-full px-4 py-3 flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
+          }}
+        >
+          <div 
+            className={`w-full px-4 py-3 flex items-center gap-3 transition-colors cursor-pointer ${
+              isSelected ? 'bg-black/10' : 'hover:bg-black/5'
+            } ${item.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            tabIndex={-1}
+          >
             <span className="w-5 h-5 text-gray-600 flex items-center justify-center">{item.icon}</span>
             <span className="flex-1 text-gray-800 text-sm">{item.label}</span>
             {item.rightIcon && <span className="w-5 h-5 text-gray-500 flex items-center justify-center">{item.rightIcon}</span>}
           </div>
           {activeSubmenu === index && (
-            <div className="submenu-panel absolute left-full top-0 min-w-[140px] py-2 rounded-xl shadow-xl"
+            <div 
+              className="submenu-panel absolute left-full top-0 min-w-[140px] py-2 rounded-xl shadow-xl"
               style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.5)', marginLeft: '-4px', paddingLeft: '4px' }}
+              role="menu"
+              aria-label={item.label}
               onMouseEnter={() => setActiveSubmenu(index)}
-              onMouseLeave={() => setActiveSubmenu(null)}>
+              onMouseLeave={() => setActiveSubmenu(null)}
+            >
               {item.submenuItems.length > 0 ? item.submenuItems.map((sub) => (
                 <Button 
                   key={sub.id} 
                   type="text"
                   block
+                  role="menuitem"
                   onClick={(e) => { e.stopPropagation(); sub.onClick(); onClose(); }}
                   className="!text-left !justify-start !px-4 !py-2 !h-auto"
                 >
                   {sub.label}
                 </Button>
               )) : (
-                <div className="px-4 py-2 text-sm text-gray-400">暂无文件夹</div>
+                <div className="px-4 py-2 text-sm text-gray-400" role="menuitem" aria-disabled="true">暂无文件夹</div>
               )}
             </div>
           )}
@@ -151,9 +255,21 @@ export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuPro
 
     return (
       <div 
-        key={index} 
-        onClick={() => { item.onClick(); onClose(); }}
-        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer"
+        key={index}
+        id={itemId}
+        role="menuitem"
+        aria-disabled={item.disabled}
+        tabIndex={isSelected ? 0 : -1}
+        onClick={() => { 
+          if (!item.disabled) {
+            item.onClick(); 
+            onClose(); 
+          }
+        }}
+        onMouseEnter={() => setSelectedIndex(index)}
+        className={`w-full px-4 py-3 flex items-center gap-3 transition-colors cursor-pointer ${
+          isSelected ? 'bg-black/10' : 'hover:bg-black/5'
+        } ${item.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         <span className="w-5 h-5 text-gray-600 flex items-center justify-center">{item.icon}</span>
         <span className="flex-1 text-gray-800 text-sm">{item.label}</span>
@@ -163,8 +279,21 @@ export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuPro
   };
 
   return createPortal(
-    <div ref={menuRef} className="fixed z-[200] min-w-[180px] py-2 rounded-2xl shadow-2xl"
-      style={{ left: position.x, top: position.y, backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.3)' }}>
+    <div 
+      ref={menuRef} 
+      className="fixed z-[200] min-w-[180px] py-2 rounded-2xl shadow-2xl outline-none"
+      style={{ 
+        left: menuPosition.x, 
+        top: menuPosition.y, 
+        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+        backdropFilter: 'blur(20px)', 
+        border: '1px solid rgba(255, 255, 255, 0.3)' 
+      }}
+      role="menu"
+      aria-label={ariaLabel}
+      aria-activedescendant={selectedIndex >= 0 ? `context-menu-item-${selectedIndex}` : undefined}
+      tabIndex={-1}
+    >
       {items.map(renderMenuItem)}
     </div>,
     document.body

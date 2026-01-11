@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 import { Modal, message } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { useShortcutsStore } from '@/stores/shortcutsStore';
+import { useShortcutsStore } from '@/stores/shortcuts';
 import { isShortcutFolder } from '@/types';
 import { DeleteOutlined, CloseOutlined, FolderOutlined } from '@ant-design/icons';
 
 export function BatchEditToolbar() {
-  const { shortcuts, selectedIds, batchDelete, batchMoveToFolder, toggleBatchEdit, selectAll, clearSelection } = useShortcutsStore();
+  const { shortcuts, selectedIds, deleteItem, batchMoveToFolder, toggleBatchEdit, selectAll, clearSelection } = useShortcutsStore();
   const selectedCount = selectedIds.size;
 
   const folders = useMemo(() => 
@@ -24,7 +24,7 @@ export function BatchEditToolbar() {
       cancelText: '取消',
       okButtonProps: { danger: true },
       onOk: () => {
-        batchDelete();
+        deleteItem([...selectedIds]);
         message.success('已删除');
       },
     });

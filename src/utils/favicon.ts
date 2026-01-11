@@ -1,13 +1,12 @@
 /**
- * 使用 Google Favicon 服务获取网站图标
- * @param url 网站 URL
- * @param size 图标大小 (16, 32, 64, 128, 256)
+ * 图标服务入口
+ * 重新导出增强的图标服务功能
  */
-export function getFaviconUrl(url: string, size: number = 64): string {
-  try {
-    const domain = new URL(url).hostname;
-    return `https://www.google.com/s2/favicons?domain=${domain}&sz=${size}`;
-  } catch {
-    return `https://www.google.com/s2/favicons?domain=${url}&sz=${size}`;
-  }
-}
+export { 
+  getFaviconUrl, 
+  getFaviconUrlAsync,
+  generatePlaceholder,
+  preloadFavicons,
+  clearFaviconCache,
+  getCacheStats,
+} from './faviconService';

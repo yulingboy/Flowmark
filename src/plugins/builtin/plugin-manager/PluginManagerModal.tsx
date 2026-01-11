@@ -1,5 +1,5 @@
 import { pluginManager } from '../../core/pluginManager';
-import { useShortcutsStore } from '@/stores/shortcutsStore';
+import { useShortcutsStore } from '@/stores/shortcuts';
 import { isPluginCard } from '../../types';
 import type { Plugin } from '../../types';
 
@@ -13,13 +13,13 @@ const PluginIcon = ({ className = '' }: { className?: string }) => (
 function PluginItem({ plugin }: { plugin: Plugin }) {
   const shortcuts = useShortcutsStore(state => state.shortcuts);
   const addPluginCard = useShortcutsStore(state => state.addPluginCard);
-  const removePluginCard = useShortcutsStore(state => state.removePluginCard);
+  const deleteItem = useShortcutsStore(state => state.deleteItem);
   
   const isOnDesktop = shortcuts.some(s => isPluginCard(s) && s.pluginId === plugin.metadata.id);
 
   const handleToggle = () => {
     if (isOnDesktop) {
-      removePluginCard(`plugin-${plugin.metadata.id}`);
+      deleteItem(`plugin-${plugin.metadata.id}`);
     } else {
       addPluginCard(
         plugin.metadata.id,
