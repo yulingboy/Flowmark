@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import type { ShortcutItem, ShortcutSize } from '@/types';
 import { isShortcutFolder } from '@/types';
 import { IframeModal, ContextMenu } from '@/components/common';
@@ -27,27 +27,12 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
   const shortcuts = useShortcutsStore((state) => state.shortcuts);
   const moveToFolder = useShortcutsStore((state) => state.moveToFolder);
   const isPopupMode = item.openMode === 'popup';
-  const size = item.size || '1x1';
-  const is1x1 = size === '1x1';
+  const is1x1 = (item.size || '1x1') === '1x1';
 
   // 根据尺寸计算图标样式
-  const getIconStyle = useCallback(() => {
-    if (is1x1) {
-      return { className: 'w-full h-full object-cover', style: {} };
-    }
-    // 非1x1尺寸：图标居中显示，保持原比例
-    return { 
-      className: 'object-contain', 
-      style: { 
-        width: '64px', 
-        height: '64px',
-        maxWidth: '50%',
-        maxHeight: '50%',
-      } 
-    };
-  }, [is1x1]);
-
-  const iconStyle = getIconStyle();
+  const iconStyle = is1x1
+    ? { className: 'w-full h-full object-cover', style: {} }
+    : { className: 'object-contain', style: { width: '64px', height: '64px', maxWidth: '50%', maxHeight: '50%' } };
 
   const folders = useMemo(() => 
     shortcuts.filter(isShortcutFolder).map((f) => ({ id: f.id, name: f.name })),
