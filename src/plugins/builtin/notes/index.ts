@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Plugin, PluginSize } from '../../types';
-import { NotesCard, NotesModal } from './NotesWidget';
+import { NotesCard } from './NotesCard';
+import { NotesModal } from './NotesModal';
 
 export const notesPlugin: Plugin = {
   metadata: {

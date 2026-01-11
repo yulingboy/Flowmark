@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Plugin } from '../../types';
-import { PluginManagerCard, PluginManagerModal } from './PluginManagerWidget';
+import { PluginManagerCard } from './PluginManagerCard';
+import { PluginManagerModal } from './PluginManagerModal';
 
 export const pluginManagerPlugin: Plugin = {
   metadata: {
@@ -20,6 +21,6 @@ export const pluginManagerPlugin: Plugin = {
   // 更大的弹窗
   modalSize: { width: 720, height: 560 },
   
-  renderCard: (api, size) => React.createElement(PluginManagerCard, { api, size }),
-  renderModal: (api) => React.createElement(PluginManagerModal, { api })
+  renderCard: (_api, size) => React.createElement(PluginManagerCard, { size }),
+  renderModal: () => React.createElement(PluginManagerModal)
 };

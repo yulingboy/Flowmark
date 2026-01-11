@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Plugin, PluginSize } from '../../types';
-import { WeatherCard, WeatherModal } from './WeatherWidget';
+import { WeatherCard } from './WeatherCard';
+import { WeatherModal } from './WeatherModal';
 
 export const weatherPlugin: Plugin = {
   metadata: {
@@ -45,6 +46,6 @@ export const weatherPlugin: Plugin = {
     updateInterval: 30
   },
   
-  renderCard: (api, size: PluginSize) => React.createElement(WeatherCard, { api, size }),
-  renderModal: (api) => React.createElement(WeatherModal, { api })
+  renderCard: (_api, size: PluginSize) => React.createElement(WeatherCard, { size }),
+  renderModal: () => React.createElement(WeatherModal)
 };

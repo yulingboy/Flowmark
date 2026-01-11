@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Plugin, PluginSize } from '../../types';
-import { TodoCard, TodoModal } from './TodoWidget';
+import { TodoCard } from './TodoCard';
+import { TodoModal } from './TodoModal';
 
 export const todoPlugin: Plugin = {
   metadata: {
@@ -27,6 +28,6 @@ export const todoPlugin: Plugin = {
     showCompleted: true
   },
   
-  renderCard: (api, size: PluginSize) => React.createElement(TodoCard, { api, size }),
-  renderModal: (api) => React.createElement(TodoModal, { api })
+  renderCard: (_api, size: PluginSize) => React.createElement(TodoCard, { size }),
+  renderModal: () => React.createElement(TodoModal)
 };
