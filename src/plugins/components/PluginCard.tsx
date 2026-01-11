@@ -117,7 +117,7 @@ export function PluginCard({
       <button
         onClick={handleClick}
         onContextMenu={handleContextMenu}
-        className={`flex flex-col items-center gap-1 cursor-pointer group w-full h-full ${className}`}
+        className={`flex flex-col items-center gap-2 cursor-pointer group w-full h-full ${className}`}
       >
         <div className={`w-full flex-1 rounded-2xl overflow-hidden bg-white shadow-lg group-hover:scale-105 transition-transform relative ${batchEditMode && isSelected ? 'ring-2 ring-blue-500' : ''}`}>
           {batchEditMode && (

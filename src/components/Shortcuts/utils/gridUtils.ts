@@ -51,21 +51,26 @@ export function getValidSizesForPosition(
 
 export function getItemSize(item: GridItem, unit: number, gap: number): { width: number; height: number } {
   const { colSpan, rowSpan } = getGridSpan(item.size || '1x1');
+  // 横向间距 = gap + TEXT_HEIGHT，和竖向间距保持一致
+  const hGap = gap + TEXT_HEIGHT;
+  const vGap = gap;
   return {
-    width: colSpan * unit + (colSpan - 1) * gap,
-    height: rowSpan * unit + (rowSpan - 1) * gap + TEXT_HEIGHT,
+    width: colSpan * unit + (colSpan - 1) * hGap,
+    height: rowSpan * (unit + TEXT_HEIGHT) + (rowSpan - 1) * vGap,
   };
 }
 
 export function pixelToGrid(x: number, y: number, unit: number, gap: number): { col: number; row: number } {
-  const cellWidth = unit + gap;
-  const cellHeight = unit + gap + TEXT_HEIGHT;
+  const hGap = gap + TEXT_HEIGHT;
+  const cellWidth = unit + hGap;
+  const cellHeight = unit + TEXT_HEIGHT + gap;
   return { col: Math.round(x / cellWidth), row: Math.round(y / cellHeight) };
 }
 
 export function gridToPixel(col: number, row: number, unit: number, gap: number): Position {
-  const cellWidth = unit + gap;
-  const cellHeight = unit + gap + TEXT_HEIGHT;
+  const hGap = gap + TEXT_HEIGHT;
+  const cellWidth = unit + hGap;
+  const cellHeight = unit + TEXT_HEIGHT + gap;
   return { x: col * cellWidth, y: row * cellHeight };
 }
 

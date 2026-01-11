@@ -99,7 +99,7 @@ export function ShortcutFolder({ folder, onOpen, onResize, className = '', isDro
       <button
         onClick={handleClick}
         onContextMenu={handleContextMenu}
-        className={`flex flex-col items-center gap-1 cursor-pointer group w-full h-full ${className}`}
+        className={`flex flex-col items-center gap-2 cursor-pointer group w-full h-full ${className}`}
       >
       {/* 文件夹卡片 - 使用内联样式确保 padding 生效 */}
       <div 
