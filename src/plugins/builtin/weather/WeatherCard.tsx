@@ -1,17 +1,16 @@
 import { RefreshCw } from 'lucide-react';
 import type { PluginSize } from '../../types';
 import { useWeather } from './useWeather';
-import { WeatherIcon, InfoIcon } from './WeatherIcons';
-import { getWeatherColor } from './types';
+import { WeatherIcon } from './WeatherIcons';
 
 export function WeatherCard({ size }: { size: PluginSize }) {
-  const { weather, loading, error, refresh, config, cacheAge } = useWeather();
+  const { weather, loading, error, refresh } = useWeather();
 
   // 加载状态
   if (loading && !weather) {
     return (
-      <div className="w-full h-full flex items-center justify-center text-gray-400">
-        <RefreshCw className="w-5 h-5 animate-spin" />
+      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#4A90D9] to-[#357ABD] rounded-xl">
+        <RefreshCw className="w-5 h-5 animate-spin text-white/70" />
       </div>
     );
   }
@@ -19,11 +18,11 @@ export function WeatherCard({ size }: { size: PluginSize }) {
   // 错误状态
   if (error && !weather) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 p-2">
-        <span className="text-xs text-center">{error}</span>
+      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#4A90D9] to-[#357ABD] rounded-xl p-2">
+        <span className="text-xs text-white/70 text-center">{error}</span>
         <button 
           onClick={refresh} 
-          className="text-xs text-blue-400 mt-2 hover:text-blue-500 flex items-center gap-1"
+          className="text-xs text-white mt-2 hover:text-white/80 flex items-center gap-1"
         >
           <RefreshCw className="w-3 h-3" /> 重试
         </button>
@@ -33,128 +32,121 @@ export function WeatherCard({ size }: { size: PluginSize }) {
 
   if (!weather) return null;
 
-  const { current, hourly, daily } = weather;
-  const iconColor = getWeatherColor(current.condition);
-  const unitSymbol = config.unit === 'celsius' ? '°C' : '°F';
+  const { current, daily } = weather;
+  const todayForecast = daily[0];
 
   // 1x1 尺寸：极简显示
   if (size === '1x1') {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center p-1">
-        <WeatherIcon name={current.icon} size={28} style={{ color: iconColor }} />
-        <span className="text-lg font-bold text-gray-700 tabular-nums mt-1">
+      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#4A90D9] to-[#357ABD] rounded-xl p-2">
+        <span className="text-2xl font-light text-white tabular-nums">
           {current.temperature}°
         </span>
+        <WeatherIcon name={current.icon} size={24} className="text-white/90 mt-1" />
       </div>
     );
   }
 
-  // 2x2 尺寸：基本信息
+  // 2x2 尺寸：参考图片第一张的布局
   if (size === '2x2') {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center p-3 gap-1">
-        <WeatherIcon name={current.icon} size={40} style={{ color: iconColor }} />
-        <span className="text-2xl font-bold text-gray-700 tabular-nums">
-          {current.temperature}{unitSymbol}
-        </span>
-        <span className="text-sm text-gray-500">{current.city}</span>
-        <span className="text-xs text-gray-400">{current.condition}</span>
-        
-        {/* 简要信息 */}
-        <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
-          <span className="flex items-center gap-1">
-            <InfoIcon type="humidity" size={12} />
-            {current.humidity}%
+      <div className="w-full h-full flex flex-col bg-gradient-to-br from-[#4A90D9] to-[#357ABD] rounded-xl p-3 text-white">
+        {/* 顶部：温度和图标 */}
+        <div className="flex items-start justify-between">
+          <span className="text-4xl font-light tabular-nums leading-none">
+            {current.temperature}°
           </span>
-          <span className="flex items-center gap-1">
-            <InfoIcon type="wind" size={12} />
-            {current.wind}
-          </span>
+          <WeatherIcon name={current.icon} size={36} className="text-sky-200" />
         </div>
         
-        {/* 缓存时间和错误 */}
-        <div className="text-[10px] text-gray-300 mt-1">
-          {error ? <span className="text-orange-400">{error}</span> : cacheAge}
+        {/* 中部：城市、天气、温度范围 */}
+        <div className="flex items-center justify-between mt-2 text-sm">
+          <span className="text-white/90">
+            {current.city} {current.condition}
+          </span>
+          {todayForecast && (
+            <span className="text-white/80 tabular-nums">
+              {todayForecast.maxTemp}° ~ {todayForecast.minTemp}°
+            </span>
+          )}
+        </div>
+        
+        {/* 底部：风力和湿度 */}
+        <div className="mt-auto pt-2 grid grid-cols-2 gap-2 text-sm bg-white/10 rounded-lg p-2 -mx-1">
+          <div className="flex items-center justify-between">
+            <span className="text-white/70">风力</span>
+            <span className="text-white">{current.windDir}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-white/70">湿度</span>
+            <span className="text-white">{current.humidity}%</span>
+          </div>
         </div>
       </div>
     );
   }
 
-  // 2x4 尺寸：完整信息
+  // 2x4 尺寸：完整信息，参考图片第二张
+  const { hourly } = weather;
+  
   return (
-    <div className="w-full h-full flex flex-col p-3 overflow-hidden">
+    <div className="w-full h-full flex flex-col bg-gradient-to-br from-[#4A90D9] to-[#357ABD] rounded-xl p-3 text-white overflow-hidden">
       {/* 顶部：当前天气 */}
-      <div className="flex items-start gap-3">
-        <WeatherIcon name={current.icon} size={48} style={{ color: iconColor }} />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-baseline gap-1">
-            <span className="text-3xl font-bold text-gray-700 tabular-nums">
-              {current.temperature}
-            </span>
-            <span className="text-lg text-gray-500">{unitSymbol}</span>
-          </div>
-          <div className="text-sm text-gray-500 truncate">{current.city}</div>
-          <div className="text-xs text-gray-400">{current.condition}</div>
+      <div className="flex items-start gap-4">
+        <span className="text-4xl font-light tabular-nums leading-none">
+          {current.temperature}°
+        </span>
+        <div className="flex-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/80">
+          <span className="flex items-center gap-1">
+            {current.condition} {todayForecast && `${todayForecast.maxTemp}~${todayForecast.minTemp}`}
+            <WeatherIcon name={current.icon} size={16} className="text-sky-200" />
+          </span>
+          <span>{current.windDir}: {current.wind}</span>
+          <span>湿度: {current.humidity}%</span>
+          <span>气压: {current.pressure}hPa</span>
         </div>
         <button 
           onClick={refresh}
           disabled={loading}
-          className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
-          title="刷新"
+          className="p-1 rounded-full hover:bg-white/10 transition-colors"
         >
-          <RefreshCw className={`w-4 h-4 text-gray-400 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-4 h-4 text-white/60 ${loading ? 'animate-spin' : ''}`} />
         </button>
       </div>
       
-      {/* 详细信息 */}
-      <div className="grid grid-cols-4 gap-2 mt-3 text-xs">
-        <div className="flex flex-col items-center">
-          <InfoIcon type="temperature" size={14} className="text-gray-400" />
-          <span className="text-gray-500 mt-0.5">体感</span>
-          <span className="font-medium text-gray-700">{current.feelsLike}°</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <InfoIcon type="humidity" size={14} className="text-gray-400" />
-          <span className="text-gray-500 mt-0.5">湿度</span>
-          <span className="font-medium text-gray-700">{current.humidity}%</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <InfoIcon type="wind" size={14} className="text-gray-400" />
-          <span className="text-gray-500 mt-0.5">风速</span>
-          <span className="font-medium text-gray-700 text-[10px]">{current.wind}</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <InfoIcon type="visibility" size={14} className="text-gray-400" />
-          <span className="text-gray-500 mt-0.5">能见度</span>
-          <span className="font-medium text-gray-700">{current.visibility}km</span>
-        </div>
-      </div>
-      
-      {/* 小时预报 */}
+      {/* 24小时预报 */}
       {hourly.length > 0 && (
-        <div className="mt-3 flex-1 min-h-0">
-          <div className="text-xs text-gray-400 mb-1">小时预报</div>
+        <div className="mt-3">
+          <div className="text-xs text-white/60 mb-2">24小时预报</div>
           <div className="flex gap-2 overflow-x-auto pb-1">
-            {hourly.slice(0, 6).map((hour, i) => (
-              <div key={i} className="flex flex-col items-center min-w-[40px]">
-                <span className="text-[10px] text-gray-400">{hour.time}</span>
-                <WeatherIcon name={hour.icon} size={16} className="my-0.5 text-gray-500" />
-                <span className="text-xs font-medium text-gray-700">{hour.temperature}°</span>
+            {hourly.slice(0, 10).map((hour, i) => (
+              <div key={i} className="flex flex-col items-center min-w-[44px]">
+                <WeatherIcon name={hour.icon} size={24} className="text-sky-200" />
+                <span className="text-sm font-medium mt-1 tabular-nums">{hour.temperature}°</span>
+                <span className="text-xs text-white/60">{hour.time}</span>
               </div>
             ))}
           </div>
         </div>
       )}
       
-      {/* 底部：缓存时间 */}
-      <div className="text-[10px] text-gray-300 mt-auto pt-1 flex justify-between">
-        <span>{error ? <span className="text-orange-400">{error}</span> : cacheAge}</span>
-        {daily.length > 0 && (
-          <span className="text-gray-400">
-            {daily[0].minTemp}° / {daily[0].maxTemp}°
-          </span>
-        )}
-      </div>
+      {/* 未来7天天气 */}
+      {daily.length > 0 && (
+        <div className="mt-3 flex-1 min-h-0">
+          <div className="text-xs text-white/60 mb-2">未来7天天气</div>
+          <div className="flex gap-2 overflow-x-auto">
+            {daily.slice(0, 7).map((day, i) => (
+              <div key={i} className="flex flex-col items-center min-w-[56px]">
+                <WeatherIcon name={day.icon} size={28} className="text-sky-200" />
+                <span className="text-sm mt-1 tabular-nums">
+                  {day.maxTemp}° ~ {day.minTemp}°
+                </span>
+                <span className="text-xs text-white/60">{day.weekday}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

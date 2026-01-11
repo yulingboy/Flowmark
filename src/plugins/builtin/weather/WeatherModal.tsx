@@ -1,22 +1,21 @@
-import { RefreshCw, Droplets } from 'lucide-react';
+import { RefreshCw, MapPin } from 'lucide-react';
 import { useWeather } from './useWeather';
-import { WeatherIcon, InfoIcon } from './WeatherIcons';
-import { getWeatherColor } from './types';
+import { WeatherIcon } from './WeatherIcons';
 
 export function WeatherModal() {
-  const { weather, loading, refresh, config, cacheAge, error } = useWeather();
+  const { weather, loading, refresh, error, cacheAge } = useWeather();
 
   if (!weather) {
     return (
-      <div className="h-full flex items-center justify-center text-gray-400">
+      <div className="h-full flex items-center justify-center bg-gradient-to-br from-[#4A90D9] to-[#357ABD]">
         {loading ? (
-          <RefreshCw className="w-6 h-6 animate-spin" />
+          <RefreshCw className="w-6 h-6 animate-spin text-white/70" />
         ) : (
-          <div className="text-center">
-            <p className="text-sm">{error || '暂无天气数据'}</p>
+          <div className="text-center text-white">
+            <p className="text-sm text-white/70">{error || '暂无天气数据'}</p>
             <button 
               onClick={refresh}
-              className="mt-2 text-blue-500 hover:text-blue-600 text-sm"
+              className="mt-2 text-white hover:text-white/80 text-sm"
             >
               点击加载
             </button>
@@ -26,155 +25,89 @@ export function WeatherModal() {
     );
   }
 
-  const { current, hourly, daily, astronomy } = weather;
-  const iconColor = getWeatherColor(current.condition);
-  const unitSymbol = config.unit === 'celsius' ? '°C' : '°F';
+  const { current, hourly, daily } = weather;
+  const todayForecast = daily[0];
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
+    <div className="h-full flex flex-col bg-gradient-to-br from-[#4A90D9] to-[#357ABD] text-white overflow-hidden">
       {/* 顶部：当前天气 */}
-      <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-gray-500">{current.city}</span>
+      <div className="p-4">
+        {/* 城市和刷新 */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-1 text-white/80">
+            <MapPin size={14} />
+            <span className="text-sm">{current.city}</span>
+          </div>
           <button 
             onClick={refresh}
             disabled={loading}
-            className="p-1.5 rounded-full hover:bg-white/50 transition-colors"
+            className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
           >
-            <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 text-white/60 ${loading ? 'animate-spin' : ''}`} />
           </button>
         </div>
         
-        <div className="flex items-center gap-4">
-          <WeatherIcon name={current.icon} size={64} style={{ color: iconColor }} />
-          <div>
-            <div className="flex items-baseline">
-              <span className="text-5xl font-bold text-gray-800 tabular-nums">
-                {current.temperature}
-              </span>
-              <span className="text-2xl text-gray-500 ml-1">{unitSymbol}</span>
+        {/* 温度和详情 */}
+        <div className="flex items-start gap-4">
+          <span className="text-6xl font-light tabular-nums leading-none">
+            {current.temperature}°
+          </span>
+          <div className="flex-1 space-y-1 text-sm">
+            <div className="flex items-center gap-2 text-white/90">
+              <span>{current.condition}</span>
+              {todayForecast && (
+                <span className="tabular-nums">{todayForecast.maxTemp} ~ {todayForecast.minTemp}</span>
+              )}
+              <WeatherIcon name={current.icon} size={20} className="text-sky-200" />
             </div>
-            <div className="text-gray-600">{current.condition}</div>
-          </div>
-        </div>
-        
-        {/* 详细指标 */}
-        <div className="grid grid-cols-4 gap-3 mt-4">
-          <div className="bg-white/60 rounded-lg p-2 text-center">
-            <InfoIcon type="temperature" size={16} className="mx-auto text-gray-400" />
-            <div className="text-xs text-gray-500 mt-1">体感</div>
-            <div className="font-medium text-gray-700">{current.feelsLike}°</div>
-          </div>
-          <div className="bg-white/60 rounded-lg p-2 text-center">
-            <InfoIcon type="humidity" size={16} className="mx-auto text-gray-400" />
-            <div className="text-xs text-gray-500 mt-1">湿度</div>
-            <div className="font-medium text-gray-700">{current.humidity}%</div>
-          </div>
-          <div className="bg-white/60 rounded-lg p-2 text-center">
-            <InfoIcon type="wind" size={16} className="mx-auto text-gray-400" />
-            <div className="text-xs text-gray-500 mt-1">风速</div>
-            <div className="font-medium text-gray-700 text-sm">{current.wind}</div>
-          </div>
-          <div className="bg-white/60 rounded-lg p-2 text-center">
-            <InfoIcon type="pressure" size={16} className="mx-auto text-gray-400" />
-            <div className="text-xs text-gray-500 mt-1">气压</div>
-            <div className="font-medium text-gray-700">{current.pressure}</div>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-white/70">
+              <span>{current.windDir}: {current.wind}</span>
+              <span>湿度: {current.humidity}%</span>
+              <span>气压: {current.pressure}hPa</span>
+            </div>
           </div>
         </div>
       </div>
       
-      {/* 中部：小时预报 */}
+      {/* 24小时预报 */}
       {hourly.length > 0 && (
-        <div className="px-4 py-3 border-b border-gray-100">
-          <div className="text-sm font-medium text-gray-700 mb-2">24小时预报</div>
+        <div className="px-4 py-3 border-t border-white/10">
+          <div className="text-xs text-white/60 mb-3">24小时预报</div>
           <div className="flex gap-3 overflow-x-auto pb-2">
-            {hourly.slice(0, 12).map((hour, i) => (
+            {hourly.map((hour, i) => (
               <div key={i} className="flex flex-col items-center min-w-[48px]">
-                <span className="text-xs text-gray-400">{hour.time}</span>
-                <WeatherIcon name={hour.icon} size={20} className="my-1 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">{hour.temperature}°</span>
-                {hour.chanceOfRain > 0 && (
-                  <span className="text-[10px] text-blue-400 flex items-center gap-0.5">
-                    <Droplets size={8} />
-                    {hour.chanceOfRain}%
-                  </span>
-                )}
+                <WeatherIcon name={hour.icon} size={28} className="text-sky-200" />
+                <span className="text-sm font-medium mt-1 tabular-nums">{hour.temperature}°</span>
+                <span className="text-xs text-white/60">{hour.time}</span>
               </div>
             ))}
           </div>
         </div>
       )}
       
-      {/* 底部：多日预报 */}
-      <div className="flex-1 overflow-y-auto px-4 py-3">
-        <div className="text-sm font-medium text-gray-700 mb-2">7日预报</div>
-        <div className="space-y-2">
+      {/* 未来7天天气 */}
+      <div className="flex-1 px-4 py-3 border-t border-white/10 overflow-y-auto">
+        <div className="text-xs text-white/60 mb-3">未来7天天气</div>
+        <div className="flex gap-4 overflow-x-auto pb-2">
           {daily.map((day, i) => (
-            <div 
-              key={i} 
-              className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0"
-            >
-              <span className="w-12 text-sm text-gray-600">{day.weekday}</span>
-              <WeatherIcon name={day.icon} size={20} className="text-gray-500" />
-              <span className="flex-1 text-xs text-gray-400 truncate">{day.condition}</span>
-              {day.chanceOfRain > 0 && (
-                <span className="text-xs text-blue-400 flex items-center gap-0.5">
-                  <Droplets size={10} />
-                  {day.chanceOfRain}%
-                </span>
-              )}
-              <div className="flex items-center gap-1 tabular-nums">
-                <span className="text-sm text-gray-400">{day.minTemp}°</span>
-                <div className="w-12 h-1 bg-gray-200 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-blue-300 to-orange-300 rounded-full"
-                    style={{ 
-                      width: `${((day.maxTemp - day.minTemp) / 30) * 100}%`,
-                      marginLeft: `${((day.minTemp + 10) / 50) * 100}%`
-                    }}
-                  />
-                </div>
-                <span className="text-sm font-medium text-gray-700">{day.maxTemp}°</span>
-              </div>
+            <div key={i} className="flex flex-col items-center min-w-[64px]">
+              <WeatherIcon name={day.icon} size={36} className="text-sky-200" />
+              <span className="text-sm mt-2 tabular-nums">
+                {day.maxTemp}° ~ {day.minTemp}°
+              </span>
+              <span className="text-xs text-white/60 mt-1">
+                {day.date.slice(5).replace('-', '月')}日
+              </span>
+              <span className="text-xs text-white/60">{day.weekday}</span>
             </div>
           ))}
         </div>
-        
-        {/* 日出日落 */}
-        {astronomy.sunrise && (
-          <div className="mt-4 pt-3 border-t border-gray-100">
-            <div className="text-sm font-medium text-gray-700 mb-2">日出日落</div>
-            <div className="flex justify-around">
-              <div className="flex items-center gap-2">
-                <InfoIcon type="sunrise" size={20} className="text-orange-400" />
-                <div>
-                  <div className="text-xs text-gray-400">日出</div>
-                  <div className="text-sm font-medium text-gray-700">{astronomy.sunrise}</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <InfoIcon type="sunset" size={20} className="text-orange-500" />
-                <div>
-                  <div className="text-xs text-gray-400">日落</div>
-                  <div className="text-sm font-medium text-gray-700">{astronomy.sunset}</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <InfoIcon type="moon" size={20} className="text-gray-400" />
-                <div>
-                  <div className="text-xs text-gray-400">月相</div>
-                  <div className="text-sm font-medium text-gray-700">{astronomy.moonPhase}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
       
       {/* 底部状态栏 */}
-      <div className="px-4 py-2 bg-gray-50 text-xs text-gray-400 flex justify-between">
+      <div className="px-4 py-2 bg-black/10 text-xs text-white/50 flex justify-between">
         <span>{cacheAge}</span>
-        {error && <span className="text-orange-400">{error}</span>}
+        {error && <span className="text-orange-300">{error}</span>}
       </div>
     </div>
   );
