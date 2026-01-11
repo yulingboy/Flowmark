@@ -61,12 +61,24 @@ export function MacModal({
         isFullscreen ? setIsFullscreen(false) : onClose();
       }
     };
-    if (isOpen) document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    // 阻止全局右键菜单
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+    };
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener('contextmenu', handleContextMenu, true);
+    }
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('contextmenu', handleContextMenu, true);
+    };
   }, [isOpen, onClose, isFullscreen]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
+      // 只响应左键点击 (button === 0)，忽略右键 (button === 2)
+      if (e.button !== 0) return;
       if (!isDragging && modalRef.current && !modalRef.current.contains(e.target as Node)) {
         onClose();
       }
@@ -81,6 +93,7 @@ export function MacModal({
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
       onPointerDown={(e) => e.stopPropagation()}
+      onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); }}
     >
       <div
         ref={modalRef}

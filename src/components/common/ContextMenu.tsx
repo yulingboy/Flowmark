@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { Button } from 'antd';
 import type { ShortcutSize } from '@/types';
 
 export interface ContextMenuItem {
@@ -78,7 +79,6 @@ export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuPro
 
   const renderMenuItem = (item: ContextMenuItem, index: number) => {
     if (item.type === 'layout') {
-      // 如果指定了 layoutOptions，则只显示这些选项
       const layoutSizes = item.layoutOptions 
         ? allLayoutSizes.filter(l => item.layoutOptions!.includes(l.size))
         : allLayoutSizes;
@@ -91,16 +91,20 @@ export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuPro
           </div>
           <div className="flex gap-2 ml-8">
             {layoutSizes.map(({ size, cols, rows }) => (
-              <button key={size} onClick={() => { item.onLayoutSelect?.(size); onClose(); }}
-                className={`w-8 h-8 rounded-lg border-2 flex items-center justify-center transition-all cursor-pointer ${
-                  item.currentLayout === size ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white hover:border-gray-400'
-                }`} title={size}>
+              <Button 
+                key={size} 
+                size="small"
+                type={item.currentLayout === size ? 'primary' : 'default'}
+                onClick={() => { item.onLayoutSelect?.(size); onClose(); }}
+                className="!w-8 !h-8 !p-0"
+                title={size}
+              >
                 <div className="grid gap-0.5" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }}>
                   {Array.from({ length: cols * rows }).map((_, i) => (
-                    <div key={i} className={`w-1.5 h-1.5 rounded-sm ${item.currentLayout === size ? 'bg-blue-500' : 'bg-gray-400'}`} />
+                    <div key={i} className={`w-1.5 h-1.5 rounded-sm ${item.currentLayout === size ? 'bg-white' : 'bg-gray-400'}`} />
                   ))}
                 </div>
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -116,21 +120,26 @@ export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuPro
             if (relatedTarget?.closest('.submenu-panel')) return;
             setActiveSubmenu(null);
           }}>
-          <button className="w-full px-4 py-3 flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer border-none bg-transparent text-left">
+          <div className="w-full px-4 py-3 flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer">
             <span className="w-5 h-5 text-gray-600 flex items-center justify-center">{item.icon}</span>
             <span className="flex-1 text-gray-800 text-sm">{item.label}</span>
             {item.rightIcon && <span className="w-5 h-5 text-gray-500 flex items-center justify-center">{item.rightIcon}</span>}
-          </button>
+          </div>
           {activeSubmenu === index && (
             <div className="submenu-panel absolute left-full top-0 min-w-[140px] py-2 rounded-xl shadow-xl"
               style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.5)', marginLeft: '-4px', paddingLeft: '4px' }}
               onMouseEnter={() => setActiveSubmenu(index)}
               onMouseLeave={() => setActiveSubmenu(null)}>
               {item.submenuItems.length > 0 ? item.submenuItems.map((sub) => (
-                <button key={sub.id} onClick={(e) => { e.stopPropagation(); sub.onClick(); onClose(); }}
-                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-black/5 transition-colors cursor-pointer border-none bg-transparent">
+                <Button 
+                  key={sub.id} 
+                  type="text"
+                  block
+                  onClick={(e) => { e.stopPropagation(); sub.onClick(); onClose(); }}
+                  className="!text-left !justify-start !px-4 !py-2 !h-auto"
+                >
                   {sub.label}
-                </button>
+                </Button>
               )) : (
                 <div className="px-4 py-2 text-sm text-gray-400">暂无文件夹</div>
               )}
@@ -141,12 +150,15 @@ export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuPro
     }
 
     return (
-      <button key={index} onClick={() => { item.onClick(); onClose(); }}
-        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer border-none bg-transparent text-left">
+      <div 
+        key={index} 
+        onClick={() => { item.onClick(); onClose(); }}
+        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer"
+      >
         <span className="w-5 h-5 text-gray-600 flex items-center justify-center">{item.icon}</span>
         <span className="flex-1 text-gray-800 text-sm">{item.label}</span>
         {item.rightIcon && <span className="w-5 h-5 text-gray-500 flex items-center justify-center">{item.rightIcon}</span>}
-      </button>
+      </div>
     );
   };
 

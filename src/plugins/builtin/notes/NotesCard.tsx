@@ -1,3 +1,5 @@
+import { Badge, List, Card, Empty } from 'antd';
+import { FileTextOutlined } from '@ant-design/icons';
 import type { PluginSize } from '../../types';
 import { useNotes } from './useNotes';
 
@@ -8,9 +10,9 @@ export function NotesCard({ size }: { size: PluginSize }) {
   if (size === '1x1') {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center p-2">
-        <span className="text-2xl">📝</span>
-        <span className="text-lg font-bold text-gray-700">{notes.length}</span>
-        <span className="text-xs text-gray-400">笔记</span>
+        <FileTextOutlined style={{ fontSize: 24, color: '#3b82f6' }} />
+        <Badge count={notes.length} showZero color="#3b82f6" style={{ marginTop: 4 }} />
+        <span className="text-xs text-gray-400 mt-1">笔记</span>
       </div>
     );
   }
@@ -21,30 +23,29 @@ export function NotesCard({ size }: { size: PluginSize }) {
       <div className="w-full h-full flex flex-col p-3">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-1.5">
-            <span className="text-base">📝</span>
+            <FileTextOutlined style={{ fontSize: 16, color: '#3b82f6' }} />
             <span className="font-medium text-gray-700">记事本</span>
           </div>
-          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{notes.length}</span>
+          <Badge count={notes.length} size="small" color="#9ca3af" />
         </div>
-        <div className="flex-1 space-y-1.5 overflow-hidden">
-          {recentNotes.map(note => (
-            <div 
-              key={note.id} 
-              className="p-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-            >
-              <div className="text-sm text-gray-700 truncate text-left">
-                {note.title || note.content || '空笔记'}
-              </div>
-            </div>
-          ))}
-          {notes.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-gray-400">
-              <span className="text-2xl mb-1">📝</span>
-              <span className="text-xs">暂无笔记</span>
-            </div>
+        <div className="flex-1 overflow-hidden">
+          {notes.length === 0 ? (
+            <Empty description="暂无笔记" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          ) : (
+            <List
+              size="small"
+              dataSource={recentNotes}
+              renderItem={(note) => (
+                <List.Item className="!py-1.5 !px-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors mb-1">
+                  <span className="text-sm text-gray-700 truncate text-left">
+                    {note.title || note.content || '空笔记'}
+                  </span>
+                </List.Item>
+              )}
+            />
           )}
           {notes.length > 3 && (
-            <div className="text-xs text-gray-400 text-center">
+            <div className="text-xs text-gray-400 text-center mt-1">
               还有 {notes.length - 3} 条笔记...
             </div>
           )}
@@ -59,29 +60,31 @@ export function NotesCard({ size }: { size: PluginSize }) {
     <div className="w-full h-full flex flex-col p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="text-lg">📝</span>
+          <FileTextOutlined style={{ fontSize: 18, color: '#3b82f6' }} />
           <span className="font-medium text-gray-700">记事本</span>
         </div>
-        <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{notes.length} 条</span>
+        <Badge count={`${notes.length} 条`} color="#9ca3af" />
       </div>
-      <div className="flex-1 grid grid-cols-2 gap-2 overflow-hidden">
-        {recentNotes.map(note => (
-          <div 
-            key={note.id} 
-            className="p-2.5 rounded-xl shadow-sm flex flex-col bg-blue-50"
-          >
-            <div className="text-xs font-medium text-gray-700 truncate">
-              {note.title || '无标题'}
-            </div>
-            <div className="text-xs text-gray-600 line-clamp-2 mt-1 flex-1">
-              {note.content || '暂无内容'}
-            </div>
-          </div>
-        ))}
-        {notes.length === 0 && (
-          <div className="col-span-2 flex flex-col items-center justify-center h-full text-gray-400">
-            <span className="text-3xl mb-2">📝</span>
-            <span className="text-sm">暂无笔记</span>
+      <div className="flex-1 overflow-hidden">
+        {notes.length === 0 ? (
+          <Empty description="暂无笔记" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        ) : (
+          <div className="grid grid-cols-2 gap-2">
+            {recentNotes.map(note => (
+              <Card 
+                key={note.id} 
+                size="small"
+                className="bg-blue-50"
+                styles={{ body: { padding: 10 } }}
+              >
+                <div className="text-xs font-medium text-gray-700 truncate">
+                  {note.title || '无标题'}
+                </div>
+                <div className="text-xs text-gray-600 line-clamp-2 mt-1">
+                  {note.content || '暂无内容'}
+                </div>
+              </Card>
+            ))}
           </div>
         )}
       </div>

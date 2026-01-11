@@ -91,7 +91,12 @@ function App() {
   const handleEditShortcut = (item: ShortcutItem) => { setEditingShortcut(item); setIsAddShortcutOpen(true); };
   const handleCloseModal = () => { setIsAddShortcutOpen(false); setEditingShortcut(null); };
   const handleDeleteShortcut = (item: ShortcutItem) => { deleteShortcut(item.id); message.success('快捷方式已删除'); };
-  const handleContextMenu = (e: React.MouseEvent) => { e.preventDefault(); setContextMenu({ isOpen: true, x: e.clientX, y: e.clientY }); };
+  const handleContextMenu = (e: React.MouseEvent) => { 
+    e.preventDefault(); 
+    // 如果有弹窗打开，不显示右键菜单
+    if (isSettingsOpen || isAddShortcutOpen || isAddFolderOpen || isWallpaperOpen) return;
+    setContextMenu({ isOpen: true, x: e.clientX, y: e.clientY }); 
+  };
 
   const contextMenuItems: ContextMenuItem[] = [
     { icon: <PlusSquareOutlined />, label: '添加标签', onClick: () => setIsAddShortcutOpen(true) },
