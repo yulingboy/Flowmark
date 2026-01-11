@@ -73,10 +73,10 @@ export function WeatherModal() {
       {hourly.length > 0 && (
         <div className="px-4 py-3 border-t border-white/10">
           <div className="text-xs text-white/60 mb-3">24小时预报</div>
-          <div className="flex gap-3 overflow-x-auto pb-2">
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
             {hourly.map((hour, i) => (
-              <div key={i} className="flex flex-col items-center min-w-[48px]">
-                <WeatherIcon code={hour.icon} isDay={hour.isDay} size={28} className="text-sky-200" />
+              <div key={i} className="flex flex-col items-center min-w-[42px]">
+                <WeatherIcon code={hour.icon} isDay={hour.isDay} size={24} className="text-sky-200" />
                 <span className="text-sm font-medium mt-1 tabular-nums">{hour.temperature}°</span>
                 <span className="text-xs text-white/60">{hour.time}</span>
               </div>
@@ -88,10 +88,10 @@ export function WeatherModal() {
       {/* 未来7天天气 */}
       <div className="flex-1 px-4 py-3 border-t border-white/10 overflow-y-auto">
         <div className="text-xs text-white/60 mb-3">未来7天天气</div>
-        <div className="flex gap-4 overflow-x-auto pb-2">
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
           {daily.map((day, i) => (
-            <div key={i} className="flex flex-col items-center min-w-[64px]">
-              <WeatherIcon code={day.icon} isDay={true} size={36} className="text-sky-200" />
+            <div key={i} className="flex flex-col items-center min-w-[72px]">
+              <WeatherIcon code={day.icon} isDay={true} size={32} className="text-sky-200" />
               <span className="text-sm mt-2 tabular-nums">
                 {day.maxTemp}° ~ {day.minTemp}°
               </span>
