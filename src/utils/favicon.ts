@@ -1,5 +1,13 @@
 /**
- * 使用 Google Favicon 服务获取网站图标
+ * Favicon 服务配置
+ */
+const FAVICON_SERVICES = {
+  google: (domain: string, size: number) => `https://www.google.com/s2/favicons?domain=${domain}&sz=${size}`,
+  duckduckgo: (domain: string) => `https://icons.duckduckgo.com/ip3/${domain}.ico`,
+};
+
+/**
+ * 使用 Google Favicon 服务获取网站图标（带备用服务）
  * @param url 网站 URL
  * @param size 图标大小 (16, 32, 64, 128, 256)
  * @returns 图标 URL
@@ -7,10 +15,21 @@
 export function getFaviconUrl(url: string, size: number = 64): string {
   try {
     const domain = new URL(url).hostname;
-    return `https://www.google.com/s2/favicons?domain=${domain}&sz=${size}`;
+    return FAVICON_SERVICES.google(domain, size);
   } catch {
-    // 如果 URL 解析失败，直接使用输入作为域名
-    return `https://www.google.com/s2/favicons?domain=${url}&sz=${size}`;
+    return FAVICON_SERVICES.google(url, size);
+  }
+}
+
+/**
+ * 获取备用 Favicon URL（当主服务失败时使用）
+ */
+export function getFallbackFaviconUrl(url: string): string {
+  try {
+    const domain = new URL(url).hostname;
+    return FAVICON_SERVICES.duckduckgo(domain);
+  } catch {
+    return FAVICON_SERVICES.duckduckgo(url);
   }
 }
 
@@ -20,5 +39,5 @@ export function getFaviconUrl(url: string, size: number = 64): string {
  * @param size 图标大小
  */
 export function getFaviconByDomain(domain: string, size: number = 64): string {
-  return `https://www.google.com/s2/favicons?domain=${domain}&sz=${size}`;
+  return FAVICON_SERVICES.google(domain, size);
 }

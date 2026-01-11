@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { ShortcutFolder as ShortcutFolderType, ShortcutSize } from '@/types';
 import { ContextMenu } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
+import { LayoutIcon, DeleteIcon, UnfoldIcon, EmptyFolderIcon } from '@/components/common/icons';
 import { useShortcutsStore } from '@/stores/shortcutsStore';
 
 interface ShortcutFolderProps {
@@ -11,27 +12,6 @@ interface ShortcutFolderProps {
   className?: string;
   isDropTarget?: boolean;
 }
-
-// 右键菜单图标
-const LayoutIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
-    <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
-    <rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
-  </svg>
-);
-
-const UnfoldIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
-    <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
-  </svg>
-);
-
-const DeleteIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
-    <polyline points="3 6 5 6 21 6" />
-    <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-  </svg>
-);
 
 // 根据文件夹尺寸计算预览网格
 function getPreviewConfig(size: ShortcutSize = '1x1') {
@@ -142,9 +122,7 @@ export function ShortcutFolder({ folder, onOpen, onResize, className = '', isDro
           </div>
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <svg className="w-8 h-8 text-white/70" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
-            </svg>
+            <EmptyFolderIcon className="w-8 h-8 text-white/70" />
           </div>
         )}
       </div>
