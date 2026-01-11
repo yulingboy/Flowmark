@@ -57,13 +57,12 @@ export function HitokotoCard({ size }: { size: PluginSize }) {
           <span className="truncate max-w-[70%]">
             —— {hitokoto.from_who || hitokoto.from || '佚名'}
           </span>
-          <button
-            onClick={refresh}
-            disabled={loading}
-            className="p-1 rounded-full hover:bg-white/10 transition-colors"
+          <div
+            onClick={(e) => { e.stopPropagation(); refresh(); }}
+            className="p-1 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
           >
             <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
-          </button>
+          </div>
         </div>
       </div>
     );
@@ -88,13 +87,12 @@ export function HitokotoCard({ size }: { size: PluginSize }) {
           <span className="text-xs px-2 py-0.5 bg-white/10 rounded">
             {getTypeName(hitokoto.type)}
           </span>
-          <button
-            onClick={refresh}
-            disabled={loading}
-            className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
+          <div
+            onClick={(e) => { e.stopPropagation(); refresh(); }}
+            className="p-1.5 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          </button>
+          </div>
         </div>
       </div>
     </div>

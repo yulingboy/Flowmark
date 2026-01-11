@@ -39,22 +39,22 @@ export function PomodoroCard({ size }: { size: PluginSize }) {
         
         {/* 控制按钮 */}
         <div className="flex items-center justify-center gap-3">
-          <button
-            onClick={reset}
-            className="p-2 rounded-full hover:bg-white/10 transition-colors"
+          <div
+            onClick={(e) => { e.stopPropagation(); reset(); }}
+            className="p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
           >
             <RotateCcw className="w-4 h-4" />
-          </button>
-          <button
-            onClick={isRunning ? pause : start}
-            className="p-3 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+          </div>
+          <div
+            onClick={(e) => { e.stopPropagation(); isRunning ? pause() : start(); }}
+            className="p-3 rounded-full bg-white/20 hover:bg-white/30 transition-colors cursor-pointer"
           >
             {isRunning ? (
               <Pause className="w-5 h-5" />
             ) : (
               <Play className="w-5 h-5 ml-0.5" />
             )}
-          </button>
+          </div>
         </div>
         
         {/* 番茄计数 */}
@@ -93,23 +93,23 @@ export function PomodoroCard({ size }: { size: PluginSize }) {
       
       {/* 控制按钮 */}
       <div className="flex items-center justify-center gap-4">
-        <button
-          onClick={reset}
-          className="p-2 rounded-full hover:bg-white/10 transition-colors"
+        <div
+          onClick={(e) => { e.stopPropagation(); reset(); }}
+          className="p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
           title="重置"
         >
           <RotateCcw className="w-5 h-5" />
-        </button>
-        <button
-          onClick={isRunning ? pause : start}
-          className="p-4 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+        </div>
+        <div
+          onClick={(e) => { e.stopPropagation(); isRunning ? pause() : start(); }}
+          className="p-4 rounded-full bg-white/20 hover:bg-white/30 transition-colors cursor-pointer"
         >
           {isRunning ? (
             <Pause className="w-6 h-6" />
           ) : (
             <Play className="w-6 h-6 ml-0.5" />
           )}
-        </button>
+        </div>
       </div>
     </div>
   );

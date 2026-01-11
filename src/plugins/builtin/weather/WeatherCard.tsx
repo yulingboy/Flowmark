@@ -105,13 +105,12 @@ export function WeatherCard({ size }: { size: PluginSize }) {
           <span>湿度: {current.humidity}%</span>
           <span>气压: {current.pressure}hPa</span>
         </div>
-        <button 
-          onClick={refresh}
-          disabled={loading}
-          className="p-1 rounded-full hover:bg-white/10 transition-colors"
+        <div 
+          onClick={(e) => { e.stopPropagation(); refresh(); }}
+          className="p-1 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
         >
           <RefreshCw className={`w-4 h-4 text-white/60 ${loading ? 'animate-spin' : ''}`} />
-        </button>
+        </div>
       </div>
       
       {/* 24小时预报 */}
