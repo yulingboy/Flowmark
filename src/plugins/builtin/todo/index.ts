@@ -16,17 +16,7 @@ export const todoPlugin: Plugin = {
   supportedSizes: ['1x1', '2x2', '2x4'],
   defaultSize: '2x2',
   
-  configSchema: {
-    showCompleted: {
-      type: 'boolean',
-      label: '显示已完成任务',
-      default: true
-    }
-  },
-  
-  defaultConfig: {
-    showCompleted: true
-  },
+  modalSize: { width: 800, height: 560 },
   
   renderCard: (_api, size: PluginSize) => React.createElement(TodoCard, { size }),
   renderModal: () => React.createElement(TodoModal)
