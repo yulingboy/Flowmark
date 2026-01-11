@@ -23,8 +23,12 @@ export function DraggableItem({
   isDragging,
   shouldAnimate,
 }: DraggableItemProps) {
+  // 弹窗模式不需要拖拽
+  const isPopupMode = !isShortcutFolder(entry) && entry.openMode === 'popup';
+  
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: entry.id,
+    disabled: isPopupMode,
   });
 
   const style = {
@@ -36,13 +40,13 @@ export function DraggableItem({
     transform: transform ? `translate(${transform.x}px, ${transform.y}px)` : undefined,
     transition: shouldAnimate ? 'left 0.2s ease-out, top 0.2s ease-out' : 'none',
     opacity: isDragging ? 0.3 : 1,
-    cursor: 'grab',
+    cursor: isPopupMode ? 'pointer' : 'grab',
     touchAction: 'none',
     zIndex: isDragging ? 1000 : 1,
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div ref={setNodeRef} style={style} {...(isPopupMode ? {} : { ...attributes, ...listeners })}>
       {isShortcutFolder(entry) ? (
         <ShortcutFolder
           folder={entry}
