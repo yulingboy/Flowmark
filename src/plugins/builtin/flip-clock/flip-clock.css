@@ -1,0 +1,176 @@
+/* 翻页时钟样式 */
+
+.flip-group {
+  display: flex;
+  gap: 2px;
+}
+
+.flip-group-sm .flip-digit {
+  width: 20px;
+  height: 28px;
+  font-size: 18px;
+}
+
+.flip-group-md .flip-digit {
+  width: 28px;
+  height: 40px;
+  font-size: 26px;
+}
+
+.flip-group-lg .flip-digit {
+  width: 40px;
+  height: 56px;
+  font-size: 36px;
+}
+
+.flip-digit {
+  position: relative;
+  perspective: 200px;
+}
+
+.flip-digit-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* 上半部分 */
+.flip-digit-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%);
+  border-radius: 4px 4px 0 0;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.flip-digit-top span {
+  color: #fff;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  font-weight: 600;
+  transform: translateY(50%);
+}
+
+/* 下半部分 */
+.flip-digit-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+  border-radius: 0 0 4px 4px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.flip-digit-bottom span {
+  color: #fff;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  font-weight: 600;
+  transform: translateY(-50%);
+}
+
+/* 中间分割线 */
+.flip-digit-inner::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+
+/* 翻页动画 - 上半部分翻下 */
+.flip-digit-flip-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%);
+  border-radius: 4px 4px 0 0;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  transform-origin: bottom;
+  animation: flip-top 0.3s ease-in forwards;
+  z-index: 20;
+}
+
+.flip-digit-flip-top span {
+  color: #fff;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  font-weight: 600;
+  transform: translateY(50%);
+}
+
+/* 翻页动画 - 下半部分翻上 */
+.flip-digit-flip-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+  border-radius: 0 0 4px 4px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  transform-origin: top;
+  animation: flip-bottom 0.3s 0.3s ease-out forwards;
+  transform: rotateX(90deg);
+  z-index: 20;
+}
+
+.flip-digit-flip-bottom span {
+  color: #fff;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  font-weight: 600;
+  transform: translateY(-50%);
+}
+
+@keyframes flip-top {
+  0% {
+    transform: rotateX(0deg);
+  }
+  100% {
+    transform: rotateX(-90deg);
+  }
+}
+
+@keyframes flip-bottom {
+  0% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
+/* 分隔符 */
+.flip-separator {
+  color: #666;
+  font-weight: bold;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0.3;
+  }
+}

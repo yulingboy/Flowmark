@@ -9,8 +9,9 @@ import { wallpaperPlugin } from './wallpaper';
 import { calendarPlugin } from './calendar';
 import { hitokotoPlugin } from './hitokoto';
 import { pomodoroPlugin } from './pomodoro';
+import { flipClockPlugin } from './flip-clock';
 
-export const builtinPlugins = [pluginManagerPlugin, weatherPlugin, todoPlugin, notesPlugin, wallpaperPlugin, calendarPlugin, hitokotoPlugin, pomodoroPlugin];
+export const builtinPlugins = [pluginManagerPlugin, weatherPlugin, todoPlugin, notesPlugin, wallpaperPlugin, calendarPlugin, hitokotoPlugin, pomodoroPlugin, flipClockPlugin];
 
 export function registerBuiltinPlugins() {
   const shortcutsStore = useShortcutsStore.getState();
@@ -45,4 +46,4 @@ export function registerBuiltinPlugins() {
   });
 }
 
-export { weatherPlugin, todoPlugin, notesPlugin, pluginManagerPlugin, wallpaperPlugin, calendarPlugin, hitokotoPlugin, pomodoroPlugin };
+export { weatherPlugin, todoPlugin, notesPlugin, pluginManagerPlugin, wallpaperPlugin, calendarPlugin, hitokotoPlugin, pomodoroPlugin, flipClockPlugin };
