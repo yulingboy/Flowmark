@@ -2,7 +2,8 @@ import { useState } from 'react';
 import type { ShortcutFolder as ShortcutFolderType, ShortcutSize } from '@/types';
 import { ContextMenu } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
-import { LayoutIcon, DeleteIcon, UnfoldIcon, EmptyFolderIcon } from '@/components/common/icons';
+import { DeleteOutlined } from '@ant-design/icons';
+import { LayoutIcon, UnfoldIcon, EmptyFolderIcon } from '@/components/common/icons';
 import { useShortcutsStore } from '@/stores/shortcutsStore';
 
 interface ShortcutFolderProps {
@@ -63,7 +64,7 @@ export function ShortcutFolder({ folder, onOpen, onResize, className = '', isDro
       onClick: () => dissolveFolder(folder.id),
     },
     {
-      icon: <DeleteIcon />,
+      icon: <DeleteOutlined />,
       label: '删除卡片',
       onClick: () => deleteShortcut(folder.id),
     },

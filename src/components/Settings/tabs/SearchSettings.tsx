@@ -1,8 +1,7 @@
-import { Button } from 'antd';
+import { Button, Switch } from 'antd';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { SEARCH_ENGINE_ICONS } from '@/utils/search';
 import type { SearchEngine } from '@/types';
-import { ToggleSwitch } from '../components/ToggleSwitch';
 
 const SEARCH_ENGINES: { value: SearchEngine; label: string }[] = [
   { value: 'bing', label: 'Bing' },
@@ -12,18 +11,19 @@ const SEARCH_ENGINES: { value: SearchEngine; label: string }[] = [
 
 export function SearchSettings() {
   const {
-    searchEngine,
-    searchInNewTab,
-    autoFocusSearch,
-    showSearchSuggestions,
-    searchHistoryEnabled,
-    updateSearchEngine,
-    updateSearchInNewTab,
-    updateAutoFocusSearch,
-    updateShowSearchSuggestions,
-    updateSearchHistoryEnabled,
-    clearSearchHistory,
+    searchEngine, searchInNewTab, autoFocusSearch, showSearchSuggestions, searchHistoryEnabled,
+    updateSearchEngine, updateSearchInNewTab, updateAutoFocusSearch, updateShowSearchSuggestions, updateSearchHistoryEnabled, clearSearchHistory,
   } = useSettingsStore();
+
+  const SettingRow = ({ label, description, children }: { label: string; description?: string; children: React.ReactNode }) => (
+    <div className="flex items-center justify-between py-3 border-b border-gray-100">
+      <div>
+        <div className="text-sm text-gray-700">{label}</div>
+        {description && <div className="text-xs text-gray-400 mt-0.5">{description}</div>}
+      </div>
+      {children}
+    </div>
+  );
 
   return (
     <div>
@@ -31,15 +31,8 @@ export function SearchSettings() {
         <div className="text-sm text-gray-700 mb-3">默认搜索引擎</div>
         <div className="flex gap-3">
           {SEARCH_ENGINES.map(({ value, label }) => (
-            <button
-              key={value}
-              onClick={() => updateSearchEngine(value)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer ${
-                searchEngine === value
-                  ? 'border-2 border-blue-500 bg-blue-50'
-                  : 'border border-gray-200 bg-white'
-              }`}
-            >
+            <button key={value} onClick={() => updateSearchEngine(value)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer ${searchEngine === value ? 'border-2 border-blue-500 bg-blue-50' : 'border border-gray-200 bg-white'}`}>
               <img src={SEARCH_ENGINE_ICONS[value]} alt={label} className="w-4 h-4" />
               <span className="text-sm text-gray-700">{label}</span>
             </button>
@@ -47,34 +40,13 @@ export function SearchSettings() {
         </div>
       </div>
 
-      <ToggleSwitch
-        checked={searchInNewTab}
-        onChange={updateSearchInNewTab}
-        label="搜索新页面打开"
-      />
-      <ToggleSwitch
-        checked={autoFocusSearch}
-        onChange={updateAutoFocusSearch}
-        label="进入程序自动聚焦搜索"
-      />
-      <ToggleSwitch
-        checked={showSearchSuggestions}
-        onChange={updateShowSearchSuggestions}
-        label="搜索词联想功能"
-      />
-      <ToggleSwitch
-        checked={searchHistoryEnabled}
-        onChange={updateSearchHistoryEnabled}
-        label="搜索历史"
-        description="仅本地生效"
-      />
+      <SettingRow label="搜索新页面打开"><Switch checked={searchInNewTab} onChange={updateSearchInNewTab} /></SettingRow>
+      <SettingRow label="进入程序自动聚焦搜索"><Switch checked={autoFocusSearch} onChange={updateAutoFocusSearch} /></SettingRow>
+      <SettingRow label="搜索词联想功能"><Switch checked={showSearchSuggestions} onChange={updateShowSearchSuggestions} /></SettingRow>
+      <SettingRow label="搜索历史" description="仅本地生效"><Switch checked={searchHistoryEnabled} onChange={updateSearchHistoryEnabled} /></SettingRow>
 
       {searchHistoryEnabled && (
-        <div className="mt-4">
-          <Button danger onClick={clearSearchHistory}>
-            清除搜索历史
-          </Button>
-        </div>
+        <div className="mt-4"><Button danger onClick={clearSearchHistory}>清除搜索历史</Button></div>
       )}
     </div>
   );

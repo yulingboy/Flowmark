@@ -7,7 +7,8 @@ import { Background } from '@/components/Background/Background';
 import { SettingsButton, SettingsPanel, WallpaperModal } from '@/components/Settings';
 import { ContextMenu, ErrorBoundary } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
-import { AddIcon, FolderIcon, WallpaperIcon, RefreshIcon, EditIcon, SettingsIcon } from '@/components/common/icons';
+import { PlusSquareOutlined, FolderOutlined, ReloadOutlined, EditOutlined, SettingOutlined } from '@ant-design/icons';
+import { WallpaperIcon } from '@/components/common/icons';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useShortcutsStore } from '@/stores/shortcutsStore';
 import type { ShortcutItem } from '@/types';
@@ -87,11 +88,11 @@ function App() {
   const handleContextMenu = (e: React.MouseEvent) => { e.preventDefault(); setContextMenu({ isOpen: true, x: e.clientX, y: e.clientY }); };
 
   const contextMenuItems: ContextMenuItem[] = [
-    { icon: <AddIcon />, label: '添加标签', onClick: () => setIsAddShortcutOpen(true) },
-    { icon: <FolderIcon />, label: '新文件夹', onClick: () => setIsAddFolderOpen(true) },
-    { icon: <WallpaperIcon />, label: '更换壁纸', onClick: () => setIsWallpaperOpen(true), rightIcon: <RefreshIcon /> },
-    { icon: <EditIcon />, label: '批量编辑', onClick: () => toggleBatchEdit() },
-    { icon: <SettingsIcon />, label: '设置', onClick: () => setIsSettingsOpen(true) },
+    { icon: <PlusSquareOutlined />, label: '添加标签', onClick: () => setIsAddShortcutOpen(true) },
+    { icon: <FolderOutlined />, label: '新文件夹', onClick: () => setIsAddFolderOpen(true) },
+    { icon: <WallpaperIcon />, label: '更换壁纸', onClick: () => setIsWallpaperOpen(true), rightIcon: <ReloadOutlined /> },
+    { icon: <EditOutlined />, label: '批量编辑', onClick: () => toggleBatchEdit() },
+    { icon: <SettingOutlined />, label: '设置', onClick: () => setIsSettingsOpen(true) },
   ];
 
   return (

@@ -1,15 +1,8 @@
 import { useState } from 'react';
-import { Button, Slider } from 'antd';
+import { Button, Slider, Input } from 'antd';
+import { CheckOutlined } from '@ant-design/icons';
 import { useSettingsStore } from '@/stores/settingsStore';
-
-const ONLINE_WALLPAPERS = [
-  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80',
-  'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1920&q=80',
-  'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1920&q=80',
-  'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1920&q=80',
-  'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=1920&q=80',
-  'https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=1920&q=80',
-];
+import { PRESET_WALLPAPERS } from '@/constants';
 
 export function WallpaperSettings() {
   const { 
@@ -26,9 +19,7 @@ export function WallpaperSettings() {
       </div>
 
       <div className="flex gap-3 mb-5">
-        <Button type="primary" onClick={() => setShowOnlineWallpapers(!showOnlineWallpapers)} block>
-          在线壁纸
-        </Button>
+        <Button type="primary" onClick={() => setShowOnlineWallpapers(!showOnlineWallpapers)} block>在线壁纸</Button>
         <Button onClick={resetBackground} block>恢复默认</Button>
       </div>
 
@@ -36,10 +27,15 @@ export function WallpaperSettings() {
         <div className="mb-5">
           <div className="text-sm text-gray-700 mb-3">选择壁纸</div>
           <div className="grid grid-cols-3 gap-2">
-            {ONLINE_WALLPAPERS.map((url, index) => (
-              <button key={index} onClick={() => updateBackgroundUrl(url)}
-                className={`p-0 rounded-lg overflow-hidden cursor-pointer aspect-video border-2 ${backgroundUrl === url ? 'border-blue-500' : 'border-transparent'}`}>
-                <img src={url} alt={`壁纸 ${index + 1}`} className="w-full h-full object-cover" />
+            {PRESET_WALLPAPERS.map((wp) => (
+              <button key={wp.id} onClick={() => updateBackgroundUrl(wp.url)}
+                className={`p-0 rounded-lg overflow-hidden cursor-pointer aspect-video border-2 relative ${backgroundUrl === wp.url ? 'border-blue-500' : 'border-transparent'}`}>
+                <img src={wp.url} alt={wp.name} className="w-full h-full object-cover" />
+                {backgroundUrl === wp.url && (
+                  <div className="absolute top-1 right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                    <CheckOutlined style={{ color: 'white', fontSize: 12 }} />
+                  </div>
+                )}
               </button>
             ))}
           </div>
@@ -48,27 +44,19 @@ export function WallpaperSettings() {
 
       <div className="mb-4">
         <div className="text-sm text-gray-700 mb-2">自定义壁纸 URL</div>
-        <input
-          type="text"
-          value={backgroundUrl}
-          onChange={(e) => updateBackgroundUrl(e.target.value)}
-          placeholder="输入图片 URL"
-          className="w-full py-2.5 px-3 border border-gray-200 rounded-lg text-sm box-border"
-        />
+        <Input value={backgroundUrl} onChange={(e) => updateBackgroundUrl(e.target.value)} placeholder="输入图片 URL" />
       </div>
 
       <div className="py-3 border-b border-gray-100">
         <div className="flex justify-between text-sm text-gray-700 mb-2">
-          <span>背景模糊值</span>
-          <span>{backgroundBlur}%</span>
+          <span>背景模糊值</span><span>{backgroundBlur}%</span>
         </div>
         <Slider min={0} max={100} value={backgroundBlur} onChange={updateBackgroundBlur} />
       </div>
 
       <div className="py-3 border-b border-gray-100">
         <div className="flex justify-between text-sm text-gray-700 mb-2">
-          <span>遮罩透明度</span>
-          <span>{backgroundOverlay}%</span>
+          <span>遮罩透明度</span><span>{backgroundOverlay}%</span>
         </div>
         <Slider min={0} max={80} value={backgroundOverlay} onChange={updateBackgroundOverlay} />
       </div>

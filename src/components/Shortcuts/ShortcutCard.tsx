@@ -3,7 +3,8 @@ import type { ShortcutItem, ShortcutSize } from '@/types';
 import { isShortcutFolder } from '@/types';
 import { IframeModal, ContextMenu } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
-import { OpenTabIcon, EditIcon, MoveIcon, LayoutIcon, DeleteIcon, ChevronRightIcon, OpenModeIndicator } from '@/components/common/icons';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { OpenTabIcon, MoveIcon, LayoutIcon, ChevronRightIcon, OpenModeIndicator } from '@/components/common/icons';
 import { useShortcutsStore } from '@/stores/shortcutsStore';
 
 interface ShortcutCardProps {
@@ -88,7 +89,7 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
       onClick: () => window.open(item.url, '_blank'),
     },
     {
-      icon: <EditIcon />,
+      icon: <EditOutlined />,
       label: '编辑标签',
       onClick: () => onEdit?.(item),
     },
@@ -114,7 +115,7 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
       onClick: () => {},
     },
     {
-      icon: <DeleteIcon />,
+      icon: <DeleteOutlined />,
       label: '删除标签',
       onClick: () => onDelete?.(item),
     },

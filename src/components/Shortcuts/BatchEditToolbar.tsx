@@ -3,7 +3,8 @@ import { Modal, message } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useShortcutsStore } from '@/stores/shortcutsStore';
 import { isShortcutFolder } from '@/types';
-import { DeleteIcon, MoveIcon, CloseIcon } from '@/components/common/icons';
+import { DeleteOutlined, CloseOutlined } from '@ant-design/icons';
+import { MoveIcon } from '@/components/common/icons';
 
 export function BatchEditToolbar() {
   const { shortcuts, selectedIds, batchDelete, batchMoveToFolder, toggleBatchEdit, selectAll, clearSelection } = useShortcutsStore();
@@ -62,7 +63,7 @@ export function BatchEditToolbar() {
       {/* 删除 */}
       <button onClick={handleDelete} disabled={selectedCount === 0}
         className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-red-500 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed">
-        <DeleteIcon />
+        <DeleteOutlined />
         <span className="text-sm">删除</span>
       </button>
       
@@ -70,7 +71,7 @@ export function BatchEditToolbar() {
       
       {/* 退出批量编辑 */}
       <button onClick={toggleBatchEdit} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-gray-500 hover:bg-gray-100">
-        <CloseIcon />
+        <CloseOutlined />
         <span className="text-sm">完成</span>
       </button>
     </div>
