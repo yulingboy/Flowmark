@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface IframeModalProps {
   isOpen: boolean;
@@ -36,7 +37,7 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div
         ref={modalRef}
@@ -90,6 +91,7 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
           />
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
