@@ -10,7 +10,7 @@ export const wallpaperPlugin: Plugin = {
     version: '1.0.0',
     description: '浏览和切换桌面壁纸',
     author: 'Built-in',
-    icon: '🖼️'
+    icon: 'image'
   },
   
   supportedSizes: ['1x1', '2x2'],
