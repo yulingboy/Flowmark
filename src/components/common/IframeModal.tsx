@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 
 interface IframeModalProps {
@@ -13,6 +13,54 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
+
+  // 重置位置
+  useEffect(() => {
+    if (isOpen) {
+      setPosition({ x: 0, y: 0 });
+    }
+  }, [isOpen]);
+
+  // 拖拽处理
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (isFullscreen) return;
+    // 阻止事件冒泡，防止触发外部点击关闭
+    e.stopPropagation();
+    setIsDragging(true);
+    dragStartRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      posX: position.x,
+      posY: position.y,
+    };
+  }, [isFullscreen, position]);
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const deltaX = e.clientX - dragStartRef.current.x;
+      const deltaY = e.clientY - dragStartRef.current.y;
+      setPosition({
+        x: dragStartRef.current.posX + deltaX,
+        y: dragStartRef.current.posY + deltaY,
+      });
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -37,11 +85,11 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
         onClose();
       }
     };
-    if (isOpen && !isFullscreen) {
+    if (isOpen && !isFullscreen && !isDragging) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen, onClose, isFullscreen]);
+  }, [isOpen, onClose, isFullscreen, isDragging]);
 
   // 刷新页面
   const handleRefresh = () => {
@@ -59,6 +107,9 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
   // 切换全屏
   const handleToggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
+    if (!isFullscreen) {
+      setPosition({ x: 0, y: 0 });
+    }
   };
 
   if (!isOpen) return null;
@@ -67,21 +118,28 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
     ? 'bg-white shadow-2xl overflow-hidden relative w-full h-full flex flex-col'
     : 'bg-white rounded-2xl shadow-2xl overflow-hidden relative w-[90vw] h-[85vh] max-w-6xl flex flex-col';
 
+  const modalStyle = isFullscreen ? {} : {
+    transform: `translate(${position.x}px, ${position.y}px)`,
+  };
+
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div ref={modalRef} className={modalClass}>
-        {/* 标题栏 */}
-        <div className="flex items-center justify-between px-4 py-3 bg-gray-100 border-b border-gray-200">
+      <div ref={modalRef} className={modalClass} style={modalStyle}>
+        {/* 标题栏 - 可拖拽 */}
+        <div 
+          className={`flex items-center justify-between px-4 py-3 bg-gray-100 border-b border-gray-200 ${!isFullscreen ? 'cursor-move' : ''}`}
+          onMouseDown={handleMouseDown}
+        >
           {/* 占位 */}
           <div className="w-24" />
           
           {/* 标题 */}
-          <div className="flex-1 text-center">
+          <div className="flex-1 text-center select-none">
             <span className="text-sm text-gray-600 truncate">{title || url}</span>
           </div>
           
           {/* macOS 风格操作按钮 */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" onMouseDown={(e) => e.stopPropagation()}>
             {/* 刷新按钮 - 黄色 */}
             <div className="relative group">
               <button
