@@ -1,10 +1,11 @@
+import { useShallow } from 'zustand/react/shallow';
 import { usePluginStore } from '../../store';
 import type { Note } from './types';
 import { PLUGIN_ID } from './types';
 
 export function useNotes() {
   const notes = usePluginStore(
-    state => (state.pluginData[PLUGIN_ID]?.notes as Note[]) || []
+    useShallow(state => (state.pluginData[PLUGIN_ID]?.notes as Note[]) || [])
   );
 
   const addNote = () => {

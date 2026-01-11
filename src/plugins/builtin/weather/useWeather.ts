@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { usePluginStore } from '../../store';
 import type { WeatherData, WeatherConfig } from './types';
 import { PLUGIN_ID, getWeatherIcon } from './types';
@@ -6,19 +7,18 @@ import { PLUGIN_ID, getWeatherIcon } from './types';
 const DEFAULT_CONFIG: WeatherConfig = { location: 'Beijing', unit: 'celsius', updateInterval: 30 };
 
 export function useWeather() {
-  // 直接用 selector 订阅
   const weather = usePluginStore(
-    state => (state.pluginData[PLUGIN_ID]?.weatherData as WeatherData) || null
+    useShallow(state => (state.pluginData[PLUGIN_ID]?.weatherData as WeatherData) || null)
   );
-  const storedConfig = usePluginStore(state => state.pluginConfigs[PLUGIN_ID]);
+  const storedConfig = usePluginStore(
+    useShallow(state => state.pluginConfigs[PLUGIN_ID] || {})
+  );
   const config: WeatherConfig = { ...DEFAULT_CONFIG, ...storedConfig };
-  
-  const setPluginData = usePluginStore(state => state.setPluginData);
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchWeather = useCallback(async () => {
+  const fetchWeather = async () => {
     if (!config.location) return;
     setLoading(true);
     setError(null);
@@ -42,19 +42,19 @@ export function useWeather() {
         wind: current.windspeedKmph + ' km/h'
       };
       
-      setPluginData(PLUGIN_ID, 'weatherData', weatherData);
+      usePluginStore.getState().setPluginData(PLUGIN_ID, 'weatherData', weatherData);
     } catch {
       setError('获取失败');
     } finally {
       setLoading(false);
     }
-  }, [config.location, config.unit, setPluginData]);
+  };
 
   useEffect(() => {
     fetchWeather();
     const interval = setInterval(fetchWeather, (config.updateInterval || 30) * 60 * 1000);
     return () => clearInterval(interval);
-  }, [fetchWeather, config.updateInterval]);
+  }, [config.location, config.unit, config.updateInterval]);
 
   return { weather, loading, error, refresh: fetchWeather, config };
 }

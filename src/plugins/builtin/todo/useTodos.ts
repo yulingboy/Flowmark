@@ -1,10 +1,11 @@
+import { useShallow } from 'zustand/react/shallow';
 import { usePluginStore } from '../../store';
 import type { TodoItem } from './types';
 import { PLUGIN_ID } from './types';
 
 export function useTodos() {
   const todos = usePluginStore(
-    state => (state.pluginData[PLUGIN_ID]?.todos as TodoItem[]) || []
+    useShallow(state => (state.pluginData[PLUGIN_ID]?.todos as TodoItem[]) || [])
   );
 
   const addTodo = (text: string) => {
