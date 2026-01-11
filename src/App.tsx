@@ -17,12 +17,12 @@ const defaultShortcuts: ShortcutEntry[] = [
   { id: '4', name: '微博', url: 'https://weibo.com', icon: getFaviconUrl('https://weibo.com'), size: '1x1' },
   { id: '5', name: '优酷', url: 'https://www.youku.com', icon: getFaviconUrl('https://www.youku.com'), size: '1x1' },
   { id: '6', name: '哔哩哔哩', url: 'https://www.bilibili.com', icon: getFaviconUrl('https://www.bilibili.com'), size: '1x1' },
-  { id: '7', name: '乐视', url: 'https://www.le.com', icon: getFaviconUrl('https://www.le.com'), size: '1x1' },
-  { id: '8', name: '百度', url: 'https://www.baidu.com', icon: getFaviconUrl('https://www.baidu.com'), size: '1x1' },
+  { id: '7', name: '维基百科', url: 'https://zh.wikipedia.org', icon: getFaviconUrl('https://zh.wikipedia.org'), size: '1x1', openMode: 'popup' },
+  { id: '8', name: '百度', url: 'https://www.baidu.com', icon: getFaviconUrl('https://www.baidu.com'), size: '1x1', openMode: 'popup' },
   createShortcutFolder('folder-1', [
-    { id: 'f1-1', name: 'GitHub', url: 'https://github.com', icon: getFaviconUrl('https://github.com') },
+    { id: 'f1-1', name: 'GitHub', url: 'https://github.com', icon: getFaviconUrl('https://github.com'), openMode: 'popup' },
     { id: 'f1-2', name: 'GitLab', url: 'https://gitlab.com', icon: getFaviconUrl('https://gitlab.com') },
-    { id: 'f1-3', name: 'VS Code', url: 'https://code.visualstudio.com', icon: getFaviconUrl('https://code.visualstudio.com') },
+    { id: 'f1-3', name: 'VS Code', url: 'https://code.visualstudio.com', icon: getFaviconUrl('https://code.visualstudio.com'), openMode: 'popup' },
     { id: 'f1-4', name: 'NPM', url: 'https://www.npmjs.com', icon: getFaviconUrl('https://www.npmjs.com') },
   ], '开发工具', '2x2'),
 ];
