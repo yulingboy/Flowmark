@@ -54,10 +54,10 @@ export function ShortcutCard({ item, onClick, className = '' }: ShortcutCardProp
                   d="M0 12 Q0 0 12 0 L24 0 L24 24 L12 24 Q0 24 0 12 Z" 
                   fill="#8B5CF6"
                 />
-                <g transform="translate(10, 6)">
-                  <rect x="0" y="4" width="8" height="8" rx="1" stroke="white" strokeWidth="1.5" fill="none"/>
-                  <path d="M4 4 L4 0 L8 0" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-                  <path d="M8 0 L4 4" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+                <g transform="translate(8, 5)">
+                  <rect x="0" y="5" width="9" height="9" rx="1.5" stroke="white" strokeWidth="1.8" fill="none"/>
+                  <polyline points="5,5 5,0 10,0" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                  <line x1="5" y1="5" x2="10" y2="0" stroke="white" strokeWidth="1.8" strokeLinecap="round"/>
                 </g>
               </svg>
             ) : (
@@ -66,10 +66,10 @@ export function ShortcutCard({ item, onClick, className = '' }: ShortcutCardProp
                   d="M0 12 Q0 0 12 0 L24 0 L24 24 L12 24 Q0 24 0 12 Z" 
                   fill="#3B82F6"
                 />
-                <g transform="translate(10, 6)">
-                  <rect x="0" y="4" width="8" height="8" rx="1" stroke="white" strokeWidth="1.5" fill="none"/>
-                  <path d="M4 4 L4 0 L8 0" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-                  <path d="M8 0 L4 4" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+                <g transform="translate(8, 5)">
+                  <rect x="0" y="5" width="9" height="9" rx="1.5" stroke="white" strokeWidth="1.8" fill="none"/>
+                  <polyline points="5,5 5,0 10,0" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                  <line x1="5" y1="5" x2="10" y2="0" stroke="white" strokeWidth="1.8" strokeLinecap="round"/>
                 </g>
               </svg>
             )}
