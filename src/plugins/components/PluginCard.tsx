@@ -1,10 +1,19 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 import { pluginManager } from '../core/pluginManager';
 import { ContextMenu, MacModal } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
 import { LayoutIcon } from '@/components/common/icons';
 import type { PluginCardItem, PluginSize, CardSize } from '../types';
+import type { Position, ShortcutSize } from '@/types';
+import { pixelToGrid, getValidSizesForPosition, ALL_SIZES } from '@/components/Shortcuts/utils/gridUtils';
+
+interface GridConfig {
+  columns: number;
+  rows: number;
+  unit: number;
+  gap: number;
+}
 
 interface PluginCardProps {
   item: PluginCardItem;
@@ -14,6 +23,8 @@ interface PluginCardProps {
   batchEditMode?: boolean;
   isSelected?: boolean;
   onToggleSelect?: (id: string) => void;
+  gridConfig?: GridConfig;
+  position?: Position;
 }
 
 export function PluginCard({ 
@@ -23,7 +34,9 @@ export function PluginCard({
   className = '', 
   batchEditMode = false, 
   isSelected = false, 
-  onToggleSelect 
+  onToggleSelect,
+  gridConfig,
+  position
 }: PluginCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [contextMenu, setContextMenu] = useState<{ isOpen: boolean; x: number; y: number }>({
@@ -33,6 +46,14 @@ export function PluginCard({
   const plugin = pluginManager.getPlugin(item.pluginId);
   const api = pluginManager.getPluginAPI(item.pluginId);
   const isSystem = plugin?.isSystem === true;
+
+  // 计算禁用的布局选项
+  const disabledLayouts = useMemo(() => {
+    if (!gridConfig || !position) return [];
+    const { col, row } = pixelToGrid(position.x, position.y, gridConfig.unit, gridConfig.gap);
+    const validSizes = getValidSizesForPosition(col, row, gridConfig.columns, gridConfig.rows, item.size as ShortcutSize);
+    return ALL_SIZES.filter(size => !validSizes.includes(size));
+  }, [gridConfig, position, item.size]);
 
   if (!plugin || !api) {
     return (
@@ -71,6 +92,7 @@ export function PluginCard({
       label: '布局',
       type: 'layout',
       layoutOptions,
+      disabledLayouts,
       currentLayout: item.size || '2x2',
       onLayoutSelect: (size) => onResize?.(item, size),
       onClick: () => {},

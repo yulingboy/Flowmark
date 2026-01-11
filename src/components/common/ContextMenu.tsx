@@ -10,6 +10,7 @@ export interface ContextMenuItem {
   rightIcon?: React.ReactNode;
   type?: 'normal' | 'layout' | 'submenu';
   layoutOptions?: ShortcutSize[];
+  disabledLayouts?: ShortcutSize[];  // 禁用的布局选项（超出边界）
   currentLayout?: ShortcutSize;
   onLayoutSelect?: (size: ShortcutSize) => void;
   submenuItems?: { id: string; label: string; onClick: () => void }[];
@@ -166,6 +167,7 @@ export function ContextMenu({ isOpen, position, items, onClose, ariaLabel = '上
       const layoutSizes = item.layoutOptions 
         ? allLayoutSizes.filter(l => item.layoutOptions!.includes(l.size))
         : allLayoutSizes;
+      const disabledSet = new Set(item.disabledLayouts || []);
       
       return (
         <div key={index} className="px-4 py-3" role="presentation">
@@ -174,23 +176,29 @@ export function ContextMenu({ isOpen, position, items, onClose, ariaLabel = '上
             <span className="text-gray-800 text-sm">{item.label}</span>
           </div>
           <div className="flex gap-2 ml-8" role="group" aria-label="布局选项">
-            {layoutSizes.map(({ size, cols, rows }) => (
-              <Button 
-                key={size} 
-                size="small"
-                type={item.currentLayout === size ? 'primary' : 'default'}
-                onClick={() => { item.onLayoutSelect?.(size); onClose(); }}
-                className="!w-8 !h-8 !p-0"
-                title={size}
-                aria-pressed={item.currentLayout === size}
-              >
-                <div className="grid gap-0.5" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }}>
-                  {Array.from({ length: cols * rows }).map((_, i) => (
-                    <div key={i} className={`w-1.5 h-1.5 rounded-sm ${item.currentLayout === size ? 'bg-white' : 'bg-gray-400'}`} />
-                  ))}
-                </div>
-              </Button>
-            ))}
+            {layoutSizes.map(({ size, cols, rows }) => {
+              const isDisabled = disabledSet.has(size);
+              const isCurrent = item.currentLayout === size;
+              return (
+                <Button 
+                  key={size} 
+                  size="small"
+                  type={isCurrent ? 'primary' : 'default'}
+                  disabled={isDisabled}
+                  onClick={() => { if (!isDisabled) { item.onLayoutSelect?.(size); onClose(); } }}
+                  className={`!w-8 !h-8 !p-0 ${isDisabled ? '!opacity-40 !cursor-not-allowed' : ''}`}
+                  title={isDisabled ? `${size} (超出边界)` : size}
+                  aria-pressed={isCurrent}
+                  aria-disabled={isDisabled}
+                >
+                  <div className="grid gap-0.5" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }}>
+                    {Array.from({ length: cols * rows }).map((_, i) => (
+                      <div key={i} className={`w-1.5 h-1.5 rounded-sm ${isCurrent ? 'bg-white' : isDisabled ? 'bg-gray-300' : 'bg-gray-400'}`} />
+                    ))}
+                  </div>
+                </Button>
+              );
+            })}
           </div>
         </div>
       );

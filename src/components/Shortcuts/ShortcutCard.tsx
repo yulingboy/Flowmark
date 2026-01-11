@@ -1,11 +1,19 @@
 import { useState, useMemo } from 'react';
-import type { ShortcutItem, ShortcutSize } from '@/types';
+import type { ShortcutItem, ShortcutSize, Position } from '@/types';
 import { isShortcutFolder } from '@/types';
 import { IframeModal, ContextMenu } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
 import { EditOutlined, DeleteOutlined, FolderOutlined, RightOutlined } from '@ant-design/icons';
 import { OpenTabIcon, LayoutIcon, OpenModeIndicator } from '@/components/common/icons';
 import { useShortcutsStore } from '@/stores/shortcuts';
+import { pixelToGrid, getValidSizesForPosition, ALL_SIZES } from './utils/gridUtils';
+
+interface GridConfig {
+  columns: number;
+  rows: number;
+  unit: number;
+  gap: number;
+}
 
 interface ShortcutCardProps {
   item: ShortcutItem;
@@ -17,9 +25,11 @@ interface ShortcutCardProps {
   batchEditMode?: boolean;
   isSelected?: boolean;
   onToggleSelect?: (id: string) => void;
+  gridConfig?: GridConfig;
+  position?: Position;
 }
 
-export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, className = '', batchEditMode = false, isSelected = false, onToggleSelect }: ShortcutCardProps) {
+export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, className = '', batchEditMode = false, isSelected = false, onToggleSelect, gridConfig, position }: ShortcutCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [contextMenu, setContextMenu] = useState<{ isOpen: boolean; x: number; y: number }>({
     isOpen: false, x: 0, y: 0,
@@ -28,6 +38,14 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
   const moveToFolder = useShortcutsStore((state) => state.moveToFolder);
   const isPopupMode = item.openMode === 'popup';
   const is1x1 = (item.size || '1x1') === '1x1';
+
+  // 计算禁用的布局选项
+  const disabledLayouts = useMemo(() => {
+    if (!gridConfig || !position) return [];
+    const { col, row } = pixelToGrid(position.x, position.y, gridConfig.unit, gridConfig.gap);
+    const validSizes = getValidSizesForPosition(col, row, gridConfig.columns, gridConfig.rows, item.size);
+    return ALL_SIZES.filter(size => !validSizes.includes(size));
+  }, [gridConfig, position, item.size]);
 
   // 根据尺寸计算图标样式
   const iconStyle = is1x1
@@ -95,6 +113,7 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
       label: '布局',
       type: 'layout',
       layoutOptions: ['1x1', '1x2', '2x1', '2x2', '2x4'],
+      disabledLayouts,
       currentLayout: item.size || '1x1',
       onLayoutSelect: (size) => onResize?.(item, size),
       onClick: () => {},

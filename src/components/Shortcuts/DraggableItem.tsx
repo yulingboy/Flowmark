@@ -5,10 +5,18 @@ import { PluginCard } from '@/plugins';
 import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, ShortcutSize, Position, GridItem } from '@/types';
 import { isShortcutFolder, isPluginCard } from '@/types';
 
+interface GridConfig {
+  columns: number;
+  rows: number;
+  unit: number;
+  gap: number;
+}
+
 interface DraggableItemProps {
   entry: GridItem;
   position: Position;
   size: { width: number; height: number };
+  gridConfig: GridConfig;
   onOpen?: (folder: ShortcutFolderType) => void;
   onEdit?: (item: ShortcutItem) => void;
   onDelete?: (item: ShortcutItem) => void;
@@ -26,6 +34,7 @@ export function DraggableItem({
   entry, 
   position,
   size,
+  gridConfig,
   onOpen,
   onEdit,
   onDelete,
@@ -65,6 +74,8 @@ export function DraggableItem({
           onOpen={onOpen}
           onResize={(folder, s) => onResize?.(folder, s)}
           isDropTarget={isDropTarget}
+          gridConfig={gridConfig}
+          position={position}
         />
       ) : isPluginCard(entry) ? (
         <PluginCard
@@ -74,6 +85,8 @@ export function DraggableItem({
           batchEditMode={batchEditMode}
           isSelected={isSelected}
           onToggleSelect={onToggleSelect}
+          gridConfig={gridConfig}
+          position={position}
         />
       ) : (
         <ShortcutCard 
@@ -84,6 +97,8 @@ export function DraggableItem({
           batchEditMode={batchEditMode}
           isSelected={isSelected}
           onToggleSelect={onToggleSelect}
+          gridConfig={gridConfig}
+          position={position}
         />
       )}
     </div>

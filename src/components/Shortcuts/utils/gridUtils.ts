@@ -2,9 +2,51 @@ import type { ShortcutSize, Position, GridItem } from '@/types';
 
 export const TEXT_HEIGHT = 20;
 
+// 所有可用的尺寸选项
+export const ALL_SIZES: ShortcutSize[] = ['1x1', '1x2', '2x1', '2x2', '2x4'];
+
 export function getGridSpan(size: ShortcutSize = '1x1') {
   const [cols, rows] = size.split('x').map(Number);
   return { colSpan: cols, rowSpan: rows };
+}
+
+/**
+ * 计算给定位置可用的尺寸选项
+ * @param col - 项目所在列（0-indexed）
+ * @param row - 项目所在行（0-indexed）
+ * @param columns - 网格总列数
+ * @param rows - 网格总行数
+ * @param currentSize - 当前尺寸（始终保持可用）
+ * @returns 有效的尺寸选项数组
+ */
+export function getValidSizesForPosition(
+  col: number,
+  row: number,
+  columns: number,
+  rows: number,
+  currentSize?: ShortcutSize
+): ShortcutSize[] {
+  // 处理无效输入
+  if (columns <= 0 || rows <= 0 || col < 0 || row < 0) {
+    return currentSize ? [currentSize] : [];
+  }
+
+  const validSizes: ShortcutSize[] = [];
+
+  for (const size of ALL_SIZES) {
+    const { colSpan, rowSpan } = getGridSpan(size);
+    // 检查是否超出列边界和行边界
+    if (col + colSpan <= columns && row + rowSpan <= rows) {
+      validSizes.push(size);
+    }
+  }
+
+  // 确保当前尺寸始终包含在结果中
+  if (currentSize && !validSizes.includes(currentSize)) {
+    validSizes.push(currentSize);
+  }
+
+  return validSizes;
 }
 
 export function getItemSize(item: GridItem, unit: number, gap: number): { width: number; height: number } {

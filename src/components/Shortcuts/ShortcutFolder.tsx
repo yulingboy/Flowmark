@@ -1,10 +1,18 @@
-import { useState } from 'react';
-import type { ShortcutFolder as ShortcutFolderType, ShortcutSize } from '@/types';
+import { useState, useMemo } from 'react';
+import type { ShortcutFolder as ShortcutFolderType, ShortcutSize, Position } from '@/types';
 import { ContextMenu } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
 import { DeleteOutlined } from '@ant-design/icons';
 import { LayoutIcon, UnfoldIcon, EmptyFolderIcon } from '@/components/common/icons';
 import { useShortcutsStore } from '@/stores/shortcuts';
+import { pixelToGrid, getValidSizesForPosition } from './utils/gridUtils';
+
+interface GridConfig {
+  columns: number;
+  rows: number;
+  unit: number;
+  gap: number;
+}
 
 interface ShortcutFolderProps {
   folder: ShortcutFolderType;
@@ -12,6 +20,8 @@ interface ShortcutFolderProps {
   onResize?: (folder: ShortcutFolderType, size: ShortcutSize) => void;
   className?: string;
   isDropTarget?: boolean;
+  gridConfig?: GridConfig;
+  position?: Position;
 }
 
 // 根据文件夹尺寸计算预览网格
@@ -28,7 +38,7 @@ function getPreviewConfig(size: ShortcutSize = '1x1') {
   }
 }
 
-export function ShortcutFolder({ folder, onOpen, onResize, className = '', isDropTarget = false }: ShortcutFolderProps) {
+export function ShortcutFolder({ folder, onOpen, onResize, className = '', isDropTarget = false, gridConfig, position }: ShortcutFolderProps) {
   const [contextMenu, setContextMenu] = useState<{ isOpen: boolean; x: number; y: number }>({
     isOpen: false, x: 0, y: 0,
   });
@@ -37,6 +47,16 @@ export function ShortcutFolder({ folder, onOpen, onResize, className = '', isDro
 
   const size = folder.size || '1x1';
   const { cols, rows, maxItems } = getPreviewConfig(size);
+
+  // 计算禁用的布局选项
+  const disabledLayouts = useMemo(() => {
+    if (!gridConfig || !position) return [];
+    const { col, row } = pixelToGrid(position.x, position.y, gridConfig.unit, gridConfig.gap);
+    const validSizes = getValidSizesForPosition(col, row, gridConfig.columns, gridConfig.rows, folder.size);
+    // 文件夹只支持 1x1, 2x2, 2x4
+    const folderSizes: ShortcutSize[] = ['1x1', '2x2', '2x4'];
+    return folderSizes.filter(s => !validSizes.includes(s));
+  }, [gridConfig, position, folder.size]);
   
   const handleClick = () => {
     onOpen?.(folder);
@@ -54,6 +74,7 @@ export function ShortcutFolder({ folder, onOpen, onResize, className = '', isDro
       label: '布局',
       type: 'layout',
       layoutOptions: ['1x1', '2x2', '2x4'],
+      disabledLayouts,
       currentLayout: folder.size || '1x1',
       onLayoutSelect: (newSize) => onResize?.(folder, newSize),
       onClick: () => {},

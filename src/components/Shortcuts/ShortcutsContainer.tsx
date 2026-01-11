@@ -153,6 +153,7 @@ export function ShortcutsContainer({
                 entry={entry}
                 position={pos}
                 size={size}
+                gridConfig={{ columns, rows, unit, gap }}
                 onOpen={handleFolderOpen}
                 onEdit={onEditShortcut}
                 onDelete={onDeleteShortcut}
