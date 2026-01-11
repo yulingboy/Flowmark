@@ -12,6 +12,7 @@ interface DraggableItemProps {
   onEdit?: (item: ShortcutItem) => void;
   onDelete?: (item: ShortcutItem) => void;
   onResize?: (item: ShortcutItem, size: ShortcutSize) => void;
+  onResizeFolder?: (folder: ShortcutFolderType, size: ShortcutSize) => void;
   isDropTarget: boolean;
   isDragging: boolean;
   shouldAnimate: boolean;
@@ -28,6 +29,7 @@ export function DraggableItem({
   onEdit,
   onDelete,
   onResize,
+  onResizeFolder,
   isDropTarget,
   isDragging,
   shouldAnimate,
@@ -63,6 +65,7 @@ export function DraggableItem({
         <ShortcutFolder
           folder={entry}
           onOpen={onOpen}
+          onResize={onResizeFolder}
           isDropTarget={isDropTarget}
         />
       ) : (

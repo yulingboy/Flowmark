@@ -39,6 +39,7 @@ interface ShortcutsState {
   resizeShortcut: (id: string, size: ShortcutSize) => void;
   setEditingItem: (item: ShortcutItem | null) => void;
   moveToFolder: (itemId: string, folderId: string) => void;
+  dissolveFolder: (folderId: string) => void;
   
   // Batch edit actions
   toggleBatchEdit: () => void;
@@ -107,6 +108,19 @@ export const useShortcutsStore = create<ShortcutsState>()(
             }
             return s;
           });
+
+        return { shortcuts: newShortcuts };
+      }),
+
+      dissolveFolder: (folderId) => set((state) => {
+        const folder = state.shortcuts.find((s) => s.id === folderId && isShortcutFolder(s));
+        if (!folder || !isShortcutFolder(folder)) return state;
+
+        // 将文件夹内的项目释放到主列表，移除文件夹
+        const newShortcuts = [
+          ...state.shortcuts.filter((s) => s.id !== folderId),
+          ...folder.items.map((item) => ({ ...item, size: '1x1' as ShortcutSize })),
+        ];
 
         return { shortcuts: newShortcuts };
       }),

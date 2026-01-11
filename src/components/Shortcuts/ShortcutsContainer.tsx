@@ -117,6 +117,18 @@ export function ShortcutsContainer({
     onShortcutsChange?.(newItems);
   };
 
+  // 调整文件夹大小
+  const handleResizeFolder = (folder: ShortcutFolderType, size: ShortcutSize) => {
+    const newItems = items.map(s => {
+      if (s.id === folder.id && isShortcutFolder(s)) {
+        return { ...s, size };
+      }
+      return s;
+    });
+    setItems(newItems);
+    onShortcutsChange?.(newItems);
+  };
+
   // 计算容器尺寸（基于配置的行列数）
   const containerWidth = columns * unit + (columns - 1) * gap;
   const containerHeight = rows * unit + (rows - 1) * gap;
@@ -154,6 +166,7 @@ export function ShortcutsContainer({
                 onEdit={onEditShortcut}
                 onDelete={onDeleteShortcut}
                 onResize={handleResizeShortcut}
+                onResizeFolder={handleResizeFolder}
                 isDropTarget={isDropTarget}
                 isDragging={isDragging}
                 shouldAnimate={animatingItemId === entry.id}
