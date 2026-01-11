@@ -3,8 +3,8 @@ import type { ShortcutItem, ShortcutSize } from '@/types';
 import { isShortcutFolder } from '@/types';
 import { IframeModal, ContextMenu } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { OpenTabIcon, MoveIcon, LayoutIcon, ChevronRightIcon, OpenModeIndicator } from '@/components/common/icons';
+import { EditOutlined, DeleteOutlined, FolderOutlined, RightOutlined } from '@ant-design/icons';
+import { OpenTabIcon, LayoutIcon, OpenModeIndicator } from '@/components/common/icons';
 import { useShortcutsStore } from '@/stores/shortcutsStore';
 
 interface ShortcutCardProps {
@@ -94,10 +94,10 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
       onClick: () => onEdit?.(item),
     },
     {
-      icon: <MoveIcon />,
+      icon: <FolderOutlined />,
       label: '移动至分类',
       type: 'submenu',
-      rightIcon: <ChevronRightIcon />,
+      rightIcon: <RightOutlined />,
       submenuItems: folders.map((folder) => ({
         id: folder.id,
         label: folder.name,

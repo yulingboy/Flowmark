@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import type { ShortcutFolder as ShortcutFolderType, ShortcutItem } from '@/types';
 import { IframeModal } from '@/components/common';
-import { OpenModeIndicator } from '@/components/common/icons';
+import { OpenModeIndicator, EmptyFolderIcon } from '@/components/common/icons';
 
 interface FolderPopupProps {
   folder: ShortcutFolderType;
@@ -202,9 +202,7 @@ export function FolderPopup({
         ) : (
           <div className="flex items-center justify-center p-12">
             <div className="text-center">
-              <svg className="w-16 h-16 text-gray-300 mx-auto mb-3" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
-              </svg>
+              <EmptyFolderIcon className="w-16 h-16 text-gray-300 mx-auto mb-3" />
               <p className="text-gray-500 text-base font-medium">空文件夹</p>
             </div>
           </div>

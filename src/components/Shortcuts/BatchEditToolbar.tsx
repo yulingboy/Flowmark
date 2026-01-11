@@ -3,8 +3,7 @@ import { Modal, message } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useShortcutsStore } from '@/stores/shortcutsStore';
 import { isShortcutFolder } from '@/types';
-import { DeleteOutlined, CloseOutlined } from '@ant-design/icons';
-import { MoveIcon } from '@/components/common/icons';
+import { DeleteOutlined, CloseOutlined, FolderOutlined } from '@ant-design/icons';
 
 export function BatchEditToolbar() {
   const { shortcuts, selectedIds, batchDelete, batchMoveToFolder, toggleBatchEdit, selectAll, clearSelection } = useShortcutsStore();
@@ -45,7 +44,7 @@ export function BatchEditToolbar() {
       {/* 移动到文件夹 */}
       <div className="relative group">
         <button disabled={selectedCount === 0} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
-          <MoveIcon />
+          <FolderOutlined />
           <span className="text-sm">移动至</span>
         </button>
         {folders.length > 0 && selectedCount > 0 && (

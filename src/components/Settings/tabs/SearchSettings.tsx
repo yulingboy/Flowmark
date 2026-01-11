@@ -1,6 +1,7 @@
 import { Button, Switch } from 'antd';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { SEARCH_ENGINE_ICONS } from '@/utils/search';
+import { SettingRow } from '../SettingRow';
 import type { SearchEngine } from '@/types';
 
 const SEARCH_ENGINES: { value: SearchEngine; label: string }[] = [
@@ -14,16 +15,6 @@ export function SearchSettings() {
     searchEngine, searchInNewTab, autoFocusSearch, showSearchSuggestions, searchHistoryEnabled,
     updateSearchEngine, updateSearchInNewTab, updateAutoFocusSearch, updateShowSearchSuggestions, updateSearchHistoryEnabled, clearSearchHistory,
   } = useSettingsStore();
-
-  const SettingRow = ({ label, description, children }: { label: string; description?: string; children: React.ReactNode }) => (
-    <div className="flex items-center justify-between py-3 border-b border-gray-100">
-      <div>
-        <div className="text-sm text-gray-700">{label}</div>
-        {description && <div className="text-xs text-gray-400 mt-0.5">{description}</div>}
-      </div>
-      {children}
-    </div>
-  );
 
   return (
     <div>

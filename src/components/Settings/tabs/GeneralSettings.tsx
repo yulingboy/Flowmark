@@ -1,21 +1,12 @@
 import { Select, Button, Modal, Switch } from 'antd';
 import { useSettingsStore } from '@/stores/settingsStore';
+import { SettingRow } from '../SettingRow';
 
 export function GeneralSettings() {
   const { 
     openInNewTab, showClock, showSearch, showShortcuts, language,
     updateOpenInNewTab, updateShowClock, updateShowSearch, updateShowShortcuts, updateLanguage, resetAllSettings,
   } = useSettingsStore();
-
-  const SettingRow = ({ label, description, children }: { label: string; description?: string; children: React.ReactNode }) => (
-    <div className="flex items-center justify-between py-3 border-b border-gray-100">
-      <div>
-        <div className="text-sm text-gray-700">{label}</div>
-        {description && <div className="text-xs text-gray-400 mt-0.5">{description}</div>}
-      </div>
-      {children}
-    </div>
-  );
   
   return (
     <div>
