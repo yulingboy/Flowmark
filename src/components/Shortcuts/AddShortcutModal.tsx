@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Modal } from '@/components/common';
 import { getFaviconUrl } from '@/utils/favicon';
+import type { ShortcutItem } from '@/types';
 
 interface AddShortcutModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (shortcut: {
+    id?: string;
     name: string;
     url: string;
     icon: string;
@@ -13,6 +15,7 @@ interface AddShortcutModalProps {
     openMode: 'tab' | 'popup';
     bgColor?: string;
   }) => void;
+  editItem?: ShortcutItem | null;
 }
 
 const BG_COLORS = [
@@ -95,7 +98,7 @@ function extractSiteInfo(urlString: string): { name: string; description: string
   }
 }
 
-export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalProps) {
+export function AddShortcutModal({ isOpen, onClose, onSave, editItem }: AddShortcutModalProps) {
   const [url, setUrl] = useState('');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -105,6 +108,19 @@ export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalPr
   const [isPopupMode, setIsPopupMode] = useState(false);
   const [previewIcon, setPreviewIcon] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const isEditMode = !!editItem;
+
+  // 编辑模式时填充表单
+  useEffect(() => {
+    if (editItem && isOpen) {
+      setUrl(editItem.url);
+      setName(editItem.name);
+      setIconUrl(editItem.icon);
+      setPreviewIcon(editItem.icon);
+      setIsPopupMode(editItem.openMode === 'popup');
+    }
+  }, [editItem, isOpen]);
 
   // URL 变化时自动获取图标
   useEffect(() => {
@@ -147,6 +163,7 @@ export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalPr
     if (!url || !name) return;
     
     onSave({
+      id: editItem?.id,
       name,
       url: url.startsWith('http') ? url : `https://${url}`,
       icon: iconUrl || previewIcon || getFaviconUrl(url),
@@ -163,6 +180,7 @@ export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalPr
     if (!url || !name) return;
     
     onSave({
+      id: editItem?.id,
       name,
       url: url.startsWith('http') ? url : `https://${url}`,
       icon: iconUrl || previewIcon || getFaviconUrl(url),
@@ -205,7 +223,7 @@ export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalPr
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="添加标签" width="700px" closeOnBackdrop={false} draggable>
+    <Modal isOpen={isOpen} onClose={handleClose} title={isEditMode ? '编辑标签' : '添加标签'} width="700px" closeOnBackdrop={false} draggable>
       <div className="flex flex-col gap-4">
         {/* 表单内容 */}
         <div className="flex flex-col gap-4">
@@ -387,15 +405,17 @@ export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalPr
             disabled={!url || !name}
             className="flex-1 py-3 bg-blue-500 text-white rounded-lg text-sm cursor-pointer border-none hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            保存
+            {isEditMode ? '保存修改' : '保存'}
           </button>
-          <button
-            onClick={handleSaveAndContinue}
-            disabled={!url || !name}
-            className="px-6 py-3 text-blue-500 bg-transparent border-none cursor-pointer text-sm hover:text-blue-600 disabled:text-gray-400 disabled:cursor-not-allowed"
-          >
-            保存并继续 →
-          </button>
+          {!isEditMode && (
+            <button
+              onClick={handleSaveAndContinue}
+              disabled={!url || !name}
+              className="px-6 py-3 text-blue-500 bg-transparent border-none cursor-pointer text-sm hover:text-blue-600 disabled:text-gray-400 disabled:cursor-not-allowed"
+            >
+              保存并继续 →
+            </button>
+          )}
         </div>
       </div>
     </Modal>

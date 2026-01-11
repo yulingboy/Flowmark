@@ -75,6 +75,7 @@ const SettingsIcon = () => (
 function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAddShortcutOpen, setIsAddShortcutOpen] = useState(false);
+  const [editingShortcut, setEditingShortcut] = useState<ShortcutItem | null>(null);
   const [shortcuts, setShortcuts] = useState<ShortcutEntry[]>(defaultShortcuts);
   const [contextMenu, setContextMenu] = useState<{ isOpen: boolean; x: number; y: number }>({
     isOpen: false,
@@ -94,29 +95,47 @@ function App() {
     }
   }, [autoFocusSearch, showSearch]);
 
-  // 添加新标签
-  const handleAddShortcut = (shortcut: {
+  // 添加或编辑标签
+  const handleSaveShortcut = (shortcut: {
+    id?: string;
     name: string;
     url: string;
     icon: string;
     description?: string;
     openMode: 'tab' | 'popup';
   }) => {
-    const newShortcut: ShortcutEntry = {
-      id: `shortcut-${Date.now()}`,
-      name: shortcut.name,
-      url: shortcut.url,
-      icon: shortcut.icon,
-      size: '1x1',
-      openMode: shortcut.openMode,
-    };
-    setShortcuts(prev => [...prev, newShortcut]);
+    if (shortcut.id) {
+      // 编辑模式
+      setShortcuts(prev => prev.map(s => {
+        if (s.id === shortcut.id && !isShortcutFolder(s)) {
+          return { ...s, name: shortcut.name, url: shortcut.url, icon: shortcut.icon, openMode: shortcut.openMode };
+        }
+        return s;
+      }));
+    } else {
+      // 添加模式
+      const newShortcut: ShortcutEntry = {
+        id: `shortcut-${Date.now()}`,
+        name: shortcut.name,
+        url: shortcut.url,
+        icon: shortcut.icon,
+        size: '1x1',
+        openMode: shortcut.openMode,
+      };
+      setShortcuts(prev => [...prev, newShortcut]);
+    }
   };
 
   // 编辑标签
   const handleEditShortcut = (item: ShortcutItem) => {
-    console.log('编辑标签', item);
-    // TODO: 打开编辑弹窗
+    setEditingShortcut(item);
+    setIsAddShortcutOpen(true);
+  };
+
+  // 关闭弹窗
+  const handleCloseModal = () => {
+    setIsAddShortcutOpen(false);
+    setEditingShortcut(null);
   };
 
   // 删除标签
@@ -208,11 +227,12 @@ function App() {
         onClose={() => setContextMenu(prev => ({ ...prev, isOpen: false }))}
       />
 
-      {/* 添加标签弹窗 */}
+      {/* 添加/编辑标签弹窗 */}
       <AddShortcutModal
         isOpen={isAddShortcutOpen}
-        onClose={() => setIsAddShortcutOpen(false)}
-        onSave={handleAddShortcut}
+        onClose={handleCloseModal}
+        onSave={handleSaveShortcut}
+        editItem={editingShortcut}
       />
 
       {/* 时钟 */}
