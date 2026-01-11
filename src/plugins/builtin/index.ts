@@ -11,8 +11,9 @@ import { hitokotoPlugin } from './hitokoto';
 import { pomodoroPlugin } from './pomodoro';
 import { flipClockPlugin } from './flip-clock';
 import { habitPlugin } from './habit';
+import { foodPickerPlugin } from './food-picker';
 
-export const builtinPlugins = [pluginManagerPlugin, weatherPlugin, todoPlugin, notesPlugin, wallpaperPlugin, calendarPlugin, hitokotoPlugin, pomodoroPlugin, flipClockPlugin, habitPlugin];
+export const builtinPlugins = [pluginManagerPlugin, weatherPlugin, todoPlugin, notesPlugin, wallpaperPlugin, calendarPlugin, hitokotoPlugin, pomodoroPlugin, flipClockPlugin, habitPlugin, foodPickerPlugin];
 
 export function registerBuiltinPlugins() {
   const shortcutsStore = useShortcutsStore.getState();
@@ -47,4 +48,4 @@ export function registerBuiltinPlugins() {
   });
 }
 
-export { weatherPlugin, todoPlugin, notesPlugin, pluginManagerPlugin, wallpaperPlugin, calendarPlugin, hitokotoPlugin, pomodoroPlugin, flipClockPlugin, habitPlugin };
+export { weatherPlugin, todoPlugin, notesPlugin, pluginManagerPlugin, wallpaperPlugin, calendarPlugin, hitokotoPlugin, pomodoroPlugin, flipClockPlugin, habitPlugin, foodPickerPlugin };
