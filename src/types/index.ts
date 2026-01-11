@@ -1,6 +1,9 @@
 // 快捷方式尺寸类型：1x1, 1x2, 2x1, 2x2, 2x4
 export type ShortcutSize = '1x1' | '1x2' | '2x1' | '2x2' | '2x4';
 
+// 打开方式：新标签页 或 弹窗
+export type OpenMode = 'tab' | 'popup';
+
 // 位置信息
 export interface Position {
   x: number;
@@ -15,6 +18,7 @@ export interface ShortcutItem {
   icon: string;
   size?: ShortcutSize; // 默认 1x1
   position?: Position; // 自由定位
+  openMode?: OpenMode; // 打开方式，默认 tab
 }
 
 // 快捷入口文件夹
