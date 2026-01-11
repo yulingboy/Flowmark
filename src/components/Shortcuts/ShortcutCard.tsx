@@ -46,28 +46,38 @@ export function ShortcutCard({ item, onClick, className = '' }: ShortcutCardProp
             }}
           />
           
-          {/* 打开方式标识 - 右下角圆弧形 */}
-          <div className="absolute -bottom-0.5 -right-0.5">
+          {/* 打开方式标识 - 左下角圆弧形角标 */}
+          <div className="absolute bottom-0 left-0">
             {isPopupMode ? (
-              <div 
-                className="w-6 h-6 bg-purple-500 flex items-center justify-center"
-                style={{ borderRadius: '8px 0 12px 0' }}
-                title="弹窗打开"
-              >
-                <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                </svg>
-              </div>
+              <svg width="28" height="28" viewBox="0 0 28 28" className="block">
+                <path 
+                  d="M0 28 L0 8 Q0 0 8 0 L20 0 Q28 8 28 20 L28 28 Z" 
+                  fill="#8B5CF6"
+                />
+                <path 
+                  d="M7 18 L7 10 M7 10 L11 10 M7 10 L13 16" 
+                  stroke="white" 
+                  strokeWidth="1.5" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+              </svg>
             ) : (
-              <div 
-                className="w-6 h-6 bg-blue-500 flex items-center justify-center"
-                style={{ borderRadius: '8px 0 12px 0' }}
-                title="新标签页打开"
-              >
-                <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              </div>
+              <svg width="28" height="28" viewBox="0 0 28 28" className="block">
+                <path 
+                  d="M0 28 L0 8 Q0 0 8 0 L20 0 Q28 8 28 20 L28 28 Z" 
+                  fill="#3B82F6"
+                />
+                <path 
+                  d="M8 18 L8 12 Q8 10 10 10 L14 10 M14 8 L18 8 L18 12 M17 9 L12 14" 
+                  stroke="white" 
+                  strokeWidth="1.5" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+              </svg>
             )}
           </div>
         </div>
