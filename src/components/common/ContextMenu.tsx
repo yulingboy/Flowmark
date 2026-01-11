@@ -111,17 +111,24 @@ export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuPro
 
     if (item.type === 'submenu' && item.submenuItems) {
       return (
-        <div key={index} className="relative" onMouseEnter={() => setActiveSubmenu(index)} onMouseLeave={() => setActiveSubmenu(null)}>
+        <div key={index} className="relative" onMouseEnter={() => setActiveSubmenu(index)} onMouseLeave={(e) => {
+          // 检查是否移动到子菜单
+          const relatedTarget = e.relatedTarget as HTMLElement;
+          if (relatedTarget?.closest('.submenu-panel')) return;
+          setActiveSubmenu(null);
+        }}>
           <button className="w-full px-4 py-3 flex items-center gap-3 hover:bg-black/5 transition-colors cursor-pointer border-none bg-transparent text-left">
             <span className="w-5 h-5 text-gray-600 flex items-center justify-center">{item.icon}</span>
             <span className="flex-1 text-gray-800 text-base">{item.label}</span>
             {item.rightIcon && <span className="w-5 h-5 text-gray-500 flex items-center justify-center">{item.rightIcon}</span>}
           </button>
           {activeSubmenu === index && (
-            <div className="absolute left-full top-0 ml-1 min-w-[140px] py-2 rounded-xl shadow-xl"
-              style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.5)' }}>
+            <div className="submenu-panel absolute left-full top-0 min-w-[140px] py-2 rounded-xl shadow-xl"
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.5)', marginLeft: '-4px', paddingLeft: '4px' }}
+              onMouseEnter={() => setActiveSubmenu(index)}
+              onMouseLeave={() => setActiveSubmenu(null)}>
               {item.submenuItems.length > 0 ? item.submenuItems.map((sub) => (
-                <button key={sub.id} onClick={() => { sub.onClick(); onClose(); }}
+                <button key={sub.id} onClick={(e) => { e.stopPropagation(); sub.onClick(); onClose(); }}
                   className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-black/5 transition-colors cursor-pointer border-none bg-transparent">
                   {sub.label}
                 </button>
