@@ -10,7 +10,7 @@ export const flipClockPlugin: Plugin = {
     version: '1.0.0',
     description: '经典翻页时钟，带有翻页动画效果',
     author: 'Built-in',
-    icon: '🕐'
+    icon: 'clock'
   },
 
   supportedSizes: ['1x1', '2x2', '2x4'],

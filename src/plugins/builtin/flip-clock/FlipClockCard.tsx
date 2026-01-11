@@ -77,7 +77,7 @@ export function FlipClockCard({ size }: { size: PluginSize }) {
   // 1x1 尺寸：简化显示
   if (size === '1x1') {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-900 rounded-xl">
+      <div className="w-full h-full flex items-center justify-center bg-neutral-900/90 backdrop-blur-sm rounded-xl">
         <span className="text-2xl font-mono text-white tabular-nums">
           {time.hours}:{time.minutes}
         </span>
@@ -88,7 +88,7 @@ export function FlipClockCard({ size }: { size: PluginSize }) {
   // 2x2 尺寸
   if (size === '2x2') {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center bg-gray-900 rounded-xl p-2">
+      <div className="w-full h-full flex flex-col items-center justify-center bg-neutral-900/90 backdrop-blur-sm rounded-xl p-2">
         <div className="flex items-center gap-1">
           <FlipGroup value={time.hours} prevValue={prevTime.hours} size="md" />
           <Separator size="md" />
@@ -101,10 +101,10 @@ export function FlipClockCard({ size }: { size: PluginSize }) {
           )}
         </div>
         {!config.use24Hour && time.period && (
-          <span className="text-xs text-gray-400 mt-1">{time.period}</span>
+          <span className="text-xs text-white/50 mt-1">{time.period}</span>
         )}
         {config.showDate && (
-          <span className="text-xs text-gray-500 mt-2">{date.formatted}</span>
+          <span className="text-xs text-white/40 mt-2">{date.formatted}</span>
         )}
       </div>
     );
@@ -112,7 +112,7 @@ export function FlipClockCard({ size }: { size: PluginSize }) {
 
   // 2x4 尺寸：完整显示
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-900 rounded-xl p-4">
+    <div className="w-full h-full flex flex-col items-center justify-center bg-neutral-900/90 backdrop-blur-sm rounded-xl p-4">
       <div className="flex items-center gap-2">
         <FlipGroup value={time.hours} prevValue={prevTime.hours} size="lg" />
         <Separator size="lg" />
@@ -124,11 +124,11 @@ export function FlipClockCard({ size }: { size: PluginSize }) {
           </>
         )}
         {!config.use24Hour && time.period && (
-          <span className="text-xl text-gray-400 ml-2">{time.period}</span>
+          <span className="text-xl text-white/50 ml-2">{time.period}</span>
         )}
       </div>
       {config.showDate && (
-        <span className="text-sm text-gray-500 mt-4">{date.formatted}</span>
+        <span className="text-sm text-white/40 mt-4">{date.formatted}</span>
       )}
     </div>
   );
