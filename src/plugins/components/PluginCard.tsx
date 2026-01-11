@@ -140,11 +140,9 @@ export function PluginCard({
           )}
         </div>
         
-        {item.size === '1x1' && (
-          <span className="text-white text-xs truncate drop-shadow w-full text-center flex-shrink-0">
-            {item.name}
-          </span>
-        )}
+        <span className="text-white text-xs truncate drop-shadow w-full text-center flex-shrink-0">
+          {item.name}
+        </span>
       </button>
 
       <ContextMenu
