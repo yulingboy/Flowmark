@@ -58,15 +58,16 @@ function FlipGroup({ value, prevValue, size }: { value: string; prevValue: strin
   );
 }
 
-/** 分隔符 */
+/** 分隔符 - 两个点 */
 function Separator({ size }: { size: 'sm' | 'md' | 'lg' }) {
-  const sizeClass = {
-    sm: 'text-lg',
-    md: 'text-2xl',
-    lg: 'text-4xl',
-  }[size];
+  const sizeClass = `flip-separator-${size}`;
 
-  return <span className={`flip-separator ${sizeClass}`}>:</span>;
+  return (
+    <div className={`flip-separator ${sizeClass}`}>
+      <div className="flip-separator-dot" />
+      <div className="flip-separator-dot" />
+    </div>
+  );
 }
 
 export function FlipClockCard({ size }: { size: PluginSize }) {

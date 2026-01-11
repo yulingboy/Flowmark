@@ -1,31 +1,40 @@
 /* 翻页时钟样式 */
 
+.flip-clock-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .flip-group {
   display: flex;
-  gap: 2px;
+  gap: 4px;
 }
 
 .flip-group-sm .flip-digit {
-  width: 20px;
-  height: 28px;
-  font-size: 18px;
+  width: 24px;
+  height: 36px;
+  font-size: 24px;
 }
 
 .flip-group-md .flip-digit {
-  width: 28px;
-  height: 40px;
-  font-size: 26px;
+  width: 36px;
+  height: 52px;
+  font-size: 36px;
 }
 
 .flip-group-lg .flip-digit {
-  width: 40px;
-  height: 56px;
-  font-size: 36px;
+  width: 56px;
+  height: 80px;
+  font-size: 56px;
 }
 
 .flip-digit {
   position: relative;
-  perspective: 200px;
+  perspective: 300px;
+  background: #1a1a1a;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
 .flip-digit-inner {
@@ -41,8 +50,7 @@
   left: 0;
   width: 100%;
   height: 50%;
-  background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%);
-  border-radius: 4px 4px 0 0;
+  background: linear-gradient(180deg, #2a2a2a 0%, #1f1f1f 100%);
   overflow: hidden;
   display: flex;
   align-items: flex-end;
@@ -51,8 +59,8 @@
 
 .flip-digit-top span {
   color: #fff;
-  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-  font-weight: 600;
+  font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  font-weight: 700;
   transform: translateY(50%);
 }
 
@@ -63,8 +71,7 @@
   left: 0;
   width: 100%;
   height: 50%;
-  background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
-  border-radius: 0 0 4px 4px;
+  background: linear-gradient(180deg, #1a1a1a 0%, #151515 100%);
   overflow: hidden;
   display: flex;
   align-items: flex-start;
@@ -73,8 +80,8 @@
 
 .flip-digit-bottom span {
   color: #fff;
-  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-  font-weight: 600;
+  font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  font-weight: 700;
   transform: translateY(-50%);
 }
 
@@ -85,9 +92,28 @@
   top: 50%;
   left: 0;
   width: 100%;
-  height: 1px;
-  background: rgba(0, 0, 0, 0.4);
+  height: 2px;
+  background: rgba(0, 0, 0, 0.6);
   z-index: 10;
+  transform: translateY(-50%);
+}
+
+/* 左右两侧的小凹槽效果 */
+.flip-digit-inner::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, 
+    rgba(0,0,0,0.3) 0%, 
+    transparent 10%, 
+    transparent 90%, 
+    rgba(0,0,0,0.3) 100%
+  );
+  z-index: 11;
+  transform: translateY(-50%);
 }
 
 /* 翻页动画 - 上半部分翻下 */
@@ -97,8 +123,7 @@
   left: 0;
   width: 100%;
   height: 50%;
-  background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%);
-  border-radius: 4px 4px 0 0;
+  background: linear-gradient(180deg, #2a2a2a 0%, #1f1f1f 100%);
   overflow: hidden;
   display: flex;
   align-items: flex-end;
@@ -106,12 +131,13 @@
   transform-origin: bottom;
   animation: flip-top 0.3s ease-in forwards;
   z-index: 20;
+  backface-visibility: hidden;
 }
 
 .flip-digit-flip-top span {
   color: #fff;
-  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-  font-weight: 600;
+  font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  font-weight: 700;
   transform: translateY(50%);
 }
 
@@ -122,22 +148,22 @@
   left: 0;
   width: 100%;
   height: 50%;
-  background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
-  border-radius: 0 0 4px 4px;
+  background: linear-gradient(180deg, #1a1a1a 0%, #151515 100%);
   overflow: hidden;
   display: flex;
   align-items: flex-start;
   justify-content: center;
   transform-origin: top;
-  animation: flip-bottom 0.3s 0.3s ease-out forwards;
+  animation: flip-bottom 0.3s 0.15s ease-out forwards;
   transform: rotateX(90deg);
   z-index: 20;
+  backface-visibility: hidden;
 }
 
 .flip-digit-flip-bottom span {
   color: #fff;
-  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-  font-weight: 600;
+  font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  font-weight: 700;
   transform: translateY(-50%);
 }
 
@@ -159,18 +185,54 @@
   }
 }
 
-/* 分隔符 */
+/* 分隔符 - 两个点 */
 .flip-separator {
-  color: #666;
-  font-weight: bold;
-  animation: blink 1s infinite;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
 }
 
-@keyframes blink {
-  0%, 50% {
-    opacity: 1;
-  }
-  51%, 100% {
-    opacity: 0.3;
-  }
+.flip-separator-dot {
+  width: 6px;
+  height: 6px;
+  background: #666;
+  border-radius: 50%;
+}
+
+.flip-separator-sm .flip-separator-dot {
+  width: 4px;
+  height: 4px;
+}
+
+.flip-separator-sm {
+  gap: 4px;
+}
+
+.flip-separator-md .flip-separator-dot {
+  width: 6px;
+  height: 6px;
+}
+
+.flip-separator-md {
+  gap: 8px;
+}
+
+.flip-separator-lg .flip-separator-dot {
+  width: 10px;
+  height: 10px;
+}
+
+.flip-separator-lg {
+  gap: 12px;
+}
+
+/* 日期显示 */
+.flip-clock-date {
+  color: #888;
+  font-size: 16px;
+  letter-spacing: 4px;
+  margin-top: 16px;
 }

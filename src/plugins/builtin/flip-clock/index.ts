@@ -33,12 +33,18 @@ export const flipClockPlugin: Plugin = {
       label: '显示日期',
       default: true,
     },
+    showLunar: {
+      type: 'boolean',
+      label: '显示农历',
+      default: true,
+    },
   },
 
   defaultConfig: {
     showSeconds: true,
     use24Hour: true,
     showDate: true,
+    showLunar: true,
   },
 
   renderCard: (_api, size: PluginSize) => React.createElement(FlipClockCard, { size }),

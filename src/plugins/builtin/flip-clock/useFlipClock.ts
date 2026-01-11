@@ -11,7 +11,7 @@ export function useFlipClock() {
   const config: FlipClockConfig = { ...DEFAULT_CONFIG, ...storedConfig };
 
   const [time, setTime] = useState(() => getCurrentTime(config.use24Hour));
-  const [date, setDate] = useState(() => getCurrentDate());
+  const [date, setDate] = useState(() => getCurrentDate(config.showLunar));
   const [prevTime, setPrevTime] = useState(time);
 
   useEffect(() => {
@@ -19,7 +19,7 @@ export function useFlipClock() {
       const newTime = getCurrentTime(config.use24Hour);
       setPrevTime(time);
       setTime(newTime);
-      setDate(getCurrentDate());
+      setDate(getCurrentDate(config.showLunar));
     };
 
     // 立即更新一次
@@ -28,7 +28,7 @@ export function useFlipClock() {
     // 每秒更新
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
-  }, [config.use24Hour]);
+  }, [config.use24Hour, config.showLunar]);
 
   return {
     time,
