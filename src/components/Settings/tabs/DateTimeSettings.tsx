@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Radio, ColorPicker, Button } from 'antd';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { ToggleSwitch } from '../components/ToggleSwitch';
 
@@ -85,38 +86,18 @@ export function DateTimeSettings() {
 
       <div className="flex items-center justify-between py-3 border-b border-gray-100">
         <div className="text-sm text-gray-700">字体大小</div>
-        <div className="flex gap-2">
-          {(['small', 'medium', 'large'] as const).map((size) => (
-            <button
-              key={size}
-              onClick={() => updateClockFontSize(size)}
-              className={`px-3 py-1 text-xs rounded-md cursor-pointer ${
-                clockFontSize === size
-                  ? 'border-2 border-blue-500 bg-blue-50'
-                  : 'border border-gray-200 bg-white'
-              } text-gray-700`}
-            >
-              {size === 'small' ? '小' : size === 'medium' ? '中' : '大'}
-            </button>
-          ))}
-        </div>
+        <Radio.Group value={clockFontSize} onChange={(e) => updateClockFontSize(e.target.value)}>
+          <Radio.Button value="small">小</Radio.Button>
+          <Radio.Button value="medium">中</Radio.Button>
+          <Radio.Button value="large">大</Radio.Button>
+        </Radio.Group>
       </div>
 
       <div className="flex items-center justify-between py-3 border-b border-gray-100">
         <div className="text-sm text-gray-700">字体颜色</div>
         <div className="flex items-center gap-2">
-          <input
-            type="color"
-            value={clockColor}
-            onChange={(e) => updateClockColor(e.target.value)}
-            className="w-8 h-8 p-0 border border-gray-200 rounded-md cursor-pointer"
-          />
-          <button
-            onClick={() => updateClockColor('#ffffff')}
-            className="px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded cursor-pointer"
-          >
-            重置
-          </button>
+          <ColorPicker value={clockColor} onChange={(_, hex) => updateClockColor(hex)} />
+          <Button size="small" onClick={() => updateClockColor('#ffffff')}>重置</Button>
         </div>
       </div>
 

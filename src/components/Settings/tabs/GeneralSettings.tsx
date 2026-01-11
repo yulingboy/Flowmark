@@ -1,3 +1,4 @@
+import { Select, Button, Modal } from 'antd';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { ToggleSwitch } from '../components/ToggleSwitch';
 
@@ -52,20 +53,21 @@ export function GeneralSettings() {
       
       <div className="flex items-center justify-between py-3 border-b border-gray-100">
         <div className="text-sm text-gray-700">界面语言</div>
-        <select
+        <Select
           value={language}
-          onChange={(e) => updateLanguage(e.target.value as 'zh-CN' | 'en-US')}
-          className="px-3 py-1.5 rounded-md border border-gray-200 text-sm text-gray-700 bg-white cursor-pointer"
-        >
-          <option value="zh-CN">简体中文</option>
-          <option value="en-US">English</option>
-        </select>
+          onChange={updateLanguage}
+          style={{ width: 120 }}
+          options={[
+            { value: 'zh-CN', label: '简体中文' },
+            { value: 'en-US', label: 'English' },
+          ]}
+        />
       </div>
       
       <div className="text-xs text-gray-400 my-5">数据管理</div>
       
       <div className="flex gap-3 py-3">
-        <button
+        <Button
           onClick={() => {
             const data = JSON.stringify(useSettingsStore.getState(), null, 2);
             const blob = new Blob([data], { type: 'application/json' });
@@ -76,43 +78,49 @@ export function GeneralSettings() {
             a.click();
             URL.revokeObjectURL(url);
           }}
-          className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg cursor-pointer"
         >
           导出设置
-        </button>
-        <label className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg cursor-pointer">
-          导入设置
-          <input
-            type="file"
-            accept=".json"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                  try {
-                    const data = JSON.parse(event.target?.result as string);
-                    useSettingsStore.setState(data);
-                  } catch {
-                    alert('导入失败：文件格式错误');
-                  }
-                };
-                reader.readAsText(file);
-              }
-            }}
-          />
-        </label>
-        <button
+        </Button>
+        <Button>
+          <label className="cursor-pointer">
+            导入设置
+            <input
+              type="file"
+              accept=".json"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = (event) => {
+                    try {
+                      const data = JSON.parse(event.target?.result as string);
+                      useSettingsStore.setState(data);
+                    } catch {
+                      Modal.error({ title: '导入失败', content: '文件格式错误' });
+                    }
+                  };
+                  reader.readAsText(file);
+                }
+              }}
+            />
+          </label>
+        </Button>
+        <Button
+          danger
           onClick={() => {
-            if (confirm('确定要重置所有设置吗？此操作不可撤销。')) {
-              resetAllSettings();
-            }
+            Modal.confirm({
+              title: '重置设置',
+              content: '确定要重置所有设置吗？此操作不可撤销。',
+              okText: '重置',
+              cancelText: '取消',
+              okButtonProps: { danger: true },
+              onOk: resetAllSettings,
+            });
           }}
-          className="px-4 py-2 text-sm bg-red-50 text-red-500 border border-red-200 rounded-lg cursor-pointer"
         >
           重置设置
-        </button>
+        </Button>
       </div>
     </div>
   );

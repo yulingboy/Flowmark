@@ -1,3 +1,4 @@
+import { Button } from 'antd';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { SEARCH_ENGINE_ICONS } from '@/utils/search';
 import type { SearchEngine } from '@/types';
@@ -70,12 +71,9 @@ export function SearchSettings() {
 
       {searchHistoryEnabled && (
         <div className="mt-4">
-          <button
-            onClick={clearSearchHistory}
-            className="px-4 py-2 text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg cursor-pointer"
-          >
+          <Button danger onClick={clearSearchHistory}>
             清除搜索历史
-          </button>
+          </Button>
         </div>
       )}
     </div>
