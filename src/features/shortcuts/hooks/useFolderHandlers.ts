@@ -51,6 +51,18 @@ export function createFolderHandlers({
     }
   };
 
+  /**
+   * 处理从文件夹弹窗拖出卡片
+   * 
+   * 处理流程：
+   * 1. 从文件夹中移除该卡片
+   * 2. 在文件夹附近查找有效位置（边界感知）
+   * 3. 如果找不到位置，尝试将卡片降级为 1x1 尺寸
+   * 4. 如果仍然找不到位置，拒绝操作，卡片保持在文件夹中
+   * 
+   * @param folderId 文件夹 ID
+   * @param item 要拖出的卡片
+   */
   const handleItemDragOut = (folderId: string, item: ShortcutItem) => {
     const folder = itemsMap.get(folderId);
     const folderPos = folder?.position || { x: 0, y: 0 };
@@ -63,6 +75,7 @@ export function createFolderHandlers({
       return i;
     });
     
+    // 初始化网格管理器，用于查找可用位置
     const manager = new GridManager(columns, rows, unit, gap);
     manager.initFromItems(newItems);
     
@@ -70,9 +83,9 @@ export function createFolderHandlers({
     const gridConfig: GridConfig = { columns, rows, unit, gap };
     const occupiedCells = manager.getOccupiedCells();
     
-    // 使用边界感知的位置查找
+    // 使用边界感知的位置查找，优先在文件夹右侧放置
     let targetPos = findValidPositionInBounds(
-      folderGrid.col + 1,
+      folderGrid.col + 1,  // 文件夹右侧一列
       folderGrid.row,
       item.size || '1x1',
       gridConfig,
@@ -81,7 +94,7 @@ export function createFolderHandlers({
     
     let finalItem = item;
     
-    // 如果找不到有效位置，尝试降级为 1x1
+    // 如果找不到有效位置，尝试降级为 1x1 尺寸
     if (!targetPos && item.size !== '1x1') {
       targetPos = findValidPositionInBounds(
         folderGrid.col + 1,
@@ -96,19 +109,20 @@ export function createFolderHandlers({
       }
     }
     
-    // 如果仍然找不到位置，拒绝操作
+    // 如果仍然找不到位置，拒绝操作，卡片保持在文件夹中
     if (!targetPos) {
       console.warn(`Cannot place item ${item.id}: no valid position available within grid boundaries`);
-      return; // 保持在文件夹中
+      return;
     }
     
+    // 将网格坐标转换为像素坐标，添加到主网格
     const finalPos = gridToPixel(targetPos.col, targetPos.row, unit, gap);
     const itemWithPos: ShortcutItem = { ...finalItem, position: finalPos };
     
     newItems.push(itemWithPos);
     setItems(newItems);
     onShortcutsChange?.(newItems);
-    setOpenFolder(null);
+    setOpenFolder(null);  // 关闭文件夹弹窗
   };
 
   return { handleFolderOpen, handleCloseFolder, handleFolderItemsChange, handleItemDragOut };

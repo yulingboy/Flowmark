@@ -55,26 +55,36 @@ export function ShortcutsContainer({
     items, setItems, itemsMap, columns, rows, unit, gap, setOpenFolder, onShortcutsChange,
   });
 
+  /**
+   * 处理卡片尺寸调整
+   * 
+   * 验证流程：
+   * 1. 边界验证：检查新尺寸是否会超出网格边界（4行限制）
+   * 2. 碰撞验证：检查新尺寸是否会与其他卡片重叠
+   * 
+   * 如果任一验证失败，拒绝操作，保持原尺寸不变
+   */
   const handleResizeItem = (item: GridItem, size: ShortcutSize) => {
     const position = item.position || { x: 0, y: 0 };
     
     // 边界验证：检查新尺寸是否会超出网格边界
     if (!canResizeItem(position, size, { columns, rows, unit, gap })) {
       console.warn(`Cannot resize item ${item.id} to ${size}: would overflow grid boundaries`);
-      return; // 拒绝操作
+      return; // 拒绝操作，保持原尺寸
     }
     
     // 碰撞验证：检查新尺寸是否会与其他卡片冲突
     const { col, row } = pixelToGrid(position.x, position.y, unit, gap);
     const { colSpan, rowSpan } = getGridSpan(size);
     const manager = new GridManager(columns, rows, unit, gap);
-    manager.initFromItems(items, item.id); // 排除当前卡片
+    manager.initFromItems(items, item.id); // 排除当前卡片自身
     
     if (!manager.canPlace(col, row, colSpan, rowSpan)) {
       console.warn(`Cannot resize item ${item.id} to ${size}: would collide with other items`);
-      return; // 拒绝操作
+      return; // 拒绝操作，保持原尺寸
     }
     
+    // 验证通过，更新尺寸
     const newItems = items.map(s => (s.id === item.id ? { ...s, size } : s));
     setItems(newItems);
     onShortcutsChange?.(newItems);
