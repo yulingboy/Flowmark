@@ -18,7 +18,7 @@ export interface ShortcutsState {
   setShortcuts: (shortcuts: GridItem[]) => void;
   addShortcut: (shortcut: Omit<ShortcutItem, 'id'>) => boolean;
   addFolder: (name: string) => boolean;
-  addPluginCard: (pluginId: string, name: string, icon: string, size?: ShortcutSize) => boolean;
+  addPluginCard: (pluginId: string, name: string, icon: string, size?: ShortcutSize, supportedSizes?: ShortcutSize[]) => boolean;
   updateShortcut: (id: string, data: Partial<ShortcutItem>) => void;
   deleteItem: (ids: string | string[]) => void;
   resizeItem: (id: string, size: ShortcutSize) => void;

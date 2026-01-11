@@ -27,7 +27,8 @@ function PluginItem({ plugin }: { plugin: Plugin }) {
         plugin.metadata.id,
         plugin.metadata.name,
         plugin.metadata.icon || '🔌',
-        plugin.defaultSize || '2x2'
+        plugin.defaultSize || '2x2',
+        plugin.supportedSizes as any
       );
       if (success) {
         message.success('已添加插件');
