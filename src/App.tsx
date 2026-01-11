@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Clock } from '@/components/Clock/Clock';
 import { Search } from '@/components/Search/Search';
-import { ShortcutsContainer } from '@/components/Shortcuts';
+import { ShortcutsContainer, AddShortcutModal } from '@/components/Shortcuts';
 import { Background } from '@/components/Background/Background';
 import { SettingsButton, SettingsPanel } from '@/components/Settings';
 import { ContextMenu } from '@/components/common';
@@ -74,6 +74,8 @@ const SettingsIcon = () => (
 
 function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isAddShortcutOpen, setIsAddShortcutOpen] = useState(false);
+  const [shortcuts, setShortcuts] = useState<ShortcutEntry[]>(defaultShortcuts);
   const [contextMenu, setContextMenu] = useState<{ isOpen: boolean; x: number; y: number }>({
     isOpen: false,
     x: 0,
@@ -92,6 +94,25 @@ function App() {
     }
   }, [autoFocusSearch, showSearch]);
 
+  // 添加新标签
+  const handleAddShortcut = (shortcut: {
+    name: string;
+    url: string;
+    icon: string;
+    description?: string;
+    openMode: 'tab' | 'popup';
+  }) => {
+    const newShortcut: ShortcutEntry = {
+      id: `shortcut-${Date.now()}`,
+      name: shortcut.name,
+      url: shortcut.url,
+      icon: shortcut.icon,
+      size: '1x1',
+      openMode: shortcut.openMode,
+    };
+    setShortcuts(prev => [...prev, newShortcut]);
+  };
+
   // 右键菜单
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -106,7 +127,7 @@ function App() {
     {
       icon: <AddIcon />,
       label: '添加标签',
-      onClick: () => console.log('添加标签'),
+      onClick: () => setIsAddShortcutOpen(true),
     },
     {
       icon: <FolderIcon />,
@@ -166,6 +187,13 @@ function App() {
         onClose={() => setContextMenu(prev => ({ ...prev, isOpen: false }))}
       />
 
+      {/* 添加标签弹窗 */}
+      <AddShortcutModal
+        isOpen={isAddShortcutOpen}
+        onClose={() => setIsAddShortcutOpen(false)}
+        onSave={handleAddShortcut}
+      />
+
       {/* 时钟 */}
       {showClock && <Clock />}
 
@@ -176,7 +204,7 @@ function App() {
       {showShortcuts && (
         <div style={{ marginTop: '32px' }}>
           <ShortcutsContainer 
-            shortcuts={defaultShortcuts} 
+            shortcuts={shortcuts} 
             columns={12}
             rows={4}
             unit={72}
