@@ -4,49 +4,14 @@ import { Search } from '@/components/Search/Search';
 import { ShortcutsContainer, AddShortcutModal, AddFolderModal, BatchEditToolbar } from '@/components/Shortcuts';
 import { Background } from '@/components/Background/Background';
 import { SettingsButton, SettingsPanel, WallpaperModal } from '@/components/Settings';
-import { ContextMenu } from '@/components/common';
+import { ContextMenu, ToastContainer, ErrorBoundary } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
+import { AddIcon, FolderIcon, WallpaperIcon, RefreshIcon, EditIcon, SettingsIcon } from '@/components/common/icons';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useShortcutsStore } from '@/stores/shortcutsStore';
+import { useToast } from '@/hooks/useToast';
 import type { ShortcutItem } from '@/types';
-
-// 右键菜单图标
-const AddIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
-    <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M12 8v8M8 12h8" />
-  </svg>
-);
-
-const FolderIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
-    <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
-  </svg>
-);
-
-const WallpaperIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
-    <rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="M21 15l-5-5L5 21" />
-  </svg>
-);
-
-const RefreshIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
-    <path d="M23 4v6h-6M1 20v-6h6" /><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
-  </svg>
-);
-
-const EditIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
-    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-  </svg>
-);
-
-const SettingsIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
-    <circle cx="12" cy="12" r="3" />
-    <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
-  </svg>
-);
+import { GRID } from '@/constants';
 
 function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -59,6 +24,46 @@ function App() {
   const { backgroundUrl, showClock, showSearch, showShortcuts, autoFocusSearch } = useSettingsStore();
   const { shortcuts, setShortcuts, updateShortcut, addShortcut, addFolder, deleteShortcut, batchEditMode, toggleBatchEdit } = useShortcutsStore();
   const searchRef = useRef<HTMLInputElement>(null);
+  const { toasts, dismissToast, success } = useToast();
+
+  // 键盘快捷键 - 使用 useEffect 手动处理避免依赖问题
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+      
+      // Escape 键关闭弹窗
+      if (e.key === 'Escape') {
+        if (isSettingsOpen) setIsSettingsOpen(false);
+        else if (isAddShortcutOpen) { setIsAddShortcutOpen(false); setEditingShortcut(null); }
+        else if (isAddFolderOpen) setIsAddFolderOpen(false);
+        else if (isWallpaperOpen) setIsWallpaperOpen(false);
+        return;
+      }
+      
+      // 输入框中不处理其他快捷键
+      if (isInput) return;
+      
+      // Ctrl+K 聚焦搜索
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+      // Ctrl+, 打开设置
+      else if ((e.ctrlKey || e.metaKey) && e.key === ',') {
+        e.preventDefault();
+        setIsSettingsOpen(true);
+      }
+      // Ctrl+N 添加快捷方式
+      else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
+        e.preventDefault();
+        setIsAddShortcutOpen(true);
+      }
+    };
+    
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isSettingsOpen, isAddShortcutOpen, isAddFolderOpen, isWallpaperOpen]);
 
   useEffect(() => {
     if (autoFocusSearch && showSearch) {
@@ -70,14 +75,16 @@ function App() {
   const handleSaveShortcut = (shortcut: { id?: string; name: string; url: string; icon: string; openMode: 'tab' | 'popup' }) => {
     if (shortcut.id) {
       updateShortcut(shortcut.id, { name: shortcut.name, url: shortcut.url, icon: shortcut.icon, openMode: shortcut.openMode });
+      success('快捷方式已更新');
     } else {
       addShortcut({ name: shortcut.name, url: shortcut.url, icon: shortcut.icon, openMode: shortcut.openMode, size: '1x1' });
+      success('快捷方式已添加');
     }
   };
 
   const handleEditShortcut = (item: ShortcutItem) => { setEditingShortcut(item); setIsAddShortcutOpen(true); };
   const handleCloseModal = () => { setIsAddShortcutOpen(false); setEditingShortcut(null); };
-  const handleDeleteShortcut = (item: ShortcutItem) => deleteShortcut(item.id);
+  const handleDeleteShortcut = (item: ShortcutItem) => { deleteShortcut(item.id); success('快捷方式已删除'); };
   const handleContextMenu = (e: React.MouseEvent) => { e.preventDefault(); setContextMenu({ isOpen: true, x: e.clientX, y: e.clientY }); };
 
   const contextMenuItems: ContextMenuItem[] = [
@@ -100,17 +107,22 @@ function App() {
       <AddFolderModal isOpen={isAddFolderOpen} onClose={() => setIsAddFolderOpen(false)} onSave={addFolder} />
       <WallpaperModal isOpen={isWallpaperOpen} onClose={() => setIsWallpaperOpen(false)} />
       
-      {showClock && <Clock />}
-      {showSearch && <Search placeholder="搜索内容" inputRef={searchRef} />}
+      {showClock && <ErrorBoundary><Clock /></ErrorBoundary>}
+      {showSearch && <ErrorBoundary><Search placeholder="搜索内容" inputRef={searchRef} /></ErrorBoundary>}
       {showShortcuts && (
         <div style={{ marginTop: '32px' }}>
-          <ShortcutsContainer shortcuts={shortcuts} columns={12} rows={4} unit={72} gap={20}
-            onShortcutsChange={setShortcuts} onEditShortcut={handleEditShortcut} onDeleteShortcut={handleDeleteShortcut} />
+          <ErrorBoundary>
+            <ShortcutsContainer shortcuts={shortcuts} columns={GRID.COLUMNS} rows={GRID.ROWS} unit={GRID.UNIT} gap={GRID.GAP}
+              onShortcutsChange={setShortcuts} onEditShortcut={handleEditShortcut} onDeleteShortcut={handleDeleteShortcut} />
+          </ErrorBoundary>
         </div>
       )}
       
       {/* 批量编辑工具栏 */}
       {batchEditMode && <BatchEditToolbar />}
+      
+      {/* Toast 容器 */}
+      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { SearchEngine } from '@/types';
 import { addToHistory, removeFromHistory } from '@/utils/searchHistory';
+import { DEFAULTS } from '@/constants';
 
 interface SettingsState {
   // 常规设置
@@ -69,8 +70,6 @@ interface SettingsState {
   updateClockFontSize: (value: 'small' | 'medium' | 'large') => void;
 }
 
-const DEFAULT_BACKGROUND = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80';
-
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
@@ -79,10 +78,10 @@ export const useSettingsStore = create<SettingsState>()(
       showClock: true,
       showSearch: true,
       showShortcuts: true,
-      language: 'zh-CN' as const,
+      language: DEFAULTS.LANGUAGE,
       
       // 搜索设置
-      searchEngine: 'bing',
+      searchEngine: DEFAULTS.SEARCH_ENGINE,
       searchInNewTab: true,
       autoFocusSearch: true,
       showSearchSuggestions: true,
@@ -90,9 +89,9 @@ export const useSettingsStore = create<SettingsState>()(
       searchHistory: [],
       
       // 壁纸设置
-      backgroundUrl: DEFAULT_BACKGROUND,
-      backgroundBlur: 0,
-      backgroundOverlay: 20,
+      backgroundUrl: DEFAULTS.BACKGROUND_URL,
+      backgroundBlur: DEFAULTS.BACKGROUND_BLUR,
+      backgroundOverlay: DEFAULTS.BACKGROUND_OVERLAY,
       
       // 时间日期设置
       showSeconds: true,
@@ -101,8 +100,8 @@ export const useSettingsStore = create<SettingsState>()(
       showDate: true,
       showWeekday: true,
       showYear: false,
-      clockColor: '#ffffff',
-      clockFontSize: 'large' as const,
+      clockColor: DEFAULTS.CLOCK_COLOR,
+      clockFontSize: DEFAULTS.CLOCK_FONT_SIZE,
 
       // Actions - 常规
       updateOpenInNewTab: (value) => set({ openInNewTab: value }),
@@ -115,24 +114,24 @@ export const useSettingsStore = create<SettingsState>()(
         showClock: true,
         showSearch: true,
         showShortcuts: true,
-        language: 'zh-CN',
-        searchEngine: 'bing',
+        language: DEFAULTS.LANGUAGE,
+        searchEngine: DEFAULTS.SEARCH_ENGINE,
         searchInNewTab: true,
         autoFocusSearch: true,
         showSearchSuggestions: true,
         searchHistoryEnabled: false,
         searchHistory: [],
-        backgroundUrl: DEFAULT_BACKGROUND,
-        backgroundBlur: 0,
-        backgroundOverlay: 20,
+        backgroundUrl: DEFAULTS.BACKGROUND_URL,
+        backgroundBlur: DEFAULTS.BACKGROUND_BLUR,
+        backgroundOverlay: DEFAULTS.BACKGROUND_OVERLAY,
         showSeconds: true,
         show24Hour: true,
         showLunar: true,
         showDate: true,
         showWeekday: true,
         showYear: false,
-        clockColor: '#ffffff',
-        clockFontSize: 'large',
+        clockColor: DEFAULTS.CLOCK_COLOR,
+        clockFontSize: DEFAULTS.CLOCK_FONT_SIZE,
       }),
       
       // Actions - 搜索
@@ -158,9 +157,9 @@ export const useSettingsStore = create<SettingsState>()(
       updateBackgroundBlur: (value) => set({ backgroundBlur: value }),
       updateBackgroundOverlay: (value) => set({ backgroundOverlay: value }),
       resetBackground: () => set({ 
-        backgroundUrl: DEFAULT_BACKGROUND, 
-        backgroundBlur: 0, 
-        backgroundOverlay: 20 
+        backgroundUrl: DEFAULTS.BACKGROUND_URL, 
+        backgroundBlur: DEFAULTS.BACKGROUND_BLUR, 
+        backgroundOverlay: DEFAULTS.BACKGROUND_OVERLAY 
       }),
       
       // Actions - 时间日期

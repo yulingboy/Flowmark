@@ -1,9 +1,9 @@
-const MAX_HISTORY_ITEMS = 10;
+import { SEARCH } from '@/constants';
 
 /**
  * 添加搜索记录到历史
  * - 去重：如果已存在则移到最前面
- * - 限制最大数量为 10 条
+ * - 限制最大数量
  */
 export function addToHistory(history: string[], query: string): string[] {
   const trimmed = query.trim();
@@ -13,7 +13,7 @@ export function addToHistory(history: string[], query: string): string[] {
   const filtered = history.filter(item => item !== trimmed);
   
   // 添加到最前面，限制数量
-  return [trimmed, ...filtered].slice(0, MAX_HISTORY_ITEMS);
+  return [trimmed, ...filtered].slice(0, SEARCH.MAX_HISTORY_ITEMS);
 }
 
 /**
@@ -27,5 +27,5 @@ export function removeFromHistory(history: string[], query: string): string[] {
  * 获取最大历史记录数量
  */
 export function getMaxHistoryItems(): number {
-  return MAX_HISTORY_ITEMS;
+  return SEARCH.MAX_HISTORY_ITEMS;
 }

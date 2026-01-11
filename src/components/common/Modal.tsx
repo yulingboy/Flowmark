@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
+import { useDraggableModal } from '@/hooks/useDraggableModal';
 
 interface ModalProps {
   isOpen: boolean;
@@ -23,53 +24,18 @@ export function Modal({
   draggable = false,
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStartRef = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
+  
+  // 使用可拖拽 Hook
+  const { position, isDragging, handleMouseDown, resetPosition } = useDraggableModal({
+    disabled: !draggable,
+  });
 
-  // 重置位置
+  // 打开时重置位置
   useEffect(() => {
     if (isOpen) {
-      setPosition({ x: 0, y: 0 });
+      resetPosition();
     }
-  }, [isOpen]);
-
-  // 拖拽处理
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (!draggable) return;
-    e.stopPropagation();
-    setIsDragging(true);
-    dragStartRef.current = {
-      x: e.clientX,
-      y: e.clientY,
-      posX: position.x,
-      posY: position.y,
-    };
-  }, [draggable, position]);
-
-  useEffect(() => {
-    if (!isDragging) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const deltaX = e.clientX - dragStartRef.current.x;
-      const deltaY = e.clientY - dragStartRef.current.y;
-      setPosition({
-        x: dragStartRef.current.posX + deltaX,
-        y: dragStartRef.current.posY + deltaY,
-      });
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging]);
+  }, [isOpen, resetPosition]);
 
   // ESC 键关闭
   useEffect(() => {
@@ -160,15 +126,10 @@ export function BoxIcon() {
   return (
     <div className="w-20 h-20 relative">
       <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* 底座圆形 */}
         <ellipse cx="40" cy="65" rx="30" ry="8" fill="#e5e7eb" />
-        {/* 箱子主体 */}
         <rect x="20" y="30" width="40" height="30" rx="2" fill="#f3f4f6" stroke="#d1d5db" strokeWidth="2" />
-        {/* 箱子盖子 */}
         <path d="M18 30 L40 20 L62 30 L40 35 Z" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1" />
-        {/* 箱子内部阴影 */}
         <rect x="25" y="35" width="30" height="20" fill="#e5e7eb" />
-        {/* 文件 */}
         <rect x="30" y="25" width="20" height="25" rx="1" fill="white" stroke="#d1d5db" strokeWidth="1" />
         <line x1="33" y1="32" x2="47" y2="32" stroke="#d1d5db" strokeWidth="1" />
         <line x1="33" y1="36" x2="47" y2="36" stroke="#d1d5db" strokeWidth="1" />
