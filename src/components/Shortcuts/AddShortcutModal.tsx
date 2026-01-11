@@ -140,7 +140,7 @@ export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalPr
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="" width="700px" closeOnBackdrop={false}>
+    <Modal isOpen={isOpen} onClose={handleClose} title="添加标签" width="700px" closeOnBackdrop={false} draggable>
       <div className="flex flex-col gap-4">
         {/* 表单内容 */}
         <div className="flex flex-col gap-4">

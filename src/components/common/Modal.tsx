@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 
 interface ModalProps {
@@ -9,10 +9,67 @@ interface ModalProps {
   children: ReactNode;
   width?: string;
   closeOnBackdrop?: boolean;
+  draggable?: boolean;
 }
 
-export function Modal({ isOpen, onClose, icon, title, children, width = '480px', closeOnBackdrop = true }: ModalProps) {
+export function Modal({ 
+  isOpen, 
+  onClose, 
+  icon, 
+  title, 
+  children, 
+  width = '480px', 
+  closeOnBackdrop = true,
+  draggable = false,
+}: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
+
+  // 重置位置
+  useEffect(() => {
+    if (isOpen) {
+      setPosition({ x: 0, y: 0 });
+    }
+  }, [isOpen]);
+
+  // 拖拽处理
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (!draggable) return;
+    e.stopPropagation();
+    setIsDragging(true);
+    dragStartRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      posX: position.x,
+      posY: position.y,
+    };
+  }, [draggable, position]);
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const deltaX = e.clientX - dragStartRef.current.x;
+      const deltaY = e.clientY - dragStartRef.current.y;
+      setPosition({
+        x: dragStartRef.current.posX + deltaX,
+        y: dragStartRef.current.posY + deltaY,
+      });
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
 
   // ESC 键关闭
   useEffect(() => {
@@ -28,7 +85,7 @@ export function Modal({ isOpen, onClose, icon, title, children, width = '480px',
   // 点击外部关闭
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (closeOnBackdrop && modalRef.current && !modalRef.current.contains(e.target as Node)) {
+      if (closeOnBackdrop && !isDragging && modalRef.current && !modalRef.current.contains(e.target as Node)) {
         onClose();
       }
     };
@@ -36,7 +93,7 @@ export function Modal({ isOpen, onClose, icon, title, children, width = '480px',
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen, onClose, closeOnBackdrop]);
+  }, [isOpen, onClose, closeOnBackdrop, isDragging]);
 
   if (!isOpen) return null;
 
@@ -45,38 +102,47 @@ export function Modal({ isOpen, onClose, icon, title, children, width = '480px',
       <div
         ref={modalRef}
         className="bg-white rounded-2xl shadow-2xl overflow-hidden relative"
-        style={{ width }}
+        style={{ 
+          width,
+          transform: `translate(${position.x}px, ${position.y}px)`,
+        }}
       >
-        {/* 关闭按钮 */}
-        <div className="absolute top-4 right-4 flex gap-2">
-          <button
-            onClick={onClose}
-            className="w-3 h-3 rounded-full bg-yellow-400 hover:bg-yellow-500 cursor-pointer border-none"
-            title="最小化"
-          />
-          <button
-            className="w-3 h-3 rounded-full bg-green-400 hover:bg-green-500 cursor-pointer border-none"
-            title="最大化"
-          />
-          <button
-            onClick={onClose}
-            className="w-3 h-3 rounded-full bg-red-400 hover:bg-red-500 cursor-pointer border-none"
-            title="关闭"
-          />
+        {/* 标题栏 - 可拖拽区域 */}
+        <div 
+          className={`flex items-center justify-between px-4 py-3 ${draggable ? 'cursor-move' : ''}`}
+          onMouseDown={handleMouseDown}
+        >
+          {/* 标题 */}
+          <div className="flex-1 select-none">
+            {title && <span className="text-sm font-medium text-gray-700">{title}</span>}
+          </div>
+          
+          {/* macOS 风格按钮 */}
+          <div className="flex gap-2" onMouseDown={(e) => e.stopPropagation()}>
+            <button
+              onClick={onClose}
+              className="w-3 h-3 rounded-full bg-yellow-400 hover:bg-yellow-500 cursor-pointer border-none"
+              title="最小化"
+            />
+            <button
+              className="w-3 h-3 rounded-full bg-green-400 hover:bg-green-500 cursor-pointer border-none"
+              title="最大化"
+            />
+            <button
+              onClick={onClose}
+              className="w-3 h-3 rounded-full bg-red-400 hover:bg-red-500 cursor-pointer border-none"
+              title="关闭"
+            />
+          </div>
         </div>
 
         {/* 内容区域 */}
-        <div className="px-8 py-12 text-center">
+        <div className="px-8 pb-8 pt-4">
           {/* 图标 */}
           {icon && (
             <div className="mb-6 flex justify-center">
               {icon}
             </div>
-          )}
-
-          {/* 标题 */}
-          {title && (
-            <h3 className="text-lg font-medium text-gray-800 mb-4">{title}</h3>
           )}
 
           {/* 内容 */}
