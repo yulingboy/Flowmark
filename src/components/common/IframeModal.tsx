@@ -67,49 +67,43 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
             <span className="text-sm text-gray-600 truncate">{title || url}</span>
           </div>
           
-          {/* 操作按钮 */}
+          {/* macOS 风格操作按钮 */}
           <div className="flex items-center gap-2">
-            {/* 刷新按钮 */}
-            <button
-              onClick={handleRefresh}
-              className="w-8 h-8 rounded-lg hover:bg-gray-200 flex items-center justify-center cursor-pointer border-none bg-transparent transition-colors group relative"
-              aria-label="刷新"
-            >
-              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            {/* 刷新按钮 - 黄色 */}
+            <div className="relative group">
+              <button
+                onClick={handleRefresh}
+                className="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-600 cursor-pointer border-none"
+                aria-label="刷新"
+              />
+              <span className="absolute top-6 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                 刷新
               </span>
-            </button>
+            </div>
             
-            {/* 新标签页打开按钮 */}
-            <button
-              onClick={handleOpenInNewTab}
-              className="w-8 h-8 rounded-lg hover:bg-gray-200 flex items-center justify-center cursor-pointer border-none bg-transparent transition-colors group relative"
-              aria-label="在新标签页打开"
-            >
-              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-              <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            {/* 新标签页打开按钮 - 绿色 */}
+            <div className="relative group">
+              <button
+                onClick={handleOpenInNewTab}
+                className="w-3 h-3 rounded-full bg-green-500 hover:bg-green-600 cursor-pointer border-none"
+                aria-label="在新标签页打开"
+              />
+              <span className="absolute top-6 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                 新标签页打开
               </span>
-            </button>
+            </div>
             
-            {/* 关闭按钮 */}
-            <button
-              onClick={onClose}
-              className="w-8 h-8 rounded-lg hover:bg-red-100 flex items-center justify-center cursor-pointer border-none bg-transparent transition-colors group relative"
-              aria-label="关闭"
-            >
-              <svg className="w-4 h-4 text-gray-600 group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            {/* 关闭按钮 - 红色 */}
+            <div className="relative group">
+              <button
+                onClick={onClose}
+                className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 cursor-pointer border-none"
+                aria-label="关闭"
+              />
+              <span className="absolute top-6 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                 关闭
               </span>
-            </button>
+            </div>
           </div>
         </div>
 
