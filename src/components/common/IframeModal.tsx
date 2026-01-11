@@ -26,8 +26,8 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
     }
   }, [isOpen]);
 
-  // 拖拽处理
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+  // 拖拽处理 - 阻止事件冒泡到 dnd-kit
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
     if (isFullscreen) return;
     e.stopPropagation();
     setIsDragging(true);
@@ -85,16 +85,19 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      onPointerDown={(e) => e.stopPropagation()}
+    >
       <div
         ref={modalRef}
         className={isFullscreen ? 'fixed inset-4 bg-white shadow-2xl rounded-lg flex flex-col' : 'bg-white shadow-2xl rounded-lg w-[900px] h-[600px] flex flex-col'}
         style={isFullscreen ? {} : { transform: `translate(${position.x}px, ${position.y}px)` }}
       >
         <div className={`flex items-center justify-between px-4 py-3 border-b border-gray-200 ${!isFullscreen ? 'cursor-move' : ''}`}
-          onMouseDown={!isFullscreen ? handleMouseDown : undefined}>
+          onPointerDown={!isFullscreen ? handlePointerDown : undefined}>
           <span className="text-sm font-medium text-gray-700 select-none">{title || url}</span>
-          <div className="flex gap-2" onMouseDown={(e) => e.stopPropagation()}>
+          <div className="flex gap-2" onPointerDown={(e) => e.stopPropagation()}>
             <button onClick={handleRefresh} className="w-3 h-3 rounded-full bg-yellow-400 hover:bg-yellow-500 border-none cursor-pointer" title="刷新" />
             <button onClick={handleToggleFullscreen} className="w-3 h-3 rounded-full bg-green-400 hover:bg-green-500 border-none cursor-pointer" title={isFullscreen ? '退出全屏' : '全屏'} />
             <button onClick={() => window.open(url, '_blank')} className="w-3 h-3 rounded-full bg-blue-400 hover:bg-blue-500 border-none cursor-pointer" title="新标签页打开" />
@@ -103,7 +106,14 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
         </div>
         <div className="flex-1 relative">
           {isLoading && <div className="absolute inset-0 flex items-center justify-center bg-white"><Spin tip="加载中..." /></div>}
-          <iframe ref={iframeRef} src={url} className="w-full h-full border-none" onLoad={() => setIsLoading(false)} title={title || 'iframe'} sandbox="allow-same-origin allow-scripts allow-popups allow-forms" />
+          <iframe 
+            ref={iframeRef} 
+            src={url} 
+            className="w-full h-full border-none" 
+            onLoad={() => setIsLoading(false)} 
+            title={title || 'iframe'} 
+            sandbox="allow-same-origin allow-scripts allow-popups allow-forms" 
+          />
         </div>
       </div>
     </div>,

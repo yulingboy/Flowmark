@@ -37,12 +37,9 @@ export function DraggableItem({
   isSelected = false,
   onToggleSelect,
 }: DraggableItemProps) {
-  // 弹窗模式不需要拖拽，批量编辑模式也禁用拖拽
-  const isPopupMode = !isShortcutFolder(entry) && entry.openMode === 'popup';
-  
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: entry.id,
-    disabled: isPopupMode || batchEditMode,
+    disabled: batchEditMode, // 只在批量编辑模式禁用拖拽，popup 模式通过 PointerSensor 的 distance 区分点击和拖拽
   });
 
   const style = {
@@ -54,13 +51,13 @@ export function DraggableItem({
     transform: transform ? `translate(${transform.x}px, ${transform.y}px)` : undefined,
     transition: shouldAnimate ? 'left 0.2s ease-out, top 0.2s ease-out' : 'none',
     opacity: isDragging ? 0.3 : 1,
-    cursor: batchEditMode ? 'pointer' : (isPopupMode ? 'pointer' : 'grab'),
+    cursor: batchEditMode ? 'pointer' : 'grab',
     touchAction: 'none',
     zIndex: isDragging ? 1000 : 1,
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...(isPopupMode || batchEditMode ? {} : { ...attributes, ...listeners })}>
+    <div ref={setNodeRef} style={style} {...(batchEditMode ? {} : { ...attributes, ...listeners })}>
       {isShortcutFolder(entry) ? (
         <ShortcutFolder
           folder={entry}
