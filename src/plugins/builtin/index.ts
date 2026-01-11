@@ -8,8 +8,9 @@ import { pluginManagerPlugin } from './plugin-manager';
 import { wallpaperPlugin } from './wallpaper';
 import { calendarPlugin } from './calendar';
 import { hitokotoPlugin } from './hitokoto';
+import { pomodoroPlugin } from './pomodoro';
 
-export const builtinPlugins = [pluginManagerPlugin, weatherPlugin, todoPlugin, notesPlugin, wallpaperPlugin, calendarPlugin, hitokotoPlugin];
+export const builtinPlugins = [pluginManagerPlugin, weatherPlugin, todoPlugin, notesPlugin, wallpaperPlugin, calendarPlugin, hitokotoPlugin, pomodoroPlugin];
 
 export function registerBuiltinPlugins() {
   const shortcutsStore = useShortcutsStore.getState();
@@ -44,4 +45,4 @@ export function registerBuiltinPlugins() {
   });
 }
 
-export { weatherPlugin, todoPlugin, notesPlugin, pluginManagerPlugin, wallpaperPlugin, calendarPlugin, hitokotoPlugin };
+export { weatherPlugin, todoPlugin, notesPlugin, pluginManagerPlugin, wallpaperPlugin, calendarPlugin, hitokotoPlugin, pomodoroPlugin };
