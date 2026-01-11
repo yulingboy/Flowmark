@@ -1,15 +1,74 @@
 import { useState } from 'react';
-import type { ShortcutItem } from '@/types';
-import { IframeModal } from '@/components/common';
+import type { ShortcutItem, ShortcutSize } from '@/types';
+import { IframeModal, ContextMenu } from '@/components/common';
+import type { ContextMenuItem } from '@/components/common';
 
 interface ShortcutCardProps {
   item: ShortcutItem;
   onClick?: (item: ShortcutItem) => void;
+  onEdit?: (item: ShortcutItem) => void;
+  onDelete?: (item: ShortcutItem) => void;
+  onResize?: (item: ShortcutItem, size: ShortcutSize) => void;
   className?: string;
 }
 
-export function ShortcutCard({ item, onClick, className = '' }: ShortcutCardProps) {
+// 右键菜单图标
+const OpenTabIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
+    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+    <polyline points="15 3 21 3 21 9" />
+    <line x1="10" y1="14" x2="21" y2="3" />
+  </svg>
+);
+
+const EditIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
+    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+  </svg>
+);
+
+const MoveIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
+    <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
+  </svg>
+);
+
+const DockIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
+    <rect x="2" y="6" width="20" height="12" rx="2" />
+    <line x1="6" y1="18" x2="6" y2="21" />
+    <line x1="18" y1="18" x2="18" y2="21" />
+  </svg>
+);
+
+const LayoutIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
+    <rect x="3" y="3" width="7" height="7" />
+    <rect x="14" y="3" width="7" height="7" />
+    <rect x="14" y="14" width="7" height="7" />
+    <rect x="3" y="14" width="7" height="7" />
+  </svg>
+);
+
+const DeleteIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+  </svg>
+);
+
+const ArrowRightIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+    <polyline points="9 18 15 12 9 6" />
+  </svg>
+);
+
+export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, className = '' }: ShortcutCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [contextMenu, setContextMenu] = useState<{ isOpen: boolean; x: number; y: number }>({
+    isOpen: false, x: 0, y: 0,
+  });
   const isPopupMode = item.openMode === 'popup';
 
   const handleClick = () => {
@@ -17,7 +76,6 @@ export function ShortcutCard({ item, onClick, className = '' }: ShortcutCardProp
       onClick(item);
       return;
     }
-
     if (isPopupMode) {
       setIsModalOpen(true);
     } else {
@@ -25,10 +83,55 @@ export function ShortcutCard({ item, onClick, className = '' }: ShortcutCardProp
     }
   };
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({ isOpen: true, x: e.clientX, y: e.clientY });
+  };
+
+  const contextMenuItems: ContextMenuItem[] = [
+    {
+      icon: <OpenTabIcon />,
+      label: '新标签打开',
+      onClick: () => window.open(item.url, '_blank'),
+    },
+    {
+      icon: <EditIcon />,
+      label: '编辑标签',
+      onClick: () => onEdit?.(item),
+    },
+    {
+      icon: <MoveIcon />,
+      label: '移动至分类',
+      onClick: () => console.log('移动至分类'),
+      rightIcon: <ArrowRightIcon />,
+    },
+    {
+      icon: <DockIcon />,
+      label: '加入Dock栏',
+      onClick: () => console.log('加入Dock栏'),
+    },
+    {
+      icon: <LayoutIcon />,
+      label: '布局',
+      type: 'layout',
+      layoutOptions: ['1x1', '1x2', '2x1', '2x2', '2x4'],
+      currentLayout: item.size || '1x1',
+      onLayoutSelect: (size) => onResize?.(item, size),
+      onClick: () => {},
+    },
+    {
+      icon: <DeleteIcon />,
+      label: '删除标签',
+      onClick: () => onDelete?.(item),
+    },
+  ];
+
   return (
     <>
       <button
         onClick={handleClick}
+        onContextMenu={handleContextMenu}
         className={`flex flex-col items-center gap-1 cursor-pointer group w-full h-full ${className}`}
       >
         {/* 图标卡片 */}
@@ -45,7 +148,6 @@ export function ShortcutCard({ item, onClick, className = '' }: ShortcutCardProp
               target.parentElement!.innerHTML = `<span class="text-gray-600 text-2xl font-bold">${item.name[0]}</span>`;
             }}
           />
-
           {/* 打开方式标识 - 只有新标签页模式才显示角标 */}
           {!isPopupMode && (
             <div className="absolute bottom-0 right-0 w-6 h-6 bg-[#0084FF] rounded-tl-2xl flex items-center justify-center">
@@ -53,12 +155,19 @@ export function ShortcutCard({ item, onClick, className = '' }: ShortcutCardProp
             </div>
           )}
         </div>
-
         {/* 名称 */}
         <span className="text-white text-xs truncate drop-shadow w-full text-center flex-shrink-0">
           {item.name}
         </span>
       </button>
+
+      {/* 右键菜单 */}
+      <ContextMenu
+        isOpen={contextMenu.isOpen}
+        position={{ x: contextMenu.x, y: contextMenu.y }}
+        items={contextMenuItems}
+        onClose={() => setContextMenu(prev => ({ ...prev, isOpen: false }))}
+      />
 
       {/* 弹窗 */}
       <IframeModal

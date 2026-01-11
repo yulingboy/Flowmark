@@ -8,8 +8,8 @@ import { ContextMenu } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { getFaviconUrl } from '@/utils/favicon';
-import type { ShortcutEntry } from '@/types';
-import { createShortcutFolder } from '@/types';
+import type { ShortcutEntry, ShortcutItem, ShortcutSize } from '@/types';
+import { createShortcutFolder, isShortcutFolder } from '@/types';
 
 // 默认快捷入口数据
 const defaultShortcuts: ShortcutEntry[] = [
@@ -113,6 +113,27 @@ function App() {
     setShortcuts(prev => [...prev, newShortcut]);
   };
 
+  // 编辑标签
+  const handleEditShortcut = (item: ShortcutItem) => {
+    console.log('编辑标签', item);
+    // TODO: 打开编辑弹窗
+  };
+
+  // 删除标签
+  const handleDeleteShortcut = (item: ShortcutItem) => {
+    setShortcuts(prev => prev.filter(s => s.id !== item.id));
+  };
+
+  // 调整标签大小
+  const handleResizeShortcut = (item: ShortcutItem, size: ShortcutSize) => {
+    setShortcuts(prev => prev.map(s => {
+      if (s.id === item.id && !isShortcutFolder(s)) {
+        return { ...s, size };
+      }
+      return s;
+    }));
+  };
+
   // 右键菜单
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -209,6 +230,9 @@ function App() {
             rows={4}
             unit={72}
             gap={20}
+            onEditShortcut={handleEditShortcut}
+            onDeleteShortcut={handleDeleteShortcut}
+            onResizeShortcut={handleResizeShortcut}
           />
         </div>
       )}

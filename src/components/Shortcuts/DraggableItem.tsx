@@ -1,7 +1,7 @@
 import { useDraggable } from '@dnd-kit/core';
 import { ShortcutCard } from './ShortcutCard';
 import { ShortcutFolder } from './ShortcutFolder';
-import type { ShortcutEntry, ShortcutFolder as ShortcutFolderType, Position } from '@/types';
+import type { ShortcutEntry, ShortcutFolder as ShortcutFolderType, ShortcutItem, ShortcutSize, Position } from '@/types';
 import { isShortcutFolder } from '@/types';
 
 interface DraggableItemProps {
@@ -9,6 +9,9 @@ interface DraggableItemProps {
   position: Position;
   size: { width: number; height: number };
   onOpen?: (folder: ShortcutFolderType) => void;
+  onEdit?: (item: ShortcutItem) => void;
+  onDelete?: (item: ShortcutItem) => void;
+  onResize?: (item: ShortcutItem, size: ShortcutSize) => void;
   isDropTarget: boolean;
   isDragging: boolean;
   shouldAnimate: boolean;
@@ -19,6 +22,9 @@ export function DraggableItem({
   position,
   size,
   onOpen,
+  onEdit,
+  onDelete,
+  onResize,
   isDropTarget,
   isDragging,
   shouldAnimate,
@@ -54,7 +60,12 @@ export function DraggableItem({
           isDropTarget={isDropTarget}
         />
       ) : (
-        <ShortcutCard item={entry} />
+        <ShortcutCard 
+          item={entry} 
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onResize={onResize}
+        />
       )}
     </div>
   );

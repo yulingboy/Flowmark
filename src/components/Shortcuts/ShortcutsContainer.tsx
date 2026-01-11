@@ -15,12 +15,15 @@ import { getItemSize } from './utils/gridUtils';
 import { useShortcutItems } from './hooks/useShortcutItems';
 import { createDragHandlers } from './hooks/useDragHandlers';
 import { createFolderHandlers } from './hooks/useFolderHandlers';
-import type { ShortcutEntry, ShortcutFolder as ShortcutFolderType } from '@/types';
+import type { ShortcutEntry, ShortcutFolder as ShortcutFolderType, ShortcutItem, ShortcutSize } from '@/types';
 import { isShortcutFolder } from '@/types';
 
 interface ShortcutsContainerProps {
   shortcuts: ShortcutEntry[];
   onShortcutsChange?: (shortcuts: ShortcutEntry[]) => void;
+  onEditShortcut?: (item: ShortcutItem) => void;
+  onDeleteShortcut?: (item: ShortcutItem) => void;
+  onResizeShortcut?: (item: ShortcutItem, size: ShortcutSize) => void;
   className?: string;
   columns?: number;
   rows?: number;
@@ -31,6 +34,9 @@ interface ShortcutsContainerProps {
 export function ShortcutsContainer({
   shortcuts,
   onShortcutsChange,
+  onEditShortcut,
+  onDeleteShortcut,
+  onResizeShortcut,
   className = '',
   columns = 4,
   rows = 3,
@@ -129,6 +135,9 @@ export function ShortcutsContainer({
                 position={pos}
                 size={size}
                 onOpen={handleFolderOpen}
+                onEdit={onEditShortcut}
+                onDelete={onDeleteShortcut}
+                onResize={onResizeShortcut}
                 isDropTarget={isDropTarget}
                 isDragging={isDragging}
                 shouldAnimate={animatingItemId === entry.id}
