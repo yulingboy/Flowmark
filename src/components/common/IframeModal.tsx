@@ -89,7 +89,7 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
                 className="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-600 cursor-pointer border-none"
                 aria-label="刷新"
               />
-              <span className="absolute bottom-5 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+              <span className="absolute top-5 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                 刷新
               </span>
             </div>
@@ -101,7 +101,7 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
                 className="w-3 h-3 rounded-full bg-blue-500 hover:bg-blue-600 cursor-pointer border-none"
                 aria-label={isFullscreen ? '退出全屏' : '全屏'}
               />
-              <span className="absolute bottom-5 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+              <span className="absolute top-5 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                 {isFullscreen ? '退出全屏' : '全屏'}
               </span>
             </div>
@@ -113,7 +113,7 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
                 className="w-3 h-3 rounded-full bg-green-500 hover:bg-green-600 cursor-pointer border-none"
                 aria-label="在新标签页打开"
               />
-              <span className="absolute bottom-5 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+              <span className="absolute top-5 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                 新标签页打开
               </span>
             </div>
@@ -125,7 +125,7 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
                 className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 cursor-pointer border-none"
                 aria-label="关闭"
               />
-              <span className="absolute bottom-5 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+              <span className="absolute top-5 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                 关闭
               </span>
             </div>
