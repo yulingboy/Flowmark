@@ -5,8 +5,9 @@ import { weatherPlugin } from './weather';
 import { todoPlugin } from './todo';
 import { notesPlugin } from './notes';
 import { pluginManagerPlugin } from './plugin-manager';
+import { wallpaperPlugin } from './wallpaper';
 
-export const builtinPlugins = [pluginManagerPlugin, weatherPlugin, todoPlugin, notesPlugin];
+export const builtinPlugins = [pluginManagerPlugin, weatherPlugin, todoPlugin, notesPlugin, wallpaperPlugin];
 
 export function registerBuiltinPlugins() {
   const shortcutsStore = useShortcutsStore.getState();
@@ -41,4 +42,4 @@ export function registerBuiltinPlugins() {
   });
 }
 
-export { weatherPlugin, todoPlugin, notesPlugin, pluginManagerPlugin };
+export { weatherPlugin, todoPlugin, notesPlugin, pluginManagerPlugin, wallpaperPlugin };
