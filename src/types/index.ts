@@ -1,5 +1,6 @@
-// 快捷方式尺寸类型：1x1, 1x2, 2x1, 2x2, 2x4
+// 卡片尺寸类型：1x1, 1x2, 2x1, 2x2, 2x4
 export type ShortcutSize = '1x1' | '1x2' | '2x1' | '2x2' | '2x4';
+export type CardSize = ShortcutSize;
 
 // 打开方式：新标签页 或 弹窗
 export type OpenMode = 'tab' | 'popup';
@@ -16,9 +17,9 @@ export interface ShortcutItem {
   name: string;
   url: string;
   icon: string;
-  size?: ShortcutSize; // 默认 1x1
-  position?: Position; // 自由定位
-  openMode?: OpenMode; // 打开方式，默认 tab
+  size?: ShortcutSize;
+  position?: Position;
+  openMode?: OpenMode;
 }
 
 // 快捷入口文件夹
@@ -27,24 +28,37 @@ export interface ShortcutFolder {
   name: string;
   items: ShortcutItem[];
   isFolder: true;
-  size?: ShortcutSize; // 默认 1x1
-  position?: Position; // 自由定位
+  size?: ShortcutSize;
+  position?: Position;
 }
 
-// 快捷入口条目（卡片或文件夹）
+// 快捷入口条目
 export type ShortcutEntry = ShortcutItem | ShortcutFolder;
 
-// 类型守卫：判断是否为文件夹
-export function isShortcutFolder(entry: ShortcutEntry): entry is ShortcutFolder {
+// 从插件系统导入类型
+import type { PluginCardItem } from '@/plugins';
+export type { PluginCardItem };
+
+// 网格项目
+export type GridItem = ShortcutEntry | PluginCardItem;
+
+// 类型守卫
+export function isShortcutFolder(entry: GridItem): entry is ShortcutFolder {
   return 'isFolder' in entry && entry.isFolder === true;
+}
+
+export { isPluginCard } from '@/plugins';
+
+export function isShortcutItem(entry: GridItem): entry is ShortcutItem {
+  return !isShortcutFolder(entry) && !('isPlugin' in entry);
 }
 
 // 时钟数据
 export interface ClockData {
-  time: string;      // HH:MM:SS
-  date: string;      // MM月DD日
-  weekday: string;   // 星期X
-  lunar: string;     // 农历日期
+  time: string;
+  date: string;
+  weekday: string;
+  lunar: string;
 }
 
 // 搜索引擎类型

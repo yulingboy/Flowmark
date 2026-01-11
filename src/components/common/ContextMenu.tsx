@@ -68,7 +68,7 @@ export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuPro
 
   if (!isOpen) return null;
 
-  const layoutSizes: { size: ShortcutSize; cols: number; rows: number }[] = [
+  const allLayoutSizes: { size: ShortcutSize; cols: number; rows: number }[] = [
     { size: '1x1', cols: 1, rows: 1 },
     { size: '1x2', cols: 1, rows: 2 },
     { size: '2x1', cols: 2, rows: 1 },
@@ -78,6 +78,11 @@ export function ContextMenu({ isOpen, position, items, onClose }: ContextMenuPro
 
   const renderMenuItem = (item: ContextMenuItem, index: number) => {
     if (item.type === 'layout') {
+      // 如果指定了 layoutOptions，则只显示这些选项
+      const layoutSizes = item.layoutOptions 
+        ? allLayoutSizes.filter(l => item.layoutOptions!.includes(l.size))
+        : allLayoutSizes;
+      
       return (
         <div key={index} className="px-4 py-3">
           <div className="flex items-center gap-3 mb-2">

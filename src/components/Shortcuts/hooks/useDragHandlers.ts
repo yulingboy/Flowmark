@@ -1,12 +1,12 @@
 import type { DragStartEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
 import { GridManager, pixelToGrid, gridToPixel, getGridSpan } from '../utils/gridUtils';
-import type { ShortcutEntry, ShortcutItem } from '@/types';
-import { isShortcutFolder } from '@/types';
+import type { ShortcutItem, GridItem } from '@/types';
+import { isShortcutFolder, isPluginCard } from '@/types';
 
 interface DragHandlersOptions {
-  items: ShortcutEntry[];
-  setItems: React.Dispatch<React.SetStateAction<ShortcutEntry[]>>;
-  itemsMap: Map<string, ShortcutEntry>;
+  items: GridItem[];
+  setItems: React.Dispatch<React.SetStateAction<GridItem[]>>;
+  itemsMap: Map<string, GridItem>;
   columns: number;
   rows: number;
   unit: number;
@@ -14,7 +14,7 @@ interface DragHandlersOptions {
   setActiveId: (id: string | null) => void;
   setDragOverFolderId: (id: string | null) => void;
   setAnimatingItemId: (id: string | null) => void;
-  onShortcutsChange?: (shortcuts: ShortcutEntry[]) => void;
+  onShortcutsChange?: (shortcuts: GridItem[]) => void;
 }
 
 export function createDragHandlers({
@@ -45,7 +45,8 @@ export function createDragHandlers({
     const draggedItemId = active.id as string;
     const draggedItem = itemsMap.get(draggedItemId);
     
-    if (!draggedItem || isShortcutFolder(draggedItem)) {
+    // 插件卡片和文件夹不能拖入文件夹
+    if (!draggedItem || isShortcutFolder(draggedItem) || isPluginCard(draggedItem)) {
       setDragOverFolderId(null);
       return;
     }
@@ -103,8 +104,8 @@ export function createDragHandlers({
     const targetGrid = pixelToGrid(newPixelPos.x, newPixelPos.y, unit, gap);
     const { colSpan, rowSpan } = getGridSpan(draggedItem.size || '1x1');
 
-    // 检查是否拖到文件夹上
-    if (!isShortcutFolder(draggedItem)) {
+    // 检查是否拖到文件夹上（只有快捷方式可以拖入文件夹）
+    if (!isShortcutFolder(draggedItem) && !isPluginCard(draggedItem)) {
       for (const item of items) {
         if (item.id === draggedItemId || !isShortcutFolder(item)) continue;
         

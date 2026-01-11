@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { ShortcutEntry, ShortcutItem, ShortcutSize, ShortcutFolder } from '@/types';
-import { isShortcutFolder } from '@/types';
+import type { ShortcutEntry, ShortcutItem, ShortcutSize, ShortcutFolder, GridItem, PluginCardItem } from '@/types';
+import { isShortcutFolder, isPluginCard } from '@/types';
 import { getFaviconUrl } from '@/utils/favicon';
 
 // 创建文件夹
@@ -28,7 +28,7 @@ const defaultShortcuts: ShortcutEntry[] = [
 ];
 
 interface ShortcutsState {
-  shortcuts: ShortcutEntry[];
+  shortcuts: GridItem[];
   editingItem: ShortcutItem | null;
   
   // Batch edit state
@@ -36,12 +36,15 @@ interface ShortcutsState {
   selectedIds: Set<string>;
   
   // Actions
-  setShortcuts: (shortcuts: ShortcutEntry[]) => void;
+  setShortcuts: (shortcuts: GridItem[]) => void;
   addShortcut: (shortcut: Omit<ShortcutItem, 'id'>) => void;
   addFolder: (name: string) => void;
+  addPluginCard: (pluginId: string, name: string, icon: string, size?: ShortcutSize) => void;
   updateShortcut: (id: string, data: Partial<ShortcutItem>) => void;
   deleteShortcut: (id: string) => void;
   resizeShortcut: (id: string, size: ShortcutSize) => void;
+  resizePluginCard: (id: string, size: ShortcutSize) => void;
+  removePluginCard: (id: string) => void;
   setEditingItem: (item: ShortcutItem | null) => void;
   moveToFolder: (itemId: string, folderId: string) => void;
   dissolveFolder: (folderId: string) => void;
@@ -77,6 +80,22 @@ export const useShortcutsStore = create<ShortcutsState>()(
         shortcuts: [...state.shortcuts, createFolder(`folder-${Date.now()}`, [], name)],
       })),
 
+      addPluginCard: (pluginId, name, icon, size = '2x2') => set((state) => {
+        // 检查是否已存在
+        const exists = state.shortcuts.some(s => isPluginCard(s) && s.pluginId === pluginId);
+        if (exists) return state;
+        
+        const pluginCard: PluginCardItem = {
+          id: `plugin-${pluginId}`,
+          pluginId,
+          name,
+          icon,
+          size,
+          isPlugin: true
+        };
+        return { shortcuts: [...state.shortcuts, pluginCard] };
+      }),
+
       updateShortcut: (id, data) => set((state) => ({
         shortcuts: state.shortcuts.map((s) => {
           if (s.id === id && !isShortcutFolder(s)) {
@@ -92,11 +111,24 @@ export const useShortcutsStore = create<ShortcutsState>()(
 
       resizeShortcut: (id, size) => set((state) => ({
         shortcuts: state.shortcuts.map((s) => {
-          if (s.id === id && !isShortcutFolder(s)) {
+          if (s.id === id && !isShortcutFolder(s) && !isPluginCard(s)) {
             return { ...s, size };
           }
           return s;
         }),
+      })),
+
+      resizePluginCard: (id, size) => set((state) => ({
+        shortcuts: state.shortcuts.map((s) => {
+          if (s.id === id && isPluginCard(s)) {
+            return { ...s, size };
+          }
+          return s;
+        }),
+      })),
+
+      removePluginCard: (id) => set((state) => ({
+        shortcuts: state.shortcuts.filter((s) => s.id !== id),
       })),
 
       setEditingItem: (item) => set({ editingItem: item }),

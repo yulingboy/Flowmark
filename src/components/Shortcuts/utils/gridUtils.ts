@@ -1,4 +1,4 @@
-import type { ShortcutEntry, ShortcutSize, Position } from '@/types';
+import type { ShortcutSize, Position, GridItem } from '@/types';
 
 export const TEXT_HEIGHT = 20;
 
@@ -7,7 +7,7 @@ export function getGridSpan(size: ShortcutSize = '1x1') {
   return { colSpan: cols, rowSpan: rows };
 }
 
-export function getItemSize(item: ShortcutEntry, unit: number, gap: number): { width: number; height: number } {
+export function getItemSize(item: GridItem, unit: number, gap: number): { width: number; height: number } {
   const { colSpan, rowSpan } = getGridSpan(item.size || '1x1');
   return {
     width: colSpan * unit + (colSpan - 1) * gap,
@@ -83,7 +83,7 @@ export class GridManager {
     return null;
   }
 
-  initFromItems(items: ShortcutEntry[], excludeId?: string): void {
+  initFromItems(items: GridItem[], excludeId?: string): void {
     this.grid.clear();
     for (const item of items) {
       if (item.id === excludeId || !item.position) continue;

@@ -1,16 +1,16 @@
 import { GridManager, pixelToGrid, gridToPixel, getGridSpan } from '../utils/gridUtils';
-import type { ShortcutEntry, ShortcutFolder as ShortcutFolderType, ShortcutItem } from '@/types';
+import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, GridItem } from '@/types';
 import { isShortcutFolder } from '@/types';
 
 interface FolderHandlersOptions {
-  items: ShortcutEntry[];
-  setItems: React.Dispatch<React.SetStateAction<ShortcutEntry[]>>;
-  itemsMap: Map<string, ShortcutEntry>;
+  items: GridItem[];
+  setItems: React.Dispatch<React.SetStateAction<GridItem[]>>;
+  itemsMap: Map<string, GridItem>;
   columns: number;
   unit: number;
   gap: number;
   setOpenFolder: (folder: ShortcutFolderType | null) => void;
-  onShortcutsChange?: (shortcuts: ShortcutEntry[]) => void;
+  onShortcutsChange?: (shortcuts: GridItem[]) => void;
 }
 
 export function createFolderHandlers({

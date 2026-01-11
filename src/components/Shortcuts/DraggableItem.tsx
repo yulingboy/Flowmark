@@ -1,11 +1,12 @@
 import { useDraggable } from '@dnd-kit/core';
 import { ShortcutCard } from './ShortcutCard';
 import { ShortcutFolder } from './ShortcutFolder';
-import type { ShortcutEntry, ShortcutFolder as ShortcutFolderType, ShortcutItem, ShortcutSize, Position } from '@/types';
-import { isShortcutFolder } from '@/types';
+import { PluginCard } from '@/plugins';
+import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, ShortcutSize, Position, GridItem, PluginCardItem } from '@/types';
+import { isShortcutFolder, isPluginCard } from '@/types';
 
 interface DraggableItemProps {
-  entry: ShortcutEntry;
+  entry: GridItem;
   position: Position;
   size: { width: number; height: number };
   onOpen?: (folder: ShortcutFolderType) => void;
@@ -13,6 +14,8 @@ interface DraggableItemProps {
   onDelete?: (item: ShortcutItem) => void;
   onResize?: (item: ShortcutItem, size: ShortcutSize) => void;
   onResizeFolder?: (folder: ShortcutFolderType, size: ShortcutSize) => void;
+  onResizePluginCard?: (item: PluginCardItem, size: ShortcutSize) => void;
+  onRemovePluginCard?: (item: PluginCardItem) => void;
   isDropTarget: boolean;
   isDragging: boolean;
   shouldAnimate: boolean;
@@ -30,6 +33,8 @@ export function DraggableItem({
   onDelete,
   onResize,
   onResizeFolder,
+  onResizePluginCard,
+  onRemovePluginCard,
   isDropTarget,
   isDragging,
   shouldAnimate,
@@ -64,6 +69,15 @@ export function DraggableItem({
           onOpen={onOpen}
           onResize={onResizeFolder}
           isDropTarget={isDropTarget}
+        />
+      ) : isPluginCard(entry) ? (
+        <PluginCard
+          item={entry}
+          onResize={onResizePluginCard}
+          onRemove={onRemovePluginCard}
+          batchEditMode={batchEditMode}
+          isSelected={isSelected}
+          onToggleSelect={onToggleSelect}
         />
       ) : (
         <ShortcutCard 

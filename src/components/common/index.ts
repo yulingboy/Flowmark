@@ -1,4 +1,5 @@
 export { IframeModal } from './IframeModal';
+export { MacModal } from './MacModal';
 export { ContextMenu } from './ContextMenu';
 export type { ContextMenuItem } from './ContextMenu';
 

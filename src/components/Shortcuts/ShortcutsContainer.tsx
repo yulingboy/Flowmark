@@ -11,17 +11,18 @@ import { DraggableItem } from './DraggableItem';
 import { ShortcutCard } from './ShortcutCard';
 import { ShortcutFolder } from './ShortcutFolder';
 import { FolderPopup } from './FolderPopup';
+import { PluginCard } from '@/plugins';
 import { getItemSize } from './utils/gridUtils';
 import { useShortcutItems } from './hooks/useShortcutItems';
 import { createDragHandlers } from './hooks/useDragHandlers';
 import { createFolderHandlers } from './hooks/useFolderHandlers';
-import type { ShortcutEntry, ShortcutFolder as ShortcutFolderType, ShortcutItem, ShortcutSize } from '@/types';
-import { isShortcutFolder } from '@/types';
+import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, ShortcutSize, GridItem, PluginCardItem } from '@/types';
+import { isShortcutFolder, isPluginCard } from '@/types';
 import { useShortcutsStore } from '@/stores/shortcutsStore';
 
 interface ShortcutsContainerProps {
-  shortcuts: ShortcutEntry[];
-  onShortcutsChange?: (shortcuts: ShortcutEntry[]) => void;
+  shortcuts: GridItem[];
+  onShortcutsChange?: (shortcuts: GridItem[]) => void;
   onEditShortcut?: (item: ShortcutItem) => void;
   onDeleteShortcut?: (item: ShortcutItem) => void;
   className?: string;
@@ -108,11 +109,30 @@ export function ShortcutsContainer({
   // 调整标签大小（在内部处理，保留位置信息）
   const handleResizeShortcut = (item: ShortcutItem, size: ShortcutSize) => {
     const newItems = items.map(s => {
-      if (s.id === item.id && !isShortcutFolder(s)) {
+      if (s.id === item.id && !isShortcutFolder(s) && !isPluginCard(s)) {
         return { ...s, size };
       }
       return s;
     });
+    setItems(newItems);
+    onShortcutsChange?.(newItems);
+  };
+
+  // 调整插件卡片大小
+  const handleResizePluginCard = (item: PluginCardItem, size: ShortcutSize) => {
+    const newItems = items.map(s => {
+      if (s.id === item.id && isPluginCard(s)) {
+        return { ...s, size };
+      }
+      return s;
+    });
+    setItems(newItems);
+    onShortcutsChange?.(newItems);
+  };
+
+  // 移除插件卡片
+  const handleRemovePluginCard = (item: PluginCardItem) => {
+    const newItems = items.filter(s => s.id !== item.id);
     setItems(newItems);
     onShortcutsChange?.(newItems);
   };
@@ -167,6 +187,8 @@ export function ShortcutsContainer({
                 onDelete={onDeleteShortcut}
                 onResize={handleResizeShortcut}
                 onResizeFolder={handleResizeFolder}
+                onResizePluginCard={handleResizePluginCard}
+                onRemovePluginCard={handleRemovePluginCard}
                 isDropTarget={isDropTarget}
                 isDragging={isDragging}
                 shouldAnimate={animatingItemId === entry.id}
@@ -191,8 +213,10 @@ export function ShortcutsContainer({
             >
               {isShortcutFolder(activeItem) ? (
                 <ShortcutFolder folder={activeItem} />
+              ) : isPluginCard(activeItem) ? (
+                <PluginCard item={activeItem} />
               ) : (
-                <ShortcutCard item={activeItem} />
+                <ShortcutCard item={activeItem as ShortcutItem} />
               )}
             </div>
           ) : null}

@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { GridManager, pixelToGrid, gridToPixel, getGridSpan } from '../utils/gridUtils';
-import type { ShortcutEntry } from '@/types';
+import type { GridItem } from '@/types';
 
 interface UseShortcutItemsOptions {
-  shortcuts: ShortcutEntry[];
+  shortcuts: GridItem[];
   columns: number;
   unit: number;
   gap: number;
 }
 
 export function useShortcutItems({ shortcuts, columns, unit, gap }: UseShortcutItemsOptions) {
-  const [items, setItems] = useState<ShortcutEntry[]>(shortcuts);
+  const [items, setItems] = useState<GridItem[]>(shortcuts);
 
   useEffect(() => {
     const manager = new GridManager(columns, unit, gap);
@@ -32,7 +32,7 @@ export function useShortcutItems({ shortcuts, columns, unit, gap }: UseShortcutI
     setItems(itemsWithPositions);
   }, [shortcuts, columns, unit, gap]);
 
-  const itemsMap = new Map<string, ShortcutEntry>();
+  const itemsMap = new Map<string, GridItem>();
   items.forEach(item => itemsMap.set(item.id, item));
 
   return { items, setItems, itemsMap };

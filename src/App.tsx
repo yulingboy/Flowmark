@@ -11,10 +11,14 @@ import { PlusSquareOutlined, FolderOutlined, ReloadOutlined, EditOutlined, Setti
 import { WallpaperIcon } from '@/components/common/icons';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useShortcutsStore } from '@/stores/shortcutsStore';
+import { registerBuiltinPlugins } from '@/plugins/builtin';
 
 import type { ShortcutItem } from '@/types';
 import { GRID } from '@/constants';
 import { preloadImage } from '@/utils/imagePreloader';
+
+// 注册内置插件
+registerBuiltinPlugins();
 
 function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -102,6 +106,7 @@ function App() {
       onContextMenu={handleContextMenu}>
       <Background imageUrl={backgroundUrl} />
       <SettingsButton onClick={() => setIsSettingsOpen(true)} className="fixed top-4 right-4" />
+      
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
       <ContextMenu isOpen={contextMenu.isOpen} position={{ x: contextMenu.x, y: contextMenu.y }} items={contextMenuItems}
         onClose={() => setContextMenu(prev => ({ ...prev, isOpen: false }))} />
