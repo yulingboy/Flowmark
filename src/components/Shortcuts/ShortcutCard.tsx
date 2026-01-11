@@ -36,14 +36,6 @@ const MoveIcon = () => (
   </svg>
 );
 
-const DockIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
-    <rect x="2" y="6" width="20" height="12" rx="2" />
-    <line x1="6" y1="18" x2="6" y2="21" />
-    <line x1="18" y1="18" x2="18" y2="21" />
-  </svg>
-);
-
 const LayoutIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
     <rect x="3" y="3" width="7" height="7" />
@@ -120,11 +112,6 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
         onClick: () => moveToFolder(item.id, folder.id),
       })),
       onClick: () => {},
-    },
-    {
-      icon: <DockIcon />,
-      label: '加入Dock栏',
-      onClick: () => console.log('加入Dock栏'),
     },
     {
       icon: <LayoutIcon />,
