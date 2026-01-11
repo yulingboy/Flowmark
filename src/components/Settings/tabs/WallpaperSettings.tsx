@@ -25,86 +25,50 @@ export function WallpaperSettings() {
 
   return (
     <div>
-      <div style={{
-        width: '100%',
-        height: '180px',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        backgroundColor: '#f3f4f6',
-        marginBottom: '16px',
-        position: 'relative',
-      }}>
+      <div className="w-full h-45 rounded-xl overflow-hidden bg-gray-100 mb-4 relative">
         <img
           src={backgroundUrl}
           alt="当前壁纸"
-          style={{ 
-            width: '100%', 
-            height: '100%', 
-            objectFit: 'cover',
-            filter: `blur(${backgroundBlur / 10}px)`,
-          }}
+          className="w-full h-full object-cover"
+          style={{ filter: `blur(${backgroundBlur / 10}px)` }}
         />
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundColor: `rgba(0, 0, 0, ${backgroundOverlay / 100})`,
-        }} />
+        <div
+          className="absolute inset-0"
+          style={{ backgroundColor: `rgba(0, 0, 0, ${backgroundOverlay / 100})` }}
+        />
       </div>
 
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
+      <div className="flex gap-3 mb-5">
         <button
           onClick={() => setShowOnlineWallpapers(!showOnlineWallpapers)}
-          style={{
-            flex: 1,
-            padding: '10px 16px',
-            fontSize: '14px',
-            backgroundColor: '#3b82f6',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-          }}
+          className="flex-1 py-2.5 px-4 text-sm bg-blue-500 text-white rounded-lg cursor-pointer"
         >
           在线壁纸
         </button>
         <button
           onClick={resetBackground}
-          style={{
-            flex: 1,
-            padding: '10px 16px',
-            fontSize: '14px',
-            backgroundColor: '#f3f4f6',
-            color: '#374151',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-          }}
+          className="flex-1 py-2.5 px-4 text-sm bg-gray-100 text-gray-700 rounded-lg cursor-pointer"
         >
           恢复默认
         </button>
       </div>
 
       {showOnlineWallpapers && (
-        <div style={{ marginBottom: '20px' }}>
-          <div style={{ fontSize: '14px', color: '#374151', marginBottom: '12px' }}>选择壁纸</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+        <div className="mb-5">
+          <div className="text-sm text-gray-700 mb-3">选择壁纸</div>
+          <div className="grid grid-cols-3 gap-2">
             {ONLINE_WALLPAPERS.map((url, index) => (
               <button
                 key={index}
                 onClick={() => updateBackgroundUrl(url)}
-                style={{
-                  padding: 0,
-                  border: backgroundUrl === url ? '2px solid #3b82f6' : '2px solid transparent',
-                  borderRadius: '8px',
-                  overflow: 'hidden',
-                  cursor: 'pointer',
-                  aspectRatio: '16/9',
-                }}
+                className={`p-0 rounded-lg overflow-hidden cursor-pointer aspect-video ${
+                  backgroundUrl === url ? 'border-2 border-blue-500' : 'border-2 border-transparent'
+                }`}
               >
                 <img
                   src={url}
                   alt={`壁纸 ${index + 1}`}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  className="w-full h-full object-cover"
                 />
               </button>
             ))}
@@ -112,21 +76,14 @@ export function WallpaperSettings() {
         </div>
       )}
 
-      <div style={{ marginBottom: '16px' }}>
-        <div style={{ fontSize: '14px', color: '#374151', marginBottom: '8px' }}>自定义壁纸 URL</div>
+      <div className="mb-4">
+        <div className="text-sm text-gray-700 mb-2">自定义壁纸 URL</div>
         <input
           type="text"
           value={backgroundUrl}
           onChange={(e) => updateBackgroundUrl(e.target.value)}
           placeholder="输入图片 URL"
-          style={{
-            width: '100%',
-            padding: '10px 12px',
-            border: '1px solid #e5e7eb',
-            borderRadius: '8px',
-            fontSize: '14px',
-            boxSizing: 'border-box',
-          }}
+          className="w-full py-2.5 px-3 border border-gray-200 rounded-lg text-sm box-border"
         />
       </div>
 

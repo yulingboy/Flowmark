@@ -1,25 +1,16 @@
 export function AboutSettings() {
   return (
     <div>
-      <div style={{ textAlign: 'center', padding: '40px 0' }}>
-        <div style={{
-          width: '64px',
-          height: '64px',
-          borderRadius: '16px',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          margin: '0 auto 16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          fontSize: '24px',
-          fontWeight: 'bold',
-        }}>
+      <div className="text-center py-10">
+        <div
+          className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold"
+          style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
+        >
           N
         </div>
-        <h3 style={{ fontSize: '18px', color: '#1f2937', margin: '0 0 8px' }}>AI Nav</h3>
-        <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 4px' }}>版本 1.0.0</p>
-        <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>一个简洁美观的新标签页</p>
+        <h3 className="text-lg text-gray-800 mb-2">AI Nav</h3>
+        <p className="text-sm text-gray-500 mb-1">版本 1.0.0</p>
+        <p className="text-xs text-gray-400">一个简洁美观的新标签页</p>
       </div>
     </div>
   );

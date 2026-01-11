@@ -7,43 +7,24 @@ interface ToggleSwitchProps {
 
 export function ToggleSwitch({ checked, onChange, label, description }: ToggleSwitchProps) {
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '12px 0',
-      borderBottom: '1px solid #f3f4f6',
-    }}>
+    <div className="flex items-center justify-between py-3 border-b border-gray-100">
       <div>
-        <div style={{ fontSize: '14px', color: '#374151' }}>{label}</div>
+        <div className="text-sm text-gray-700">{label}</div>
         {description && (
-          <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>{description}</div>
+          <div className="text-xs text-gray-400 mt-0.5">{description}</div>
         )}
       </div>
       <button
         onClick={() => onChange(!checked)}
-        style={{
-          width: '44px',
-          height: '24px',
-          borderRadius: '12px',
-          border: 'none',
-          backgroundColor: checked ? '#3b82f6' : '#d1d5db',
-          cursor: 'pointer',
-          position: 'relative',
-          transition: 'background-color 0.2s',
-        }}
+        className={`w-11 h-6 rounded-full relative transition-colors cursor-pointer ${
+          checked ? 'bg-blue-500' : 'bg-gray-300'
+        }`}
       >
-        <div style={{
-          width: '20px',
-          height: '20px',
-          borderRadius: '50%',
-          backgroundColor: 'white',
-          position: 'absolute',
-          top: '2px',
-          left: checked ? '22px' : '2px',
-          transition: 'left 0.2s',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-        }} />
+        <div
+          className={`w-5 h-5 rounded-full bg-white absolute top-0.5 transition-all shadow ${
+            checked ? 'left-[22px]' : 'left-0.5'
+          }`}
+        />
       </button>
     </div>
   );

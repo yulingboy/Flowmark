@@ -18,9 +18,7 @@ export function GeneralSettings() {
   
   return (
     <div>
-      <div style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '16px' }}>
-        界面显示
-      </div>
+      <div className="text-xs text-gray-400 mb-4">界面显示</div>
       
       <ToggleSwitch
         checked={showClock}
@@ -41,9 +39,7 @@ export function GeneralSettings() {
         description="显示网站快捷方式"
       />
       
-      <div style={{ fontSize: '12px', color: '#9ca3af', margin: '20px 0 16px' }}>
-        链接行为
-      </div>
+      <div className="text-xs text-gray-400 my-5">链接行为</div>
       
       <ToggleSwitch
         checked={openInNewTab}
@@ -52,41 +48,23 @@ export function GeneralSettings() {
         description="点击快捷方式时在新标签页打开"
       />
       
-      <div style={{ fontSize: '12px', color: '#9ca3af', margin: '20px 0 16px' }}>
-        语言设置
-      </div>
+      <div className="text-xs text-gray-400 my-5">语言设置</div>
       
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '12px 0',
-        borderBottom: '1px solid #f3f4f6',
-      }}>
-        <div style={{ fontSize: '14px', color: '#374151' }}>界面语言</div>
+      <div className="flex items-center justify-between py-3 border-b border-gray-100">
+        <div className="text-sm text-gray-700">界面语言</div>
         <select
           value={language}
           onChange={(e) => updateLanguage(e.target.value as 'zh-CN' | 'en-US')}
-          style={{
-            padding: '6px 12px',
-            borderRadius: '6px',
-            border: '1px solid #e5e7eb',
-            fontSize: '14px',
-            color: '#374151',
-            backgroundColor: 'white',
-            cursor: 'pointer',
-          }}
+          className="px-3 py-1.5 rounded-md border border-gray-200 text-sm text-gray-700 bg-white cursor-pointer"
         >
           <option value="zh-CN">简体中文</option>
           <option value="en-US">English</option>
         </select>
       </div>
       
-      <div style={{ fontSize: '12px', color: '#9ca3af', margin: '20px 0 16px' }}>
-        数据管理
-      </div>
+      <div className="text-xs text-gray-400 my-5">数据管理</div>
       
-      <div style={{ display: 'flex', gap: '12px', padding: '12px 0' }}>
+      <div className="flex gap-3 py-3">
         <button
           onClick={() => {
             const data = JSON.stringify(useSettingsStore.getState(), null, 2);
@@ -98,31 +76,16 @@ export function GeneralSettings() {
             a.click();
             URL.revokeObjectURL(url);
           }}
-          style={{
-            padding: '8px 16px',
-            fontSize: '14px',
-            backgroundColor: '#f3f4f6',
-            color: '#374151',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-          }}
+          className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg cursor-pointer"
         >
           导出设置
         </button>
-        <label style={{
-          padding: '8px 16px',
-          fontSize: '14px',
-          backgroundColor: '#f3f4f6',
-          color: '#374151',
-          borderRadius: '8px',
-          cursor: 'pointer',
-        }}>
+        <label className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg cursor-pointer">
           导入设置
           <input
             type="file"
             accept=".json"
-            style={{ display: 'none' }}
+            className="hidden"
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) {
@@ -146,15 +109,7 @@ export function GeneralSettings() {
               resetAllSettings();
             }
           }}
-          style={{
-            padding: '8px 16px',
-            fontSize: '14px',
-            backgroundColor: '#fef2f2',
-            color: '#ef4444',
-            border: '1px solid #fecaca',
-            borderRadius: '8px',
-            cursor: 'pointer',
-          }}
+          className="px-4 py-2 text-sm bg-red-50 text-red-500 border border-red-200 rounded-lg cursor-pointer"
         >
           重置设置
         </button>

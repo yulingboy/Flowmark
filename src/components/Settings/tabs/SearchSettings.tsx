@@ -26,26 +26,21 @@ export function SearchSettings() {
 
   return (
     <div>
-      <div style={{ marginBottom: '20px' }}>
-        <div style={{ fontSize: '14px', color: '#374151', marginBottom: '12px' }}>默认搜索引擎</div>
-        <div style={{ display: 'flex', gap: '12px' }}>
+      <div className="mb-5">
+        <div className="text-sm text-gray-700 mb-3">默认搜索引擎</div>
+        <div className="flex gap-3">
           {SEARCH_ENGINES.map(({ value, label }) => (
             <button
               key={value}
               onClick={() => updateSearchEngine(value)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '8px 16px',
-                borderRadius: '8px',
-                border: searchEngine === value ? '2px solid #3b82f6' : '1px solid #e5e7eb',
-                backgroundColor: searchEngine === value ? '#eff6ff' : 'white',
-                cursor: 'pointer',
-              }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer ${
+                searchEngine === value
+                  ? 'border-2 border-blue-500 bg-blue-50'
+                  : 'border border-gray-200 bg-white'
+              }`}
             >
-              <img src={SEARCH_ENGINE_ICONS[value]} alt={label} style={{ width: '16px', height: '16px' }} />
-              <span style={{ fontSize: '14px', color: '#374151' }}>{label}</span>
+              <img src={SEARCH_ENGINE_ICONS[value]} alt={label} className="w-4 h-4" />
+              <span className="text-sm text-gray-700">{label}</span>
             </button>
           ))}
         </div>
@@ -74,18 +69,10 @@ export function SearchSettings() {
       />
 
       {searchHistoryEnabled && (
-        <div style={{ marginTop: '16px' }}>
+        <div className="mt-4">
           <button
             onClick={clearSearchHistory}
-            style={{
-              padding: '8px 16px',
-              fontSize: '14px',
-              color: '#ef4444',
-              backgroundColor: '#fef2f2',
-              border: '1px solid #fecaca',
-              borderRadius: '8px',
-              cursor: 'pointer',
-            }}
+            className="px-4 py-2 text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg cursor-pointer"
           >
             清除搜索历史
           </button>

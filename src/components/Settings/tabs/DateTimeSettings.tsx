@@ -58,69 +58,43 @@ export function DateTimeSettings() {
     return () => clearInterval(interval);
   }, [showSeconds, show24Hour, showDate, showWeekday, showYear, showLunar]);
 
-  const fontSizeMap = {
-    small: '48px',
-    medium: '56px',
-    large: '64px',
+  const fontSizeClass = {
+    small: 'text-5xl',
+    medium: 'text-6xl',
+    large: 'text-7xl',
   };
 
   return (
     <div>
-      <div style={{
-        backgroundColor: '#1f2937',
-        borderRadius: '12px',
-        padding: '24px',
-        marginBottom: '20px',
-        textAlign: 'center',
-      }}>
-        <div style={{
-          fontSize: fontSizeMap[clockFontSize],
-          fontWeight: 600,
-          color: clockColor,
-          fontFamily: 'system-ui, -apple-system, sans-serif',
-          fontVariantNumeric: 'tabular-nums',
-        }}>
+      <div className="bg-gray-800 rounded-xl p-6 mb-5 text-center">
+        <div
+          className={`${fontSizeClass[clockFontSize]} font-semibold tabular-nums`}
+          style={{ color: clockColor }}
+        >
           {previewTime}
         </div>
-        <div style={{
-          fontSize: '14px',
-          color: clockColor,
-          opacity: 0.9,
-          marginTop: '8px',
-        }}>
+        <div className="text-sm mt-2 opacity-90" style={{ color: clockColor }}>
           {previewDate}
         </div>
       </div>
 
-      <div style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '12px' }}>
-        基本设置
-      </div>
+      <div className="text-xs text-gray-400 mb-3">基本设置</div>
 
       <ToggleSwitch checked={show24Hour} onChange={updateShow24Hour} label="24小时制" />
       <ToggleSwitch checked={showSeconds} onChange={updateShowSeconds} label="显示秒" />
 
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '12px 0',
-        borderBottom: '1px solid #f3f4f6',
-      }}>
-        <div style={{ fontSize: '14px', color: '#374151' }}>字体大小</div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+      <div className="flex items-center justify-between py-3 border-b border-gray-100">
+        <div className="text-sm text-gray-700">字体大小</div>
+        <div className="flex gap-2">
           {(['small', 'medium', 'large'] as const).map((size) => (
             <button
               key={size}
               onClick={() => updateClockFontSize(size)}
-              style={{
-                padding: '4px 12px',
-                fontSize: '12px',
-                borderRadius: '6px',
-                border: clockFontSize === size ? '2px solid #3b82f6' : '1px solid #e5e7eb',
-                backgroundColor: clockFontSize === size ? '#eff6ff' : 'white',
-                color: '#374151',
-                cursor: 'pointer',
-              }}
+              className={`px-3 py-1 text-xs rounded-md cursor-pointer ${
+                clockFontSize === size
+                  ? 'border-2 border-blue-500 bg-blue-50'
+                  : 'border border-gray-200 bg-white'
+              } text-gray-700`}
             >
               {size === 'small' ? '小' : size === 'medium' ? '中' : '大'}
             </button>
@@ -128,48 +102,25 @@ export function DateTimeSettings() {
         </div>
       </div>
 
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '12px 0',
-        borderBottom: '1px solid #f3f4f6',
-      }}>
-        <div style={{ fontSize: '14px', color: '#374151' }}>字体颜色</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div className="flex items-center justify-between py-3 border-b border-gray-100">
+        <div className="text-sm text-gray-700">字体颜色</div>
+        <div className="flex items-center gap-2">
           <input
             type="color"
             value={clockColor}
             onChange={(e) => updateClockColor(e.target.value)}
-            style={{
-              width: '32px',
-              height: '32px',
-              padding: 0,
-              border: '1px solid #e5e7eb',
-              borderRadius: '6px',
-              cursor: 'pointer',
-            }}
+            className="w-8 h-8 p-0 border border-gray-200 rounded-md cursor-pointer"
           />
           <button
             onClick={() => updateClockColor('#ffffff')}
-            style={{
-              padding: '4px 8px',
-              fontSize: '12px',
-              color: '#6b7280',
-              backgroundColor: '#f3f4f6',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-            }}
+            className="px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded cursor-pointer"
           >
             重置
           </button>
         </div>
       </div>
 
-      <div style={{ fontSize: '12px', color: '#9ca3af', margin: '20px 0 12px' }}>
-        内容展示
-      </div>
+      <div className="text-xs text-gray-400 my-5">内容展示</div>
 
       <ToggleSwitch checked={showYear} onChange={updateShowYear} label="年份" />
       <ToggleSwitch checked={showDate} onChange={updateShowDate} label="日期" />

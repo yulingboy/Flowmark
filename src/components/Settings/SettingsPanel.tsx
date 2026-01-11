@@ -90,55 +90,23 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
   if (!isOpen) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      zIndex: 50,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      backdropFilter: 'blur(4px)',
-    }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div
         ref={panelRef}
-        style={{
-          backgroundColor: 'white',
-          borderRadius: '16px',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-          width: '720px',
-          height: '520px',
-          display: 'flex',
-          overflow: 'hidden',
-        }}
+        className="bg-white rounded-2xl shadow-2xl w-[720px] h-[520px] flex overflow-hidden"
       >
-        <div style={{
-          width: '200px',
-          backgroundColor: '#f9fafb',
-          borderRight: '1px solid #e5e7eb',
-          padding: '20px 0',
-          display: 'flex',
-          flexDirection: 'column',
-        }}>
-          <nav style={{ flex: 1 }}>
+        {/* 左侧导航 */}
+        <div className="w-50 bg-gray-50 border-r border-gray-200 py-5 flex flex-col">
+          <nav className="flex-1">
             {TABS.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  border: 'none',
-                  background: activeTab === tab.id ? 'white' : 'transparent',
-                  cursor: 'pointer',
-                  color: activeTab === tab.id ? '#3b82f6' : '#6b7280',
-                  fontSize: '14px',
-                  textAlign: 'left',
-                  borderLeft: activeTab === tab.id ? '3px solid #3b82f6' : '3px solid transparent',
-                }}
+                className={`w-full py-3 px-4 flex items-center gap-3 border-none cursor-pointer text-sm text-left border-l-3 ${
+                  activeTab === tab.id
+                    ? 'bg-white text-blue-500 border-l-blue-500'
+                    : 'bg-transparent text-gray-500 border-l-transparent'
+                }`}
               >
                 {tab.icon}
                 {tab.label}
@@ -147,34 +115,23 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
           </nav>
         </div>
 
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '16px 24px',
-            borderBottom: '1px solid #e5e7eb',
-          }}>
-            <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#1f2937', margin: 0 }}>
+        {/* 右侧内容 */}
+        <div className="flex-1 flex flex-col">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+            <h2 className="text-base font-semibold text-gray-800">
               {TABS.find(t => t.id === activeTab)?.label}
             </h2>
             <button
               onClick={onClose}
-              style={{
-                padding: '4px',
-                borderRadius: '50%',
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-              }}
+              className="p-1 rounded-full border-none bg-transparent cursor-pointer"
             >
-              <svg style={{ width: '20px', height: '20px', color: '#6b7280' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
-          <div style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
+          <div className="flex-1 p-6 overflow-y-auto">
             {activeTab === 'general' && <GeneralSettings />}
             {activeTab === 'search' && <SearchSettings />}
             {activeTab === 'wallpaper' && <WallpaperSettings />}
