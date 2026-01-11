@@ -17,9 +17,15 @@ export default defineConfig({
     },
   },
   build: {
+    // 扩展打包输出目录
+    outDir: 'dist',
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
+        // 扩展需要固定的文件名，不带 hash
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name].[ext]',
         manualChunks: {
           'vendor-react': ['react', 'react-dom'],
           'vendor-antd': ['antd', '@ant-design/icons'],

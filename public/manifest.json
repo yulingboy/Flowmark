@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "新标签页",
+  "version": "1.0.0",
+  "description": "一个美观、可定制的浏览器新标签页",
+  "icons": {
+    "128": "icons/icon.svg"
+  },
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ]
+}
