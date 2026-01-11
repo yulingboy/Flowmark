@@ -1,115 +1,158 @@
-import { Check } from 'lucide-react';
+import { Check, Target, Plus, Minus } from 'lucide-react';
 import type { PluginSize } from '../../types';
 import { useHabit } from './useHabit';
-import { getStreak, getTodayString } from './types';
+import type { Habit } from './types';
+import { getStreak, isHabitCompleted, getHabitProgress } from './types';
 
-/** 单个习惯项 */
-function HabitItem({ 
-  habit, 
-  compact = false,
-  onToggle 
-}: { 
-  habit: { id: string; name: string; icon: string; color: string; records: Record<string, boolean> };
-  compact?: boolean;
+interface HabitItemProps {
+  habit: Habit;
   onToggle: () => void;
-}) {
-  const isChecked = !!habit.records[getTodayString()];
-  const streak = getStreak(habit.records);
+  onIncrement: () => void;
+  onDecrement: () => void;
+}
 
-  if (compact) {
-    return (
-      <div
-        onClick={(e) => { e.stopPropagation(); onToggle(); }}
-        className={`flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer transition-all ${
-          isChecked ? 'opacity-100' : 'opacity-50 hover:opacity-75'
-        }`}
-        style={{ backgroundColor: isChecked ? habit.color : `${habit.color}40` }}
-        title={`${habit.name}${isChecked ? ' ✓' : ''}`}
-      >
-        {isChecked ? (
-          <Check className="w-4 h-4 text-white" />
-        ) : (
-          <span className="text-sm">{habit.icon}</span>
-        )}
-      </div>
-    );
-  }
+/** 紧凑习惯项 - 用于 2x2 尺寸 */
+function CompactHabitItem({ habit, onToggle, onIncrement }: Omit<HabitItemProps, 'onDecrement'>) {
+  const isCompleted = isHabitCompleted(habit);
+  const { current, target } = getHabitProgress(habit);
+  const isCountType = habit.type === 'count';
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isCountType) {
+      onIncrement();
+    } else {
+      onToggle();
+    }
+  };
 
   return (
     <div
-      onClick={(e) => { e.stopPropagation(); onToggle(); }}
-      className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all ${
-        isChecked ? 'bg-white/20' : 'bg-white/5 hover:bg-white/10'
+      onClick={handleClick}
+      className={`relative flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer transition-all ${
+        isCompleted ? 'ring-2 ring-white/30' : 'opacity-60 hover:opacity-100'
       }`}
+      style={{ backgroundColor: isCompleted ? habit.color : `${habit.color}50` }}
+      title={`${habit.name} ${isCountType ? `${current}/${target}` : (isCompleted ? '✓' : '')}`}
     >
-      <div
-        className={`flex items-center justify-center w-8 h-8 rounded-lg ${
-          isChecked ? '' : 'opacity-60'
-        }`}
-        style={{ backgroundColor: habit.color }}
-      >
-        {isChecked ? (
-          <Check className="w-4 h-4 text-white" />
-        ) : (
-          <span className="text-sm">{habit.icon}</span>
-        )}
-      </div>
-      <div className="flex-1 min-w-0">
-        <span className={`text-sm ${isChecked ? 'line-through opacity-60' : ''}`}>
-          {habit.name}
-        </span>
-      </div>
-      {streak > 0 && (
-        <span className="text-xs text-white/60">🔥{streak}</span>
+      {isCompleted ? (
+        <Check className="w-4 h-4 text-white" />
+      ) : isCountType ? (
+        <span className="text-[10px] text-white font-medium">{current}/{target}</span>
+      ) : (
+        <span className="text-xs text-white font-medium">{habit.name.charAt(0)}</span>
       )}
     </div>
   );
 }
 
-export function HabitCard({ size }: { size: PluginSize }) {
-  const { habits, toggleCheck } = useHabit();
+/** 完整习惯项 - 用于 2x4 尺寸 */
+function FullHabitItem({ habit, onToggle, onIncrement, onDecrement }: HabitItemProps) {
+  const isCompleted = isHabitCompleted(habit);
+  const { current, target } = getHabitProgress(habit);
+  const isCountType = habit.type === 'count';
+  const streak = getStreak(habit.records, target);
 
-  // 统计今日完成情况
-  const todayStr = getTodayString();
-  const completedCount = habits.filter(h => h.records[todayStr]).length;
+  const handleMainClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isCountType) {
+      onIncrement();
+    } else {
+      onToggle();
+    }
+  };
+
+  return (
+    <div
+      className={`flex items-center gap-2.5 p-2 rounded-lg transition-colors ${
+        isCompleted ? 'bg-white/15' : 'bg-white/5 hover:bg-white/10'
+      }`}
+    >
+      <div
+        onClick={handleMainClick}
+        className={`flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer transition-opacity ${
+          isCompleted ? '' : 'opacity-70 hover:opacity-100'
+        }`}
+        style={{ backgroundColor: habit.color }}
+      >
+        {isCompleted ? (
+          <Check className="w-4 h-4 text-white" />
+        ) : (
+          <span className="text-xs text-white font-medium">{habit.name.charAt(0)}</span>
+        )}
+      </div>
+      
+      <div className="flex-1 min-w-0">
+        <span className={`text-sm truncate ${isCompleted ? 'line-through text-white/50' : 'text-white/90'}`}>
+          {habit.name}
+        </span>
+      </div>
+
+      {/* 计数型显示进度和加减按钮 */}
+      {isCountType ? (
+        <div className="flex items-center gap-1">
+          <button
+            onClick={(e) => { e.stopPropagation(); onDecrement(); }}
+            className="w-5 h-5 flex items-center justify-center rounded bg-white/10 hover:bg-white/20 transition-colors"
+            disabled={current === 0}
+          >
+            <Minus className="w-3 h-3 text-white/70" />
+          </button>
+          <span className="text-xs text-white/70 w-8 text-center tabular-nums">{current}/{target}</span>
+          <button
+            onClick={(e) => { e.stopPropagation(); onIncrement(); }}
+            className="w-5 h-5 flex items-center justify-center rounded bg-white/10 hover:bg-white/20 transition-colors"
+          >
+            <Plus className="w-3 h-3 text-white/70" />
+          </button>
+        </div>
+      ) : streak > 0 ? (
+        <span className="text-xs text-orange-300/80">🔥{streak}</span>
+      ) : null}
+    </div>
+  );
+}
+
+export function HabitCard({ size }: { size: PluginSize }) {
+  const { habits, toggleCheck, incrementCount, decrementCount } = useHabit();
+
+  const completedCount = habits.filter(h => isHabitCompleted(h)).length;
   const totalCount = habits.length;
 
-  // 1x1 尺寸：显示完成进度
+  // 1x1 尺寸
   if (size === '1x1') {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-green-500/80 to-emerald-600/80 rounded-xl">
-        <span className="text-2xl">✅</span>
-        <span className="text-xs text-white/80 mt-1">
+      <div className="w-full h-full flex flex-col items-center justify-center bg-black/20 backdrop-blur-sm rounded-xl">
+        <Target className="w-6 h-6 text-white/70" />
+        <span className="text-xs text-white/60 mt-1 tabular-nums">
           {completedCount}/{totalCount}
         </span>
       </div>
     );
   }
 
-  // 2x2 尺寸：显示习惯列表
+  // 2x2 尺寸
   if (size === '2x2') {
     return (
-      <div className="w-full h-full flex flex-col bg-gradient-to-br from-green-500/80 to-emerald-600/80 rounded-xl p-3 text-white">
-        {/* 标题 */}
+      <div className="w-full h-full flex flex-col bg-black/20 backdrop-blur-sm rounded-xl p-3 text-white">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium">✅ 今日习惯</span>
-          <span className="text-xs text-white/60">{completedCount}/{totalCount}</span>
+          <span className="text-xs text-white/70">今日习惯</span>
+          <span className="text-xs text-white/50 tabular-nums">{completedCount}/{totalCount}</span>
         </div>
         
-        {/* 习惯列表 */}
         {habits.length === 0 ? (
-          <div className="flex-1 flex items-center justify-center text-xs text-white/60">
+          <div className="flex-1 flex items-center justify-center text-xs text-white/40">
             点击添加习惯
           </div>
         ) : (
           <div className="flex-1 overflow-hidden">
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {habits.slice(0, 8).map(habit => (
-                <HabitItem
+                <CompactHabitItem
                   key={habit.id}
                   habit={habit}
-                  compact
                   onToggle={() => toggleCheck(habit.id)}
+                  onIncrement={() => incrementCount(habit.id)}
                 />
               ))}
             </div>
@@ -119,30 +162,27 @@ export function HabitCard({ size }: { size: PluginSize }) {
     );
   }
 
-  // 2x4 尺寸：完整显示
+  // 2x4 尺寸
   return (
-    <div className="w-full h-full flex flex-col bg-gradient-to-br from-green-500/80 to-emerald-600/80 rounded-xl p-4 text-white">
-      {/* 标题 */}
+    <div className="w-full h-full flex flex-col bg-black/20 backdrop-blur-sm rounded-xl p-4 text-white">
       <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-xl">✅</span>
-          <span className="text-base font-medium">习惯养成</span>
-        </div>
-        <span className="text-sm text-white/70">{completedCount}/{totalCount} 已完成</span>
+        <span className="text-sm font-medium text-white/90">习惯养成</span>
+        <span className="text-xs text-white/50 tabular-nums">{completedCount}/{totalCount}</span>
       </div>
       
-      {/* 习惯列表 */}
       {habits.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center text-sm text-white/60">
-          点击卡片添加习惯
+        <div className="flex-1 flex items-center justify-center text-sm text-white/40">
+          点击添加习惯
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto space-y-2">
+        <div className="flex-1 overflow-y-auto space-y-1.5 -mr-1 pr-1">
           {habits.map(habit => (
-            <HabitItem
+            <FullHabitItem
               key={habit.id}
               habit={habit}
               onToggle={() => toggleCheck(habit.id)}
+              onIncrement={() => incrementCount(habit.id)}
+              onDecrement={() => decrementCount(habit.id)}
             />
           ))}
         </div>
