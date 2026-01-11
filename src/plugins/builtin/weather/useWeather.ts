@@ -1,10 +1,22 @@
 ﻿import { useState, useEffect, useCallback, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { usePluginStore } from '../../store';
-import type { WeatherData, WeatherConfig, WeatherCache } from './types';
-import { PLUGIN_ID, getWeatherIcon, validateLocation } from './types';
+import type { 
+  WeatherResponse, 
+  WeatherConfig, 
+  WeatherCache,
+  WeatherData,
+  HourlyForecast,
+  DailyForecast,
+  AstronomyData
+} from './types';
+import { PLUGIN_ID, getWeatherIconName, validateLocation, getWeekday } from './types';
 
-const DEFAULT_CONFIG: WeatherConfig = { location: 'Beijing', unit: 'celsius', updateInterval: 30 };
+const DEFAULT_CONFIG: WeatherConfig = { 
+  location: 'Beijing', 
+  unit: 'celsius', 
+  updateInterval: 30 
+};
 
 const RETRY_CONFIG = {
   maxRetries: 3,
@@ -16,6 +28,7 @@ function calculateBackoff(attempt: number, baseDelay: number, maxDelay: number):
   return Math.min(baseDelay * Math.pow(2, attempt), maxDelay);
 }
 
+/** 格式化缓存时间 */
 export function formatCacheAge(timestamp: number): string {
   const now = Date.now();
   const diff = Math.floor((now - timestamp) / 1000);
@@ -24,6 +37,78 @@ export function formatCacheAge(timestamp: number): string {
   if (diff < 3600) return `${Math.floor(diff / 60)} 分钟前更新`;
   if (diff < 86400) return `${Math.floor(diff / 3600)} 小时前更新`;
   return `${Math.floor(diff / 86400)} 天前更新`;
+}
+
+/** 解析 API 响应数据 */
+function parseWeatherResponse(data: any, unit: 'celsius' | 'fahrenheit'): WeatherResponse {
+  const current = data.current_condition[0];
+  const area = data.nearest_area[0];
+  const weather = data.weather || [];
+  
+  // 当前天气
+  const currentWeather: WeatherData = {
+    temperature: parseInt(unit === 'celsius' ? current.temp_C : current.temp_F),
+    condition: current.weatherDesc[0].value,
+    icon: getWeatherIconName(current.weatherDesc[0].value),
+    humidity: parseInt(current.humidity),
+    city: area.areaName[0].value,
+    feelsLike: parseInt(unit === 'celsius' ? current.FeelsLikeC : current.FeelsLikeF),
+    wind: `${current.windspeedKmph} km/h`,
+    windDir: current.winddir16Point,
+    pressure: parseInt(current.pressure),
+    visibility: parseInt(current.visibility),
+    uvIndex: parseInt(current.uvIndex),
+    cloudCover: parseInt(current.cloudcover),
+  };
+  
+  // 小时预报（取今天剩余时间 + 明天的）
+  const hourly: HourlyForecast[] = [];
+  const now = new Date();
+  const currentHour = now.getHours();
+  
+  weather.slice(0, 2).forEach((day: any, dayIndex: number) => {
+    (day.hourly || []).forEach((hour: any) => {
+      const hourNum = parseInt(hour.time) / 100;
+      // 今天只取当前时间之后的
+      if (dayIndex === 0 && hourNum < currentHour) return;
+      // 最多取 24 小时
+      if (hourly.length >= 24) return;
+      
+      hourly.push({
+        time: `${hourNum}:00`,
+        temperature: parseInt(unit === 'celsius' ? hour.tempC : hour.tempF),
+        icon: getWeatherIconName(hour.weatherDesc[0].value),
+        condition: hour.weatherDesc[0].value,
+        chanceOfRain: parseInt(hour.chanceofrain),
+      });
+    });
+  });
+  
+  // 每日预报
+  const daily: DailyForecast[] = weather.slice(0, 7).map((day: any) => ({
+    date: day.date,
+    weekday: getWeekday(day.date),
+    maxTemp: parseInt(unit === 'celsius' ? day.maxtempC : day.maxtempF),
+    minTemp: parseInt(unit === 'celsius' ? day.mintempC : day.mintempF),
+    icon: getWeatherIconName(day.hourly[4]?.weatherDesc[0]?.value || 'Sunny'),
+    condition: day.hourly[4]?.weatherDesc[0]?.value || 'Sunny',
+    chanceOfRain: Math.max(...day.hourly.map((h: any) => parseInt(h.chanceofrain) || 0)),
+    sunrise: day.astronomy[0]?.sunrise || '',
+    sunset: day.astronomy[0]?.sunset || '',
+  }));
+  
+  // 天文数据
+  const todayAstro = weather[0]?.astronomy[0] || {};
+  const astronomy: AstronomyData = {
+    sunrise: todayAstro.sunrise || '',
+    sunset: todayAstro.sunset || '',
+    moonrise: todayAstro.moonrise || '',
+    moonset: todayAstro.moonset || '',
+    moonPhase: todayAstro.moon_phase || '',
+    moonIllumination: parseInt(todayAstro.moon_illumination) || 0,
+  };
+  
+  return { current: currentWeather, hourly, daily, astronomy };
 }
 
 export function useWeather() {
@@ -41,6 +126,7 @@ export function useWeather() {
   const retryCountRef = useRef(0);
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // 更新缓存时间显示
   useEffect(() => {
     if (!weatherCache?.timestamp) return;
     
@@ -51,6 +137,7 @@ export function useWeather() {
     return () => clearInterval(interval);
   }, [weatherCache?.timestamp]);
 
+  // 清理重试定时器
   useEffect(() => {
     return () => {
       if (retryTimeoutRef.current) {
@@ -79,17 +166,7 @@ export function useWeather() {
       if (!response.ok) throw new Error('获取天气失败');
       
       const data = await response.json();
-      const current = data.current_condition[0];
-      
-      const weatherData: WeatherData = {
-        temperature: parseInt(config.unit === 'celsius' ? current.temp_C : current.temp_F),
-        condition: current.weatherDesc[0].value,
-        icon: getWeatherIcon(current.weatherDesc[0].value),
-        humidity: parseInt(current.humidity),
-        city: data.nearest_area[0].areaName[0].value,
-        feelsLike: parseInt(config.unit === 'celsius' ? current.FeelsLikeC : current.FeelsLikeF),
-        wind: current.windspeedKmph + ' km/h'
-      };
+      const weatherData = parseWeatherResponse(data, config.unit);
       
       const cache: WeatherCache = {
         data: weatherData,
@@ -130,9 +207,13 @@ export function useWeather() {
     fetchWeatherWithRetry(false);
   }, [fetchWeatherWithRetry]);
 
+  // 初始加载和定时刷新
   useEffect(() => {
     fetchWeatherWithRetry(false);
-    const interval = setInterval(() => fetchWeatherWithRetry(false), (config.updateInterval || 30) * 60 * 1000);
+    const interval = setInterval(
+      () => fetchWeatherWithRetry(false), 
+      (config.updateInterval || 30) * 60 * 1000
+    );
     return () => clearInterval(interval);
   }, [config.location, config.unit, config.updateInterval, fetchWeatherWithRetry]);
 
@@ -146,4 +227,3 @@ export function useWeather() {
     cacheTimestamp: weatherCache?.timestamp,
   };
 }
-

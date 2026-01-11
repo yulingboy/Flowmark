@@ -7,14 +7,15 @@ export const weatherPlugin: Plugin = {
   metadata: {
     id: 'weather',
     name: '天气',
-    version: '1.0.0',
-    description: '显示当前天气信息',
+    version: '2.0.0',
+    description: '显示当前天气、小时预报、多日预报',
     author: 'Built-in',
     icon: '🌤️'
   },
   
   supportedSizes: ['1x1', '2x2', '2x4'],
   defaultSize: '2x2',
+  modalSize: { width: 400, height: 600 },
   
   configSchema: {
     location: {
