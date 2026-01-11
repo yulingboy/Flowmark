@@ -1,20 +1,14 @@
-import { useCallback } from 'react';
 import { usePluginStore } from '../../store';
 import type { Note } from './types';
 import { PLUGIN_ID } from './types';
 
 export function useNotes() {
-  // 直接用 selector 订阅，自动响应变化
   const notes = usePluginStore(
     state => (state.pluginData[PLUGIN_ID]?.notes as Note[]) || []
   );
-  const setPluginData = usePluginStore(state => state.setPluginData);
 
-  const saveNotes = useCallback((newNotes: Note[]) => {
-    setPluginData(PLUGIN_ID, 'notes', newNotes);
-  }, [setPluginData]);
-
-  const addNote = useCallback(() => {
+  const addNote = () => {
+    const currentNotes = usePluginStore.getState().pluginData[PLUGIN_ID]?.notes as Note[] || [];
     const newNote: Note = {
       id: Date.now().toString(),
       title: '',
@@ -22,26 +16,27 @@ export function useNotes() {
       createdAt: Date.now(),
       updatedAt: Date.now()
     };
-    saveNotes([newNote, ...notes]);
+    usePluginStore.getState().setPluginData(PLUGIN_ID, 'notes', [newNote, ...currentNotes]);
     return newNote.id;
-  }, [notes, saveNotes]);
+  };
 
-  const updateNote = useCallback((id: string, updates: Partial<Note>) => {
-    saveNotes(notes.map(n => n.id === id ? { ...n, ...updates, updatedAt: Date.now() } : n));
-  }, [notes, saveNotes]);
+  const updateNote = (id: string, updates: Partial<Note>) => {
+    const currentNotes = usePluginStore.getState().pluginData[PLUGIN_ID]?.notes as Note[] || [];
+    usePluginStore.getState().setPluginData(PLUGIN_ID, 'notes', currentNotes.map(n => n.id === id ? { ...n, ...updates, updatedAt: Date.now() } : n));
+  };
 
-  const deleteNote = useCallback((id: string) => {
-    saveNotes(notes.filter(n => n.id !== id));
-  }, [notes, saveNotes]);
+  const deleteNote = (id: string) => {
+    const currentNotes = usePluginStore.getState().pluginData[PLUGIN_ID]?.notes as Note[] || [];
+    usePluginStore.getState().setPluginData(PLUGIN_ID, 'notes', currentNotes.filter(n => n.id !== id));
+  };
 
-  const clearAllNotes = useCallback(() => {
-    saveNotes([]);
-  }, [saveNotes]);
+  const clearAllNotes = () => {
+    usePluginStore.getState().setPluginData(PLUGIN_ID, 'notes', []);
+  };
 
   return { notes, addNote, updateNote, deleteNote, clearAllNotes };
 }
 
-// 格式化完整时间
 export function formatFullTime(timestamp: number): string {
   try {
     const date = new Date(timestamp);
