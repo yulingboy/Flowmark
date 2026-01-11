@@ -46,31 +46,17 @@ export function ShortcutCard({ item, onClick, className = '' }: ShortcutCardProp
             }}
           />
           
-          {/* 打开方式标识 - 右下角圆弧形角标 */}
-          <div className="absolute -bottom-1 -right-1">
+          {/* 打开方式标识 - 右下角1/4圆角标 */}
+          <div className="absolute bottom-0 right-0">
             {isPopupMode ? (
-              <svg width="24" height="24" viewBox="0 0 24 24" className="block">
-                <path 
-                  d="M0 12 Q0 0 12 0 L24 0 L24 24 L12 24 Q0 24 0 12 Z" 
-                  fill="#8B5CF6"
-                />
-                <g transform="translate(8, 5)">
-                  <rect x="0" y="5" width="9" height="9" rx="1.5" stroke="white" strokeWidth="1.8" fill="none"/>
-                  <polyline points="5,5 5,0 10,0" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-                  <line x1="5" y1="5" x2="10" y2="0" stroke="white" strokeWidth="1.8" strokeLinecap="round"/>
-                </g>
+              <svg width="20" height="20" viewBox="0 0 20 20" className="block">
+                <path d="M20 0 Q0 0 0 20 L20 20 Z" fill="#8B5CF6"/>
+                <path d="M8 15 L8 10 Q8 8 10 8 L12 8 M12 6 L15 6 L15 9 M14.5 6.5 L11 10" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
               </svg>
             ) : (
-              <svg width="24" height="24" viewBox="0 0 24 24" className="block">
-                <path 
-                  d="M0 12 Q0 0 12 0 L24 0 L24 24 L12 24 Q0 24 0 12 Z" 
-                  fill="#3B82F6"
-                />
-                <g transform="translate(8, 5)">
-                  <rect x="0" y="5" width="9" height="9" rx="1.5" stroke="white" strokeWidth="1.8" fill="none"/>
-                  <polyline points="5,5 5,0 10,0" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-                  <line x1="5" y1="5" x2="10" y2="0" stroke="white" strokeWidth="1.8" strokeLinecap="round"/>
-                </g>
+              <svg width="20" height="20" viewBox="0 0 20 20" className="block">
+                <path d="M20 0 Q0 0 0 20 L20 20 Z" fill="#3B82F6"/>
+                <path d="M8 15 L8 10 Q8 8 10 8 L12 8 M12 6 L15 6 L15 9 M14.5 6.5 L11 10" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
               </svg>
             )}
           </div>
