@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { message } from 'antd';
 import { Clock } from '@/components/Clock/Clock';
 import { Search } from '@/components/Search/Search';
 import { ShortcutsContainer, AddShortcutModal, AddFolderModal, BatchEditToolbar } from '@/components/Shortcuts';
@@ -9,7 +10,6 @@ import type { ContextMenuItem } from '@/components/common';
 import { AddIcon, FolderIcon, WallpaperIcon, RefreshIcon, EditIcon, SettingsIcon } from '@/components/common/icons';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useShortcutsStore } from '@/stores/shortcutsStore';
-import { useToast } from '@/hooks/useToast';
 import type { ShortcutItem } from '@/types';
 import { GRID } from '@/constants';
 
@@ -24,7 +24,6 @@ function App() {
   const { backgroundUrl, showClock, showSearch, showShortcuts, autoFocusSearch } = useSettingsStore();
   const { shortcuts, setShortcuts, updateShortcut, addShortcut, addFolder, deleteShortcut, batchEditMode, toggleBatchEdit } = useShortcutsStore();
   const searchRef = useRef<HTMLInputElement>(null);
-  const { contextHolder, success } = useToast();
 
   // 键盘快捷键 - 使用 useEffect 手动处理避免依赖问题
   useEffect(() => {
@@ -75,16 +74,16 @@ function App() {
   const handleSaveShortcut = (shortcut: { id?: string; name: string; url: string; icon: string; openMode: 'tab' | 'popup' }) => {
     if (shortcut.id) {
       updateShortcut(shortcut.id, { name: shortcut.name, url: shortcut.url, icon: shortcut.icon, openMode: shortcut.openMode });
-      success('快捷方式已更新');
+      message.success('快捷方式已更新');
     } else {
       addShortcut({ name: shortcut.name, url: shortcut.url, icon: shortcut.icon, openMode: shortcut.openMode, size: '1x1' });
-      success('快捷方式已添加');
+      message.success('快捷方式已添加');
     }
   };
 
   const handleEditShortcut = (item: ShortcutItem) => { setEditingShortcut(item); setIsAddShortcutOpen(true); };
   const handleCloseModal = () => { setIsAddShortcutOpen(false); setEditingShortcut(null); };
-  const handleDeleteShortcut = (item: ShortcutItem) => { deleteShortcut(item.id); success('快捷方式已删除'); };
+  const handleDeleteShortcut = (item: ShortcutItem) => { deleteShortcut(item.id); message.success('快捷方式已删除'); };
   const handleContextMenu = (e: React.MouseEvent) => { e.preventDefault(); setContextMenu({ isOpen: true, x: e.clientX, y: e.clientY }); };
 
   const contextMenuItems: ContextMenuItem[] = [
@@ -120,9 +119,6 @@ function App() {
       
       {/* 批量编辑工具栏 */}
       {batchEditMode && <BatchEditToolbar />}
-      
-      {/* Antd Message 容器 */}
-      {contextHolder}
     </div>
   );
 }
