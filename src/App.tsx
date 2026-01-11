@@ -1,18 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { message } from 'antd';
-import { Clock } from '@/components/Clock/Clock';
-import { Search } from '@/components/Search/Search';
-import { ShortcutsContainer, AddShortcutModal, AddFolderModal, BatchEditToolbar } from '@/components/Shortcuts';
+import { Clock } from '@/features/clock';
+import { Search } from '@/features/search';
+import { ShortcutsContainer, AddShortcutModal, AddFolderModal, BatchEditToolbar, useShortcutsStore } from '@/features/shortcuts';
+import { SettingsButton, SettingsPanel, WallpaperModal, useGeneralStore, useBackgroundStore, useSearchStore } from '@/features/settings';
 import { Background } from '@/components/Background/Background';
-import { SettingsButton, SettingsPanel, WallpaperModal } from '@/components/Settings';
 import { ContextMenu, ErrorBoundary } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
 import { PlusSquareOutlined, FolderOutlined, ReloadOutlined, EditOutlined, SettingOutlined } from '@ant-design/icons';
 import { WallpaperIcon } from '@/components/common/icons';
-import { useGeneralStore } from '@/stores/settings/generalStore';
-import { useBackgroundStore } from '@/stores/settings/backgroundStore';
-import { useSearchStore } from '@/stores/settings/searchStore';
-import { useShortcutsStore } from '@/stores/shortcuts';
 import { registerBuiltinPlugins } from '@/plugins/builtin';
 
 import type { ShortcutItem } from '@/types';

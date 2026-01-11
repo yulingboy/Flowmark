@@ -6,7 +6,7 @@ import type { ContextMenuItem } from '@/components/common';
 import { LayoutIcon } from '@/components/common/icons';
 import type { PluginCardItem, PluginSize, CardSize } from '../types';
 import type { Position, ShortcutSize } from '@/types';
-import { pixelToGrid, getValidSizesForPosition, ALL_SIZES } from '@/components/Shortcuts/utils/gridUtils';
+import { pixelToGrid, getValidSizesForPosition, ALL_SIZES } from '@/features/shortcuts/utils/gridUtils';
 
 interface GridConfig {
   columns: number;

@@ -1,5 +1,5 @@
 import { pluginManager } from '../../core/pluginManager';
-import { useShortcutsStore } from '@/stores/shortcuts';
+import { useShortcutsStore } from '@/features/shortcuts';
 import { isPluginCard } from '../../types';
 import type { Plugin } from '../../types';
 

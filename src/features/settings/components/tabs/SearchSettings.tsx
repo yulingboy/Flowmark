@@ -1,0 +1,44 @@
+import { Button, Switch } from 'antd';
+import { useSearchStore } from '../../store/searchStore';
+import { SEARCH_ENGINE_ICONS } from '@/features/search/utils/search';
+import { SettingRow } from '../SettingRow';
+import type { SearchEngine } from '@/types';
+
+const SEARCH_ENGINES: { value: SearchEngine; label: string }[] = [
+  { value: 'bing', label: 'Bing' },
+  { value: 'google', label: 'Google' },
+  { value: 'baidu', label: '百度' },
+];
+
+export function SearchSettings() {
+  const {
+    searchEngine, searchInNewTab, autoFocusSearch, showSearchSuggestions, searchHistoryEnabled,
+    updateSearchEngine, updateSearchInNewTab, updateAutoFocusSearch, updateShowSearchSuggestions, updateSearchHistoryEnabled, clearSearchHistory,
+  } = useSearchStore();
+
+  return (
+    <div>
+      <div className="mb-5">
+        <div className="text-sm text-gray-700 mb-3">默认搜索引擎</div>
+        <div className="flex gap-3">
+          {SEARCH_ENGINES.map(({ value, label }) => (
+            <button key={value} onClick={() => updateSearchEngine(value)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer ${searchEngine === value ? 'border-2 border-blue-500 bg-blue-50' : 'border border-gray-200 bg-white'}`}>
+              <img src={SEARCH_ENGINE_ICONS[value]} alt={label} className="w-4 h-4" />
+              <span className="text-sm text-gray-700">{label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <SettingRow label="搜索新页面打开"><Switch checked={searchInNewTab} onChange={updateSearchInNewTab} /></SettingRow>
+      <SettingRow label="进入程序自动聚焦搜索"><Switch checked={autoFocusSearch} onChange={updateAutoFocusSearch} /></SettingRow>
+      <SettingRow label="搜索词联想功能"><Switch checked={showSearchSuggestions} onChange={updateShowSearchSuggestions} /></SettingRow>
+      <SettingRow label="搜索历史" description="仅本地生效"><Switch checked={searchHistoryEnabled} onChange={updateSearchHistoryEnabled} /></SettingRow>
+
+      {searchHistoryEnabled && (
+        <div className="mt-4"><Button danger onClick={clearSearchHistory}>清除搜索历史</Button></div>
+      )}
+    </div>
+  );
+}
