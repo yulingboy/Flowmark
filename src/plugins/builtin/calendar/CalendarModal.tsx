@@ -39,14 +39,14 @@ function getLunarDayText(lunarDay: LunarDay): string {
 }
 
 export function CalendarModal() {
-  const now = new Date();
+  const now = useMemo(() => new Date(), []);
   const [currentYear, setCurrentYear] = useState(now.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(now.getMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<{ solar: SolarDay; lunar: LunarDay } | null>(null);
 
   const today = useMemo(() => {
     return SolarDay.fromYmd(now.getFullYear(), now.getMonth() + 1, now.getDate());
-  }, []);
+  }, [now]);
 
   /** 生成日历数据 */
   const calendarDays = useMemo(() => {

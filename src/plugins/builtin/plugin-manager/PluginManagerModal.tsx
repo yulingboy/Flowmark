@@ -1,15 +1,8 @@
-import { message } from 'antd';
+import { Card, Button, Empty, message } from 'antd';
 import { pluginManager } from '../../core/pluginManager';
 import { useShortcutsStore } from '@/features/shortcuts';
 import { isPluginCard } from '../../types';
-import type { Plugin } from '../../types';
-
-// 插件图标
-const PluginIcon = ({ className = '' }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
-  </svg>
-);
+import type { Plugin, PluginSize } from '../../types';
 
 function PluginItem({ plugin }: { plugin: Plugin }) {
   const shortcuts = useShortcutsStore(state => state.shortcuts);
@@ -28,7 +21,7 @@ function PluginItem({ plugin }: { plugin: Plugin }) {
         plugin.metadata.name,
         plugin.metadata.icon || '🔌',
         plugin.defaultSize || '2x2',
-        plugin.supportedSizes as any
+        plugin.supportedSizes as PluginSize[]
       );
       if (success) {
         message.success('已添加插件');
@@ -39,52 +32,55 @@ function PluginItem({ plugin }: { plugin: Plugin }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      {/* 预览区域 */}
-      <div className="h-32 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-        <span className="text-6xl">{plugin.metadata.icon || '🔌'}</span>
-      </div>
-      
-      {/* 信息区域 */}
-      <div className="p-4">
-        <h3 className="font-medium text-gray-800 text-center">{plugin.metadata.name}</h3>
-        {plugin.metadata.description && (
-          <p className="text-xs text-gray-400 text-center mt-1 line-clamp-2">{plugin.metadata.description}</p>
-        )}
-        
-        {/* 操作按钮 */}
-        <button
-          onClick={handleToggle}
-          className={`w-full mt-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-            isOnDesktop 
-              ? 'bg-gray-100 text-gray-500 hover:bg-gray-200' 
-              : 'bg-blue-500 text-white hover:bg-blue-600'
-          }`}
-        >
-          {isOnDesktop ? '移除' : '添加'}
-        </button>
-      </div>
-    </div>
+    <Card
+      hoverable
+      cover={
+        <div className="h-32 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+          <span className="text-6xl">{plugin.metadata.icon || '🔌'}</span>
+        </div>
+      }
+      styles={{ body: { padding: 16 } }}
+    >
+      <Card.Meta
+        title={<span className="text-center block">{plugin.metadata.name}</span>}
+        description={
+          plugin.metadata.description && (
+            <p className="text-xs text-gray-400 text-center line-clamp-2">
+              {plugin.metadata.description}
+            </p>
+          )
+        }
+      />
+      <Button
+        block
+        type={isOnDesktop ? 'default' : 'primary'}
+        onClick={handleToggle}
+        className="mt-3"
+      >
+        {isOnDesktop ? '移除' : '添加'}
+      </Button>
+    </Card>
   );
 }
 
 export function PluginManagerModal() {
   const plugins = pluginManager.getPlugins().filter(p => p.metadata.id !== 'plugin-manager');
 
+  if (plugins.length === 0) {
+    return (
+      <div className="p-6 min-h-full flex items-center justify-center">
+        <Empty description="暂无可用插件" />
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 min-h-full">
-      {plugins.length === 0 ? (
-        <div className="text-center text-gray-400 py-16">
-          <PluginIcon className="w-16 h-16 mx-auto mb-3 text-gray-300" />
-          <p>暂无可用插件</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-3 gap-4">
-          {plugins.map(plugin => (
-            <PluginItem key={plugin.metadata.id} plugin={plugin} />
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-3 gap-4">
+        {plugins.map(plugin => (
+          <PluginItem key={plugin.metadata.id} plugin={plugin} />
+        ))}
+      </div>
     </div>
   );
 }

@@ -24,11 +24,15 @@ export function MacModal({
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
 
+  // 重置状态 - 使用 ref 追踪
+  const prevIsOpenRef = useRef(isOpen);
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !prevIsOpenRef.current) {
       setPosition({ x: 0, y: 0 });
       setIsFullscreen(false);
     }
+    prevIsOpenRef.current = isOpen;
+     
   }, [isOpen]);
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
@@ -58,7 +62,11 @@ export function MacModal({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        isFullscreen ? setIsFullscreen(false) : onClose();
+        if (isFullscreen) {
+          setIsFullscreen(false);
+        } else {
+          onClose();
+        }
       }
     };
     // 阻止全局右键菜单

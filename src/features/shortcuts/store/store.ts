@@ -132,7 +132,11 @@ export const useShortcutsStore = create<ShortcutsState>()(
 
       toggleSelection: (id) => set((state) => {
         const newSelected = new Set(state.selectedIds);
-        newSelected.has(id) ? newSelected.delete(id) : newSelected.add(id);
+        if (newSelected.has(id)) {
+          newSelected.delete(id);
+        } else {
+          newSelected.add(id);
+        }
         return { selectedIds: newSelected };
       }),
 

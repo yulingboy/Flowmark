@@ -110,11 +110,13 @@ export function ContextMenu({ isOpen, position, items, onClose, ariaLabel = '上
   }, [isOpen, onClose, handleKeyDown]);
 
   // 重置选中状态
+  const prevIsOpenRef = useRef(isOpen);
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !prevIsOpenRef.current) {
       setSelectedIndex(-1);
       setActiveSubmenu(null);
     }
+    prevIsOpenRef.current = isOpen;
   }, [isOpen]);
 
   // 调整位置，防止超出屏幕（带翻转逻辑）
@@ -140,6 +142,7 @@ export function ContextMenu({ isOpen, position, items, onClose, ariaLabel = '上
 
       setMenuPosition({ x, y });
     }
+     
   }, [isOpen, position]);
 
   // 聚焦菜单以接收键盘事件

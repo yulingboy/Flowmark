@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { usePluginStore } from '../../store';
 import type { PomodoroData, PomodoroConfig, PomodoroStatus } from './types';
@@ -13,6 +13,10 @@ const DEFAULT_DATA: PomodoroData = {
   pausedAt: null,
 };
 
+interface WebkitWindow extends Window {
+  webkitAudioContext?: typeof AudioContext;
+}
+
 export function usePomodoro() {
   const storedData = usePluginStore(
     useShallow(state => (state.pluginData[PLUGIN_ID]?.data as PomodoroData) || null)
@@ -21,7 +25,7 @@ export function usePomodoro() {
     useShallow(state => state.pluginConfigs[PLUGIN_ID] || {})
   );
   
-  const config: PomodoroConfig = { ...DEFAULT_CONFIG, ...storedConfig };
+  const config: PomodoroConfig = useMemo(() => ({ ...DEFAULT_CONFIG, ...storedConfig }), [storedConfig]);
   const [data, setData] = useState<PomodoroData>(storedData || DEFAULT_DATA);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -36,7 +40,9 @@ export function usePomodoro() {
     if (!config.soundEnabled) return;
     try {
       // 使用 Web Audio API 生成简单提示音
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioContextClass = window.AudioContext || (window as WebkitWindow).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audioContext = new AudioContextClass();
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
       
@@ -180,12 +186,15 @@ export function usePomodoro() {
     };
   }, [data.status, config, playSound, getNextStatus, getDuration]);
 
-  // 同步 store 数据
+  // 同步 store 数据 - 使用 ref 追踪
+  const prevStoredDataRef = useRef(storedData);
   useEffect(() => {
-    if (storedData && storedData !== data) {
+    if (storedData && storedData !== prevStoredDataRef.current && storedData !== data) {
       setData(storedData);
     }
-  }, [storedData]);
+    prevStoredDataRef.current = storedData;
+     
+  }, [storedData, data]);
 
   return {
     data,

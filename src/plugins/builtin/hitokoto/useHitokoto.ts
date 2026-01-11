@@ -55,7 +55,8 @@ export function useHitokoto() {
     if (!cache) {
       fetchHitokoto();
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cache]);
 
   // 自动刷新
   useEffect(() => {
@@ -76,7 +77,8 @@ export function useHitokoto() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [config.autoRefresh, config.refreshInterval, fetchHitokoto]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config.autoRefresh, config.refreshInterval]);
 
   return {
     hitokoto: cache?.data || null,

@@ -42,12 +42,18 @@ export function PomodoroCard({ size }: { size: PluginSize }) {
           <div
             onClick={(e) => { e.stopPropagation(); reset(); }}
             className="p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter') reset(); }}
           >
             <RotateCcw className="w-4 h-4" />
           </div>
           <div
-            onClick={(e) => { e.stopPropagation(); isRunning ? pause() : start(); }}
+            onClick={(e) => { e.stopPropagation(); if (isRunning) { pause(); } else { start(); } }}
             className="p-3 rounded-full bg-white/20 hover:bg-white/30 transition-colors cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter') { if (isRunning) { pause(); } else { start(); } } }}
           >
             {isRunning ? (
               <Pause className="w-5 h-5" />
@@ -97,12 +103,18 @@ export function PomodoroCard({ size }: { size: PluginSize }) {
           onClick={(e) => { e.stopPropagation(); reset(); }}
           className="p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
           title="重置"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter') reset(); }}
         >
           <RotateCcw className="w-5 h-5" />
         </div>
         <div
-          onClick={(e) => { e.stopPropagation(); isRunning ? pause() : start(); }}
+          onClick={(e) => { e.stopPropagation(); if (isRunning) { pause(); } else { start(); } }}
           className="p-4 rounded-full bg-white/20 hover:bg-white/30 transition-colors cursor-pointer"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter') { if (isRunning) { pause(); } else { start(); } } }}
         >
           {isRunning ? (
             <Pause className="w-6 h-6" />

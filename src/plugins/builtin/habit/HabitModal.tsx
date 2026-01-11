@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Plus, Trash2, Check, Flame } from 'lucide-react';
+import { Input, Button, Empty } from 'antd';
+import { PlusOutlined, DeleteOutlined, CheckOutlined, FireOutlined } from '@ant-design/icons';
 import { useHabit } from './useHabit';
 import { getStreak, getWeekRecords, getTodayString, HABIT_ICONS, HABIT_COLORS } from './types';
 
@@ -37,24 +38,23 @@ export function HabitModal() {
               </p>
             </div>
           </div>
-          <div
+          <Button
+            type="text"
+            icon={<PlusOutlined />}
             onClick={() => setShowAddForm(!showAddForm)}
-            className="p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
-          >
-            <Plus className="w-5 h-5" />
-          </div>
+            className="!text-white hover:!bg-white/10"
+          />
         </div>
 
         {/* 添加表单 */}
         {showAddForm && (
           <div className="mt-4 p-3 bg-white/10 rounded-lg space-y-3">
-            <input
-              type="text"
+            <Input
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               placeholder="习惯名称"
-              className="w-full px-3 py-2 bg-white/10 rounded-lg text-white placeholder-white/50 outline-none focus:bg-white/20"
-              onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+              onPressEnter={handleAdd}
+              className="!bg-white/10 !border-white/20 !text-white placeholder:!text-white/50"
             />
             
             {/* 图标选择 */}
@@ -87,18 +87,20 @@ export function HabitModal() {
             </div>
             
             <div className="flex justify-end gap-2">
-              <div
+              <Button
+                type="text"
                 onClick={() => setShowAddForm(false)}
-                className="px-3 py-1.5 text-sm rounded-lg hover:bg-white/10 cursor-pointer"
+                className="!text-white hover:!bg-white/10"
               >
                 取消
-              </div>
-              <div
+              </Button>
+              <Button
+                type="primary"
                 onClick={handleAdd}
-                className="px-3 py-1.5 text-sm bg-white/20 rounded-lg hover:bg-white/30 cursor-pointer"
+                className="!bg-white/20 !border-none hover:!bg-white/30"
               >
                 添加
-              </div>
+              </Button>
             </div>
           </div>
         )}
@@ -107,10 +109,16 @@ export function HabitModal() {
       {/* 习惯列表 */}
       <div className="flex-1 overflow-y-auto p-4">
         {habits.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-white/60">
-            <span className="text-4xl mb-2">🎯</span>
-            <p>还没有习惯</p>
-            <p className="text-sm">点击右上角添加</p>
+          <div className="flex flex-col items-center justify-center h-full">
+            <Empty
+              image={<span className="text-4xl">🎯</span>}
+              description={
+                <span className="text-white/60">
+                  还没有习惯<br />
+                  <span className="text-sm">点击右上角添加</span>
+                </span>
+              }
+            />
           </div>
         ) : (
           <div className="space-y-3">
@@ -136,7 +144,7 @@ export function HabitModal() {
                       style={{ backgroundColor: habit.color }}
                     >
                       {isChecked ? (
-                        <Check className="w-5 h-5 text-white" />
+                        <CheckOutlined className="text-white text-lg" />
                       ) : (
                         <span className="text-lg">{habit.icon}</span>
                       )}
@@ -150,7 +158,7 @@ export function HabitModal() {
                         </span>
                         {streak > 0 && (
                           <span className="flex items-center gap-0.5 text-xs text-amber-300">
-                            <Flame className="w-3 h-3" />
+                            <FireOutlined className="text-xs" />
                             {streak}天
                           </span>
                         )}
@@ -175,12 +183,12 @@ export function HabitModal() {
                     </div>
                     
                     {/* 删除按钮 */}
-                    <div
+                    <Button
+                      type="text"
+                      icon={<DeleteOutlined />}
                       onClick={() => removeHabit(habit.id)}
-                      className="p-1.5 rounded-full hover:bg-white/10 cursor-pointer opacity-50 hover:opacity-100"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </div>
+                      className="!text-white/50 hover:!text-white hover:!bg-white/10"
+                    />
                   </div>
                 </div>
               );

@@ -2,6 +2,16 @@ import { useState, useEffect } from 'react';
 import { Radio, ColorPicker, Button, Switch } from 'antd';
 import { useClockStore } from '../../store/clockStore';
 
+// 将 SettingRow 移到组件外部
+function SettingRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between py-3 border-b border-gray-100">
+      <div className="text-sm text-gray-700">{label}</div>
+      {children}
+    </div>
+  );
+}
+
 export function DateTimeSettings() {
   const { 
     showSeconds, show24Hour, showLunar, showDate, showWeekday, showYear, clockColor, clockFontSize,
@@ -34,13 +44,6 @@ export function DateTimeSettings() {
   }, [showSeconds, show24Hour, showDate, showWeekday, showYear, showLunar]);
 
   const fontSizeClass = { small: 'text-5xl', medium: 'text-6xl', large: 'text-7xl' } as Record<string, string>;
-
-  const SettingRow = ({ label, children }: { label: string; children: React.ReactNode }) => (
-    <div className="flex items-center justify-between py-3 border-b border-gray-100">
-      <div className="text-sm text-gray-700">{label}</div>
-      {children}
-    </div>
-  );
 
 
   return (

@@ -67,21 +67,27 @@ export function useImageLoader(options: UseImageLoaderOptions): UseImageLoaderRe
     // 检查缓存
     const cached = imageCache.get(src);
     if (cached === 'loaded') {
-      setImageSrc(src);
-      setIsLoading(false);
-      setIsError(false);
-      return;
+      // 使用 setTimeout 避免在 effect 中同步 setState
+      const timer = setTimeout(() => {
+        setImageSrc(src);
+        setIsLoading(false);
+        setIsError(false);
+      }, 0);
+      return () => clearTimeout(timer);
     }
     if (cached === 'error') {
-      setImageSrc(fallback || placeholder || src);
-      setIsLoading(false);
-      setIsError(true);
-      return;
+      const timer = setTimeout(() => {
+        setImageSrc(fallback || placeholder || src);
+        setIsLoading(false);
+        setIsError(true);
+      }, 0);
+      return () => clearTimeout(timer);
     }
 
     // 开始加载
     setIsLoading(true);
     setIsError(false);
+     
     imageCache.set(src, 'loading');
 
     const img = new Image();

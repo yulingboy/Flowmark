@@ -49,10 +49,10 @@ const LUNAR_DAYS = ['初一', '初二', '初三', '初四', '初五', '初六', 
   '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'];
 
 /** 简化的农历计算（使用 tyme4ts 如果可用，否则使用简化版本） */
-export function getLunarDate(): string {
+export async function getLunarDate(): Promise<string> {
   try {
-    // 尝试使用 tyme4ts
-    const { SolarDay } = require('tyme4ts');
+    // 动态导入 tyme4ts
+    const { SolarDay } = await import('tyme4ts');
     const now = new Date();
     const solar = SolarDay.fromYmd(now.getFullYear(), now.getMonth() + 1, now.getDate());
     const lunar = solar.getLunarDay();
@@ -69,6 +69,16 @@ export function getLunarDate(): string {
   }
 }
 
+/** 同步获取农历日期（使用简化版本） */
+export function getLunarDateSync(): string {
+  const now = new Date();
+  const month = now.getMonth();
+  const day = now.getDate();
+  const lunarMonth = LUNAR_MONTHS[month % 12];
+  const lunarDay = LUNAR_DAYS[(day - 1) % 30];
+  return `${lunarMonth}月${lunarDay}`;
+}
+
 /** 获取当前日期 */
 export function getCurrentDate(showLunar: boolean = true) {
   const now = new Date();
@@ -77,7 +87,7 @@ export function getCurrentDate(showLunar: boolean = true) {
   const day = now.getDate();
   const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
   const weekday = weekdays[now.getDay()];
-  const lunar = showLunar ? getLunarDate() : '';
+  const lunar = showLunar ? getLunarDateSync() : '';
 
   const formatted = showLunar 
     ? `${year}年${month}月${day}日  ${lunar}  ${weekday}`

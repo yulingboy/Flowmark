@@ -19,5 +19,13 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // 允许在 effect 中调用 setState（常见模式，如初始化、同步外部状态）
+      'react-hooks/set-state-in-effect': 'off',
+      // 允许在渲染期间访问 ref（某些场景需要）
+      'react-hooks/refs': 'off',
+      // 保留手动 memoization 警告为 warning
+      'react-hooks/preserve-manual-memoization': 'warn',
+    },
   },
 ])

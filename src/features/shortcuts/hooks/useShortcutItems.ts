@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { GridManager, pixelToGrid, gridToPixel, getGridSpan } from '../utils/gridUtils';
 import type { GridItem } from '@/types';
 
@@ -25,11 +25,10 @@ interface UseShortcutItemsOptions {
  * 4. 无位置的卡片：从 (0,0) 开始查找可用位置
  */
 export function useShortcutItems({ shortcuts, columns, rows, unit, gap }: UseShortcutItemsOptions) {
-  const [items, setItems] = useState<GridItem[]>(shortcuts);
-
-  useEffect(() => {
+  // 使用 useMemo 计算 items，避免 useEffect 中的 setState
+  const items = useMemo(() => {
     const manager = new GridManager(columns, rows, unit, gap);
-    const itemsWithPositions = shortcuts.map((item) => {
+    return shortcuts.map((item) => {
       if (item.position) {
         const { col, row } = pixelToGrid(item.position.x, item.position.y, unit, gap);
         const { colSpan, rowSpan } = getGridSpan(item.size || '1x1');
@@ -65,12 +64,18 @@ export function useShortcutItems({ shortcuts, columns, rows, unit, gap }: UseSho
       manager.occupy(pos.col, pos.row, colSpan, rowSpan);
       return { ...item, position: gridToPixel(pos.col, pos.row, unit, gap) };
     });
-    setItems(itemsWithPositions);
   }, [shortcuts, columns, rows, unit, gap]);
+
+  const [itemsState, setItems] = useState<GridItem[]>(items);
+
+  // 当 items 变化时更新 state
+  useEffect(() => {
+    setItems(items);
+  }, [items]);
 
   // 构建 ID -> 卡片 的映射，方便快速查找
   const itemsMap = new Map<string, GridItem>();
-  items.forEach(item => itemsMap.set(item.id, item));
+  itemsState.forEach(item => itemsMap.set(item.id, item));
 
-  return { items, setItems, itemsMap };
+  return { items: itemsState, setItems, itemsMap };
 }

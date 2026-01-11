@@ -7,7 +7,8 @@ export interface Note {
 }
 
 export interface NotesConfig {
-  // 暂无配置项
+  /** 预留配置项 */
+  placeholder?: string;
 }
 
 export const PLUGIN_ID = 'notes';

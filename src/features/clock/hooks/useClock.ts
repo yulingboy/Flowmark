@@ -29,7 +29,8 @@ export function useClock(): ExtendedClockData {
   const isVisible = usePageVisibility();
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   
-  const [clockData, setClockData] = useState<ClockData & { year: string }>(() => {
+  // 初始化时钟数据
+  const initClockData = useCallback(() => {
     const now = new Date();
     return {
       time: formatTime(now, showSeconds, show24Hour),
@@ -38,18 +39,13 @@ export function useClock(): ExtendedClockData {
       weekday: getWeekday(now),
       lunar: getLunarDate(now),
     };
-  });
+  }, [showSeconds, show24Hour]);
+
+  const [clockData, setClockData] = useState<ClockData & { year: string }>(initClockData);
 
   const updateClock = useCallback(() => {
-    const now = new Date();
-    setClockData({
-      time: formatTime(now, showSeconds, show24Hour),
-      date: formatDate(now),
-      year: formatYear(now),
-      weekday: getWeekday(now),
-      lunar: getLunarDate(now),
-    });
-  }, [showSeconds, show24Hour]);
+    setClockData(initClockData());
+  }, [initClockData]);
 
   useEffect(() => {
     if (intervalRef.current) {
@@ -58,6 +54,7 @@ export function useClock(): ExtendedClockData {
     }
     
     if (isVisible) {
+      // 立即更新一次
       updateClock();
       intervalRef.current = setInterval(updateClock, 1000);
     }
@@ -68,6 +65,7 @@ export function useClock(): ExtendedClockData {
         intervalRef.current = null;
       }
     };
+     
   }, [isVisible, updateClock]);
 
   return { 

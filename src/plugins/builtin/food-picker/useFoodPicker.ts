@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { usePluginStore } from '../../store';
 import type { FoodPickerConfig, FoodCategory } from './types';
@@ -13,17 +13,19 @@ export function useFoodPicker() {
   const [currentFood, setCurrentFood] = useState<string | null>(null);
   const [currentCategory, setCurrentCategory] = useState<FoodCategory | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
+  const initializedRef = useRef(false);
 
   // 初始化时随机选一个
   useEffect(() => {
-    if (!currentFood) {
+    if (!initializedRef.current && !currentFood) {
+      initializedRef.current = true;
       const result = pickRandomFood(DEFAULT_CATEGORIES, config.enabledCategories);
       if (result) {
         setCurrentFood(result.food);
         setCurrentCategory(result.category);
       }
     }
-  }, []);
+  }, [currentFood, config.enabledCategories]);
 
   /** 随机选择 */
   const spin = useCallback(() => {

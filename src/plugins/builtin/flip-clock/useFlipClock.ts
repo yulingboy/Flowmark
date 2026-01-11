@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { usePluginStore } from '../../store';
 import type { FlipClockConfig } from './types';
@@ -13,12 +13,14 @@ export function useFlipClock() {
   const [time, setTime] = useState(() => getCurrentTime(config.use24Hour));
   const [date, setDate] = useState(() => getCurrentDate(config.showLunar));
   const [prevTime, setPrevTime] = useState(time);
+  const currentTimeRef = useRef(time);
 
   useEffect(() => {
     const updateTime = () => {
       const newTime = getCurrentTime(config.use24Hour);
-      setPrevTime(time);
+      setPrevTime(currentTimeRef.current);
       setTime(newTime);
+      currentTimeRef.current = newTime;
       setDate(getCurrentDate(config.showLunar));
     };
 

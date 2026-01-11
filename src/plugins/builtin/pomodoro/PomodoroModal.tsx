@@ -1,4 +1,5 @@
-import { Play, Pause, RotateCcw, SkipForward } from 'lucide-react';
+import { Progress, Button } from 'antd';
+import { PlayCircleOutlined, PauseCircleOutlined, RedoOutlined, StepForwardOutlined } from '@ant-design/icons';
 import { usePomodoro } from './usePomodoro';
 import { formatTime, STATUS_NAMES, STATUS_COLORS } from './types';
 
@@ -23,63 +24,47 @@ export function PomodoroModal() {
           {STATUS_NAMES[data.status]}
         </div>
         
-        {/* 圆形进度 */}
-        <div className="relative w-48 h-48 mb-6">
-          <svg className="w-full h-full transform -rotate-90">
-            <circle
-              cx="96"
-              cy="96"
-              r="88"
-              fill="none"
-              stroke="rgba(255,255,255,0.2)"
-              strokeWidth="8"
-            />
-            <circle
-              cx="96"
-              cy="96"
-              r="88"
-              fill="none"
-              stroke="rgba(255,255,255,0.8)"
-              strokeWidth="8"
-              strokeLinecap="round"
-              strokeDasharray={2 * Math.PI * 88}
-              strokeDashoffset={2 * Math.PI * 88 * (1 - progress / 100)}
-              className="transition-all duration-1000"
-            />
-          </svg>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-5xl font-mono tabular-nums">
+        {/* 圆形进度 - 使用 Ant Design Progress */}
+        <Progress
+          type="circle"
+          percent={progress}
+          size={192}
+          format={() => (
+            <span className="text-5xl font-mono tabular-nums text-white">
               {formatTime(data.timeLeft)}
             </span>
-          </div>
-        </div>
+          )}
+          strokeColor="rgba(255,255,255,0.8)"
+          trailColor="rgba(255,255,255,0.2)"
+          strokeWidth={4}
+          className="mb-6"
+        />
         
-        {/* 控制按钮 */}
+        {/* 控制按钮 - 使用 Ant Design Button */}
         <div className="flex items-center gap-4">
-          <button
+          <Button
+            shape="circle"
+            size="large"
+            icon={<RedoOutlined />}
             onClick={reset}
-            className="p-3 rounded-full hover:bg-white/10 transition-colors"
             title="重置"
-          >
-            <RotateCcw className="w-6 h-6" />
-          </button>
-          <button
+            className="!bg-transparent !border-none !text-white hover:!bg-white/10 !w-12 !h-12"
+          />
+          <Button
+            shape="circle"
+            size="large"
+            icon={isRunning ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
             onClick={isRunning ? pause : start}
-            className="p-5 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
-          >
-            {isRunning ? (
-              <Pause className="w-8 h-8" />
-            ) : (
-              <Play className="w-8 h-8 ml-1" />
-            )}
-          </button>
-          <button
+            className="!bg-white/20 !border-none !text-white hover:!bg-white/30 !w-16 !h-16 !text-2xl"
+          />
+          <Button
+            shape="circle"
+            size="large"
+            icon={<StepForwardOutlined />}
             onClick={skip}
-            className="p-3 rounded-full hover:bg-white/10 transition-colors"
             title="跳过"
-          >
-            <SkipForward className="w-6 h-6" />
-          </button>
+            className="!bg-transparent !border-none !text-white hover:!bg-white/10 !w-12 !h-12"
+          />
         </div>
       </div>
 

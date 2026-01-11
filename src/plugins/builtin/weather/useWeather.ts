@@ -29,8 +29,46 @@ function translateWindDir(dir: string): string {
   return dirMap[dir] || dir;
 }
 
+interface WeatherApiCurrent {
+  temp_C: string;
+  temp_F: string;
+  weatherDesc: { value: string }[];
+  lang_zh?: { value: string }[];
+  weatherCode: string;
+  humidity: string;
+  windspeedKmph: string;
+  winddir16Point: string;
+  pressure: string;
+}
+
+interface WeatherApiArea {
+  areaName: { value: string }[];
+}
+
+interface WeatherApiHourly {
+  time: string;
+  tempC: string;
+  tempF: string;
+  weatherCode: string;
+}
+
+interface WeatherApiDay {
+  date: string;
+  maxtempC: string;
+  maxtempF: string;
+  mintempC: string;
+  mintempF: string;
+  hourly?: WeatherApiHourly[];
+}
+
+interface WeatherApiResponse {
+  current_condition: WeatherApiCurrent[];
+  nearest_area: WeatherApiArea[];
+  weather?: WeatherApiDay[];
+}
+
 /** 解析 API 响应数据 */
-function parseWeatherResponse(data: any, unit: 'celsius' | 'fahrenheit'): WeatherResponse {
+function parseWeatherResponse(data: WeatherApiResponse, unit: 'celsius' | 'fahrenheit'): WeatherResponse {
   const current = data.current_condition[0];
   const area = data.nearest_area[0];
   const weather = data.weather || [];
@@ -50,8 +88,8 @@ function parseWeatherResponse(data: any, unit: 'celsius' | 'fahrenheit'): Weathe
   };
   
   const hourly: HourlyForecast[] = [];
-  weather.slice(0, 2).forEach((day: any, dayIndex: number) => {
-    (day.hourly || []).forEach((hour: any) => {
+  weather.slice(0, 2).forEach((day: WeatherApiDay, dayIndex: number) => {
+    (day.hourly || []).forEach((hour: WeatherApiHourly) => {
       const hourNum = parseInt(hour.time) / 100;
       if (dayIndex === 0 && hourNum < currentHour) return;
       if (hourly.length >= 24) return;
@@ -64,7 +102,7 @@ function parseWeatherResponse(data: any, unit: 'celsius' | 'fahrenheit'): Weathe
     });
   });
   
-  const daily: DailyForecast[] = weather.slice(0, 7).map((day: any) => ({
+  const daily: DailyForecast[] = weather.slice(0, 7).map((day: WeatherApiDay) => ({
     date: day.date,
     weekday: getWeekday(day.date),
     maxTemp: parseInt(unit === 'celsius' ? day.maxtempC : day.maxtempF),

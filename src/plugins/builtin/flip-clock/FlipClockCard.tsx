@@ -13,6 +13,7 @@ function FlipDigit({ digit, prevDigit }: { digit: string; prevDigit: string }) {
       const timer = setTimeout(() => setFlipping(false), 600);
       return () => clearTimeout(timer);
     }
+     
   }, [digit, prevDigit]);
 
   return (

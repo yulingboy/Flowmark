@@ -1,4 +1,5 @@
-import { Shuffle, Check } from 'lucide-react';
+import { Tag, Button } from 'antd';
+import { SyncOutlined } from '@ant-design/icons';
 import { useFoodPicker } from './useFoodPicker';
 
 export function FoodPickerModal() {
@@ -37,19 +38,18 @@ export function FoodPickerModal() {
         )}
         
         {/* 选择按钮 */}
-        <div
+        <Button
+          type="primary"
+          size="large"
+          icon={<SyncOutlined spin={isSpinning} />}
           onClick={spin}
-          className={`mt-6 flex items-center gap-2 px-8 py-3 rounded-full cursor-pointer transition-all ${
-            isSpinning 
-              ? 'bg-white/10' 
-              : 'bg-white/20 hover:bg-white/30 hover:scale-105'
-          }`}
+          loading={isSpinning}
+          className="!mt-6 !px-8 !h-12 !rounded-full !bg-white/20 !border-none hover:!bg-white/30 hover:!scale-105 !transition-all"
         >
-          <Shuffle className={`w-5 h-5 ${isSpinning ? 'animate-spin' : ''}`} />
           <span className="text-lg font-medium">
             {isSpinning ? '选择中...' : '随机选择'}
           </span>
-        </div>
+        </Button>
       </div>
 
       {/* 分类选择 */}
@@ -59,19 +59,19 @@ export function FoodPickerModal() {
           {categories.map(cat => {
             const isEnabled = config.enabledCategories.includes(cat.id);
             return (
-              <div
+              <Tag.CheckableTag
                 key={cat.id}
-                onClick={() => toggleCategory(cat.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full cursor-pointer transition-all ${
+                checked={isEnabled}
+                onChange={() => toggleCategory(cat.id)}
+                className={`!flex !items-center !gap-1.5 !px-3 !py-1.5 !rounded-full !border-none !transition-all ${
                   isEnabled 
-                    ? 'bg-white/30' 
-                    : 'bg-white/10 opacity-60 hover:opacity-80'
+                    ? '!bg-white/30 !text-white' 
+                    : '!bg-white/10 !text-white/60 hover:!text-white/80'
                 }`}
               >
                 <span>{cat.icon}</span>
                 <span className="text-sm">{cat.name}</span>
-                {isEnabled && <Check className="w-3 h-3" />}
-              </div>
+              </Tag.CheckableTag>
             );
           })}
         </div>

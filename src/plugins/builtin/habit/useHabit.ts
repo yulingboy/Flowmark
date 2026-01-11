@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { usePluginStore } from '../../store';
 import type { Habit, HabitConfig } from './types';
@@ -8,7 +8,9 @@ export function useHabit() {
   const rawData = usePluginStore(
     useShallow(state => state.pluginData[PLUGIN_ID] || {})
   );
-  const habits: Habit[] = (rawData as Record<string, unknown>).habits as Habit[] || [];
+  const habits: Habit[] = useMemo(() => {
+    return (rawData as Record<string, unknown>).habits as Habit[] || [];
+  }, [rawData]);
   const storedConfig = usePluginStore(
     useShallow(state => state.pluginConfigs[PLUGIN_ID] || {})
   );

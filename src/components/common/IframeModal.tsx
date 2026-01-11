@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Spin } from 'antd';
 
@@ -76,27 +76,37 @@ export function IframeModal({
     };
   }, [isOpen]);
 
-  // 打开时恢复位置或重置
-  useEffect(() => {
-    if (isOpen) {
-      setIsLoading(true);
-      
-      if (rememberPosition) {
-        const cacheKey = getCacheKey(url);
-        const cached = positionCache.get(cacheKey);
-        if (cached) {
-          setPosition({ x: cached.x, y: cached.y });
-          setSize({ width: cached.width, height: cached.height });
-        } else {
-          setPosition({ x: 0, y: 0 });
-          setSize({ width: 900, height: 600 });
-        }
-      } else {
-        setPosition({ x: 0, y: 0 });
-        setSize({ width: 900, height: 600 });
+  // 打开时恢复位置或重置 - 使用 useMemo 计算初始值
+  const initialState = useMemo(() => {
+    if (!isOpen) return null;
+    
+    if (rememberPosition) {
+      const cacheKey = getCacheKey(url);
+      const cached = positionCache.get(cacheKey);
+      if (cached) {
+        return {
+          position: { x: cached.x, y: cached.y },
+          size: { width: cached.width, height: cached.height }
+        };
       }
     }
+    return {
+      position: { x: 0, y: 0 },
+      size: { width: 900, height: 600 }
+    };
   }, [isOpen, url, rememberPosition]);
+
+  // 当 isOpen 变化时更新状态
+  const prevIsOpenRef = useRef(isOpen);
+  useEffect(() => {
+    if (isOpen && !prevIsOpenRef.current && initialState) {
+      setIsLoading(true);
+      setPosition(initialState.position);
+      setSize(initialState.size);
+    }
+    prevIsOpenRef.current = isOpen;
+     
+  }, [isOpen, initialState]);
 
   // 保存位置到缓存
   const savePosition = useCallback(() => {
@@ -170,11 +180,14 @@ export function IframeModal({
   }, [isResizing, minSize, maxSize, savePosition]);
 
 
-  // 键盘事件
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        isFullscreen ? setIsFullscreen(false) : onClose();
+        if (isFullscreen) {
+          setIsFullscreen(false);
+        } else {
+          onClose();
+        }
       }
     };
     if (isOpen) document.addEventListener('keydown', handleKeyDown);
