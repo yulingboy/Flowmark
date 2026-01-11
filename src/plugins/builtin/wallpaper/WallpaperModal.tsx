@@ -133,10 +133,18 @@ export function WallpaperModal() {
         <div className="flex-1 overflow-y-auto p-4 bg-gray-50/30">
           <div className="grid grid-cols-3 gap-3">
             {filteredWallpapers.map((wp) => (
-              <button 
+              <div 
                 key={wp.id} 
+                role="button"
+                tabIndex={0}
                 onClick={() => updateBackgroundUrl(wp.url)}
                 onDoubleClick={() => setPreviewUrl(wp.url)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    updateBackgroundUrl(wp.url);
+                  }
+                }}
                 className={`group p-0 rounded-xl overflow-hidden cursor-pointer aspect-video border-2 relative transition-all hover:shadow-lg hover:-translate-y-0.5 ${
                   isCurrentWallpaper(wp.url) 
                     ? 'border-blue-500 ring-2 ring-blue-200 shadow-md' 
@@ -172,7 +180,7 @@ export function WallpaperModal() {
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-2 pt-6">
                   <span className="text-white text-xs font-medium">{wp.name}</span>
                 </div>
-              </button>
+              </div>
             ))}
           </div>
         </div>
