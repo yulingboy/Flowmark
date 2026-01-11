@@ -42,7 +42,7 @@ export function WeatherCard({ size }: { size: PluginSize }) {
         <span className="text-2xl font-light text-white tabular-nums">
           {current.temperature}°
         </span>
-        <WeatherIcon name={current.icon} size={24} className="text-white/90 mt-1" />
+        <WeatherIcon code={current.icon} isDay={current.isDay} size={24} className="text-white/90 mt-1" />
       </div>
     );
   }
@@ -56,7 +56,7 @@ export function WeatherCard({ size }: { size: PluginSize }) {
           <span className="text-4xl font-light tabular-nums leading-none">
             {current.temperature}°
           </span>
-          <WeatherIcon name={current.icon} size={36} className="text-sky-200" />
+          <WeatherIcon code={current.icon} isDay={current.isDay} size={36} className="text-sky-200" />
         </div>
         
         {/* 中部：城市、天气、温度范围 */}
@@ -99,7 +99,7 @@ export function WeatherCard({ size }: { size: PluginSize }) {
         <div className="flex-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/80">
           <span className="flex items-center gap-1">
             {current.condition} {todayForecast && `${todayForecast.maxTemp}~${todayForecast.minTemp}`}
-            <WeatherIcon name={current.icon} size={16} className="text-sky-200" />
+            <WeatherIcon code={current.icon} isDay={current.isDay} size={16} className="text-sky-200" />
           </span>
           <span>{current.windDir}: {current.wind}</span>
           <span>湿度: {current.humidity}%</span>
@@ -121,7 +121,7 @@ export function WeatherCard({ size }: { size: PluginSize }) {
           <div className="flex gap-2 overflow-x-auto pb-1">
             {hourly.slice(0, 10).map((hour, i) => (
               <div key={i} className="flex flex-col items-center min-w-[44px]">
-                <WeatherIcon name={hour.icon} size={24} className="text-sky-200" />
+                <WeatherIcon code={hour.icon} isDay={hour.isDay} size={24} className="text-sky-200" />
                 <span className="text-sm font-medium mt-1 tabular-nums">{hour.temperature}°</span>
                 <span className="text-xs text-white/60">{hour.time}</span>
               </div>
@@ -137,7 +137,7 @@ export function WeatherCard({ size }: { size: PluginSize }) {
           <div className="flex gap-2 overflow-x-auto">
             {daily.slice(0, 7).map((day, i) => (
               <div key={i} className="flex flex-col items-center min-w-[56px]">
-                <WeatherIcon name={day.icon} size={28} className="text-sky-200" />
+                <WeatherIcon code={day.icon} isDay={true} size={28} className="text-sky-200" />
                 <span className="text-sm mt-1 tabular-nums">
                   {day.maxTemp}° ~ {day.minTemp}°
                 </span>

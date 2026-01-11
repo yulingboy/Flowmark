@@ -58,7 +58,7 @@ export function WeatherModal() {
               {todayForecast && (
                 <span className="tabular-nums">{todayForecast.maxTemp} ~ {todayForecast.minTemp}</span>
               )}
-              <WeatherIcon name={current.icon} size={20} className="text-sky-200" />
+              <WeatherIcon code={current.icon} isDay={current.isDay} size={20} className="text-sky-200" />
             </div>
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-white/70">
               <span>{current.windDir}: {current.wind}</span>
@@ -76,7 +76,7 @@ export function WeatherModal() {
           <div className="flex gap-3 overflow-x-auto pb-2">
             {hourly.map((hour, i) => (
               <div key={i} className="flex flex-col items-center min-w-[48px]">
-                <WeatherIcon name={hour.icon} size={28} className="text-sky-200" />
+                <WeatherIcon code={hour.icon} isDay={hour.isDay} size={28} className="text-sky-200" />
                 <span className="text-sm font-medium mt-1 tabular-nums">{hour.temperature}°</span>
                 <span className="text-xs text-white/60">{hour.time}</span>
               </div>
@@ -91,7 +91,7 @@ export function WeatherModal() {
         <div className="flex gap-4 overflow-x-auto pb-2">
           {daily.map((day, i) => (
             <div key={i} className="flex flex-col items-center min-w-[64px]">
-              <WeatherIcon name={day.icon} size={36} className="text-sky-200" />
+              <WeatherIcon code={day.icon} isDay={true} size={36} className="text-sky-200" />
               <span className="text-sm mt-2 tabular-nums">
                 {day.maxTemp}° ~ {day.minTemp}°
               </span>

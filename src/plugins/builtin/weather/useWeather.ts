@@ -10,7 +10,7 @@ import type {
   DailyForecast,
   AstronomyData
 } from './types';
-import { PLUGIN_ID, getWeatherIconName, validateLocation, getWeekday } from './types';
+import { PLUGIN_ID, validateLocation, getWeekday } from './types';
 
 const DEFAULT_CONFIG: WeatherConfig = { 
   location: 'Beijing', 
@@ -45,60 +45,68 @@ function parseWeatherResponse(data: any, unit: 'celsius' | 'fahrenheit'): Weathe
   const area = data.nearest_area[0];
   const weather = data.weather || [];
   
+  // 获取当前小时判断白天/夜晚
+  const currentHour = new Date().getHours();
+  const isDay = currentHour >= 6 && currentHour < 18;
+  
   // 当前天气
   const currentWeather: WeatherData = {
     temperature: parseInt(unit === 'celsius' ? current.temp_C : current.temp_F),
-    condition: current.weatherDesc[0].value,
-    icon: getWeatherIconName(current.weatherDesc[0].value),
+    condition: current.lang_zh?.[0]?.value || current.weatherDesc[0].value,
+    icon: current.weatherCode || '116',
     humidity: parseInt(current.humidity),
     city: area.areaName[0].value,
     feelsLike: parseInt(unit === 'celsius' ? current.FeelsLikeC : current.FeelsLikeF),
-    wind: `${current.windspeedKmph} km/h`,
-    windDir: current.winddir16Point,
+    wind: `${current.windspeedKmph}km/h`,
+    windDir: translateWindDir(current.winddir16Point),
     pressure: parseInt(current.pressure),
     visibility: parseInt(current.visibility),
     uvIndex: parseInt(current.uvIndex),
     cloudCover: parseInt(current.cloudcover),
+    isDay,
   };
   
-  // 小时预报（取今天剩余时间 + 明天的）
+  // 小时预报
   const hourly: HourlyForecast[] = [];
   const now = new Date();
-  const currentHour = now.getHours();
+  const currentHourNum = now.getHours();
   
   weather.slice(0, 2).forEach((day: any, dayIndex: number) => {
     (day.hourly || []).forEach((hour: any) => {
       const hourNum = parseInt(hour.time) / 100;
-      // 今天只取当前时间之后的
-      if (dayIndex === 0 && hourNum < currentHour) return;
-      // 最多取 24 小时
+      if (dayIndex === 0 && hourNum < currentHourNum) return;
       if (hourly.length >= 24) return;
       
+      const hourIsDay = hourNum >= 6 && hourNum < 18;
       hourly.push({
         time: `${hourNum}:00`,
         temperature: parseInt(unit === 'celsius' ? hour.tempC : hour.tempF),
-        icon: getWeatherIconName(hour.weatherDesc[0].value),
-        condition: hour.weatherDesc[0].value,
+        icon: hour.weatherCode || '116',
+        condition: hour.lang_zh?.[0]?.value || hour.weatherDesc[0].value,
         chanceOfRain: parseInt(hour.chanceofrain),
+        isDay: hourIsDay,
       });
     });
   });
   
   // 每日预报
-  const daily: DailyForecast[] = weather.slice(0, 7).map((day: any) => ({
-    date: day.date,
-    weekday: getWeekday(day.date),
-    maxTemp: parseInt(unit === 'celsius' ? day.maxtempC : day.maxtempF),
-    minTemp: parseInt(unit === 'celsius' ? day.mintempC : day.mintempF),
-    icon: getWeatherIconName(day.hourly[4]?.weatherDesc[0]?.value || 'Sunny'),
-    condition: day.hourly[4]?.weatherDesc[0]?.value || 'Sunny',
-    chanceOfRain: Math.max(...day.hourly.map((h: any) => parseInt(h.chanceofrain) || 0)),
-    sunrise: day.astronomy[0]?.sunrise || '',
-    sunset: day.astronomy[0]?.sunset || '',
-  }));
+  const daily: DailyForecast[] = weather.slice(0, 7).map((day: any) => {
+    const middayHour = day.hourly?.[4] || day.hourly?.[0] || {};
+    return {
+      date: day.date,
+      weekday: getWeekday(day.date),
+      maxTemp: parseInt(unit === 'celsius' ? day.maxtempC : day.maxtempF),
+      minTemp: parseInt(unit === 'celsius' ? day.mintempC : day.mintempF),
+      icon: middayHour.weatherCode || '116',
+      condition: middayHour.lang_zh?.[0]?.value || middayHour.weatherDesc?.[0]?.value || 'Sunny',
+      chanceOfRain: Math.max(...(day.hourly || []).map((h: any) => parseInt(h.chanceofrain) || 0)),
+      sunrise: day.astronomy?.[0]?.sunrise || '',
+      sunset: day.astronomy?.[0]?.sunset || '',
+    };
+  });
   
   // 天文数据
-  const todayAstro = weather[0]?.astronomy[0] || {};
+  const todayAstro = weather[0]?.astronomy?.[0] || {};
   const astronomy: AstronomyData = {
     sunrise: todayAstro.sunrise || '',
     sunset: todayAstro.sunset || '',
@@ -109,6 +117,17 @@ function parseWeatherResponse(data: any, unit: 'celsius' | 'fahrenheit'): Weathe
   };
   
   return { current: currentWeather, hourly, daily, astronomy };
+}
+
+/** 翻译风向 */
+function translateWindDir(dir: string): string {
+  const dirMap: Record<string, string> = {
+    'N': '北风', 'NNE': '东北偏北', 'NE': '东北风', 'ENE': '东北偏东',
+    'E': '东风', 'ESE': '东南偏东', 'SE': '东南风', 'SSE': '东南偏南',
+    'S': '南风', 'SSW': '西南偏南', 'SW': '西南风', 'WSW': '西南偏西',
+    'W': '西风', 'WNW': '西北偏西', 'NW': '西北风', 'NNW': '西北偏北',
+  };
+  return dirMap[dir] || dir;
 }
 
 export function useWeather() {

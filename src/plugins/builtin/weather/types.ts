@@ -14,6 +14,7 @@ export interface WeatherData {
   visibility: number;
   uvIndex: number;
   cloudCover: number;
+  isDay: boolean;
 }
 
 /** 小时预报 */
@@ -23,6 +24,7 @@ export interface HourlyForecast {
   icon: string;
   condition: string;
   chanceOfRain: number;
+  isDay: boolean;
 }
 
 /** 每日预报 */
