@@ -10,6 +10,7 @@ interface IframeModalProps {
 
 export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -35,6 +36,19 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen, onClose]);
 
+  // 刷新页面
+  const handleRefresh = () => {
+    if (iframeRef.current) {
+      setIsLoading(true);
+      iframeRef.current.src = url;
+    }
+  };
+
+  // 在新标签页打开
+  const handleOpenInNewTab = () => {
+    window.open(url, '_blank');
+  };
+
   if (!isOpen) return null;
 
   return createPortal(
@@ -45,31 +59,58 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
       >
         {/* 标题栏 */}
         <div className="flex items-center justify-between px-4 py-3 bg-gray-100 border-b border-gray-200">
-          <div className="flex items-center gap-2">
-            {/* macOS 风格按钮 */}
-            <button
-              onClick={onClose}
-              className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 cursor-pointer border-none"
-              title="关闭"
-            />
-            <button
-              className="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-600 cursor-pointer border-none"
-              title="最小化"
-            />
-            <button
-              onClick={() => window.open(url, '_blank')}
-              className="w-3 h-3 rounded-full bg-green-500 hover:bg-green-600 cursor-pointer border-none"
-              title="在新标签页打开"
-            />
-          </div>
+          {/* 占位 */}
+          <div className="w-24" />
           
           {/* 标题 */}
           <div className="flex-1 text-center">
             <span className="text-sm text-gray-600 truncate">{title || url}</span>
           </div>
           
-          {/* 占位 */}
-          <div className="w-16" />
+          {/* 操作按钮 */}
+          <div className="flex items-center gap-2">
+            {/* 刷新按钮 */}
+            <button
+              onClick={handleRefresh}
+              className="w-8 h-8 rounded-lg hover:bg-gray-200 flex items-center justify-center cursor-pointer border-none bg-transparent transition-colors group relative"
+              aria-label="刷新"
+            >
+              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                刷新
+              </span>
+            </button>
+            
+            {/* 新标签页打开按钮 */}
+            <button
+              onClick={handleOpenInNewTab}
+              className="w-8 h-8 rounded-lg hover:bg-gray-200 flex items-center justify-center cursor-pointer border-none bg-transparent transition-colors group relative"
+              aria-label="在新标签页打开"
+            >
+              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+              <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                新标签页打开
+              </span>
+            </button>
+            
+            {/* 关闭按钮 */}
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-lg hover:bg-red-100 flex items-center justify-center cursor-pointer border-none bg-transparent transition-colors group relative"
+              aria-label="关闭"
+            >
+              <svg className="w-4 h-4 text-gray-600 group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                关闭
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* iframe 内容 */}
@@ -83,6 +124,7 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
             </div>
           )}
           <iframe
+            ref={iframeRef}
             src={url}
             className="w-full h-full border-none"
             onLoad={() => setIsLoading(false)}
