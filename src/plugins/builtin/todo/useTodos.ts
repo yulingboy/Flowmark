@@ -1,47 +1,37 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { usePluginStore } from '../../store';
 import type { TodoItem } from './types';
 import { PLUGIN_ID } from './types';
 
 export function useTodos() {
-  const [todos, setTodos] = useState<TodoItem[]>(
-    () => usePluginStore.getState().getPluginData<TodoItem[]>(PLUGIN_ID, 'todos') || []
+  // 直接用 selector 订阅，自动响应变化
+  const todos = usePluginStore(
+    state => (state.pluginData[PLUGIN_ID]?.todos as TodoItem[]) || []
   );
-
-  // 订阅 store 变化
-  useEffect(() => {
-    const unsubscribe = usePluginStore.subscribe((state) => {
-      const storedTodos = state.pluginData[PLUGIN_ID]?.['todos'] as TodoItem[] || [];
-      setTodos(storedTodos);
-    });
-    return unsubscribe;
-  }, []);
+  const setPluginData = usePluginStore(state => state.setPluginData);
 
   const saveTodos = useCallback((newTodos: TodoItem[]) => {
-    usePluginStore.getState().setPluginData(PLUGIN_ID, 'todos', newTodos);
-  }, []);
+    setPluginData(PLUGIN_ID, 'todos', newTodos);
+  }, [setPluginData]);
 
   const addTodo = useCallback((text: string) => {
     if (!text.trim()) return;
-    const currentTodos = usePluginStore.getState().getPluginData<TodoItem[]>(PLUGIN_ID, 'todos') || [];
     const newTodo: TodoItem = {
       id: Date.now().toString(),
       text: text.trim(),
       completed: false,
       createdAt: Date.now()
     };
-    saveTodos([...currentTodos, newTodo]);
-  }, [saveTodos]);
+    saveTodos([...todos, newTodo]);
+  }, [todos, saveTodos]);
 
   const toggleTodo = useCallback((id: string) => {
-    const currentTodos = usePluginStore.getState().getPluginData<TodoItem[]>(PLUGIN_ID, 'todos') || [];
-    saveTodos(currentTodos.map((t: TodoItem) => t.id === id ? { ...t, completed: !t.completed } : t));
-  }, [saveTodos]);
+    saveTodos(todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+  }, [todos, saveTodos]);
 
   const deleteTodo = useCallback((id: string) => {
-    const currentTodos = usePluginStore.getState().getPluginData<TodoItem[]>(PLUGIN_ID, 'todos') || [];
-    saveTodos(currentTodos.filter((t: TodoItem) => t.id !== id));
-  }, [saveTodos]);
+    saveTodos(todos.filter(t => t.id !== id));
+  }, [todos, saveTodos]);
 
   return { todos, addTodo, toggleTodo, deleteTodo };
 }

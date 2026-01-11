@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import type { PluginAPI } from '../../types';
 import { useNotes, formatFullTime } from './useNotes';
 
 // 空文件夹图标
@@ -13,8 +12,8 @@ function EmptyFolderIcon({ className = '' }: { className?: string }) {
 }
 
 // 弹窗视图 - 左右分栏布局
-export function NotesModal({ api }: { api: PluginAPI }) {
-  const { notes, addNote, updateNote, deleteNote, clearAllNotes } = useNotes(api);
+export function NotesModal() {
+  const { notes, addNote, updateNote, deleteNote, clearAllNotes } = useNotes();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 

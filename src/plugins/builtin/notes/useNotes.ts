@@ -1,18 +1,13 @@
 import { useCallback } from 'react';
-import type { PluginAPI } from '../../types';
 import { usePluginStore } from '../../store';
-import type { Note, NotesConfig } from './types';
+import type { Note } from './types';
 import { PLUGIN_ID } from './types';
 
-// 直接订阅 store，实现实时同步
-export function useNotes(api: PluginAPI) {
-  const config = api.getConfig<NotesConfig>();
-  
-  // 直接从 store 订阅数据，任何组件修改都会触发所有订阅者更新
+export function useNotes() {
+  // 直接用 selector 订阅，自动响应变化
   const notes = usePluginStore(
     state => (state.pluginData[PLUGIN_ID]?.notes as Note[]) || []
   );
-  
   const setPluginData = usePluginStore(state => state.setPluginData);
 
   const saveNotes = useCallback((newNotes: Note[]) => {
@@ -43,7 +38,7 @@ export function useNotes(api: PluginAPI) {
     saveNotes([]);
   }, [saveNotes]);
 
-  return { notes, config, addNote, updateNote, deleteNote, clearAllNotes };
+  return { notes, addNote, updateNote, deleteNote, clearAllNotes };
 }
 
 // 格式化完整时间

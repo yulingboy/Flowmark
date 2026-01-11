@@ -6,25 +6,17 @@ import { PLUGIN_ID, getWeatherIcon } from './types';
 const DEFAULT_CONFIG: WeatherConfig = { location: 'Beijing', unit: 'celsius', updateInterval: 30 };
 
 export function useWeather() {
-  const [weather, setWeather] = useState<WeatherData | null>(
-    () => usePluginStore.getState().getPluginData<WeatherData>(PLUGIN_ID, 'weatherData')
+  // 直接用 selector 订阅
+  const weather = usePluginStore(
+    state => (state.pluginData[PLUGIN_ID]?.weatherData as WeatherData) || null
   );
-  const [config, setConfig] = useState<WeatherConfig>(
-    () => (usePluginStore.getState().getPluginConfig(PLUGIN_ID) as unknown as WeatherConfig) || DEFAULT_CONFIG
-  );
+  const storedConfig = usePluginStore(state => state.pluginConfigs[PLUGIN_ID]);
+  const config: WeatherConfig = { ...DEFAULT_CONFIG, ...storedConfig };
+  
+  const setPluginData = usePluginStore(state => state.setPluginData);
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // 订阅 store 变化
-  useEffect(() => {
-    const unsubscribe = usePluginStore.subscribe((state) => {
-      const storedWeather = state.pluginData[PLUGIN_ID]?.['weatherData'] as WeatherData || null;
-      const storedConfig = (state.pluginConfigs[PLUGIN_ID] as unknown as WeatherConfig) || DEFAULT_CONFIG;
-      setWeather(storedWeather);
-      setConfig(storedConfig);
-    });
-    return unsubscribe;
-  }, []);
 
   const fetchWeather = useCallback(async () => {
     if (!config.location) return;
@@ -50,14 +42,13 @@ export function useWeather() {
         wind: current.windspeedKmph + ' km/h'
       };
       
-      setWeather(weatherData);
-      usePluginStore.getState().setPluginData(PLUGIN_ID, 'weatherData', weatherData);
+      setPluginData(PLUGIN_ID, 'weatherData', weatherData);
     } catch {
       setError('获取失败');
     } finally {
       setLoading(false);
     }
-  }, [config.location, config.unit]);
+  }, [config.location, config.unit, setPluginData]);
 
   useEffect(() => {
     fetchWeather();

@@ -1,9 +1,9 @@
-import type { PluginAPI, PluginSize } from '../../types';
+import type { PluginSize } from '../../types';
 import { useNotes } from './useNotes';
 
 // 卡片视图
-export function NotesCard({ api, size }: { api: PluginAPI; size: PluginSize }) {
-  const { notes } = useNotes(api);
+export function NotesCard({ size }: { size: PluginSize }) {
+  const { notes } = useNotes();
 
   if (size === '1x1') {
     return (

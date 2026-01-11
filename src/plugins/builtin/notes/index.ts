@@ -18,6 +18,6 @@ export const notesPlugin: Plugin = {
   
   modalSize: { width: 960, height: 640 },
   
-  renderCard: (api, size: PluginSize) => React.createElement(NotesCard, { api, size }),
-  renderModal: (api) => React.createElement(NotesModal, { api })
+  renderCard: (_api, size: PluginSize) => React.createElement(NotesCard, { size }),
+  renderModal: () => React.createElement(NotesModal)
 };
