@@ -8,9 +8,10 @@ interface ModalProps {
   title?: string;
   children: ReactNode;
   width?: string;
+  closeOnBackdrop?: boolean;
 }
 
-export function Modal({ isOpen, onClose, icon, title, children, width = '480px' }: ModalProps) {
+export function Modal({ isOpen, onClose, icon, title, children, width = '480px', closeOnBackdrop = true }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
 
   // ESC 键关闭
@@ -27,7 +28,7 @@ export function Modal({ isOpen, onClose, icon, title, children, width = '480px' 
   // 点击外部关闭
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+      if (closeOnBackdrop && modalRef.current && !modalRef.current.contains(e.target as Node)) {
         onClose();
       }
     };
@@ -35,7 +36,7 @@ export function Modal({ isOpen, onClose, icon, title, children, width = '480px' 
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, closeOnBackdrop]);
 
   if (!isOpen) return null;
 

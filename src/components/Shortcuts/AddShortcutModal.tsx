@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal } from '@/components/common';
 import { getFaviconUrl } from '@/utils/favicon';
 
@@ -30,7 +30,6 @@ const BG_COLORS = [
 ];
 
 export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalProps) {
-  const [activeTab, setActiveTab] = useState<'online' | 'manual' | 'widget'>('manual');
   const [url, setUrl] = useState('');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -39,12 +38,43 @@ export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalPr
   const [selectedBgColor, setSelectedBgColor] = useState('transparent');
   const [isPopupMode, setIsPopupMode] = useState(false);
   const [previewIcon, setPreviewIcon] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleFetchIcon = () => {
-    if (url) {
+  // URL 变化时自动获取图标
+  useEffect(() => {
+    if (url && url.startsWith('http')) {
+      const timer = setTimeout(() => {
+        const favicon = getFaviconUrl(url);
+        setPreviewIcon(favicon);
+        if (!iconUrl) {
+          setIconUrl(favicon);
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [url]);
+
+  const handleFetchIcon = async () => {
+    if (!url) return;
+    setIsLoading(true);
+    try {
       const favicon = getFaviconUrl(url);
       setPreviewIcon(favicon);
       setIconUrl(favicon);
+      
+      // 尝试从 URL 获取网站标题作为名称
+      if (!name) {
+        try {
+          const urlObj = new URL(url);
+          const hostname = urlObj.hostname.replace('www.', '');
+          const siteName = hostname.split('.')[0];
+          setName(siteName.charAt(0).toUpperCase() + siteName.slice(1));
+        } catch {
+          // 忽略错误
+        }
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -53,14 +83,13 @@ export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalPr
     
     onSave({
       name,
-      url,
+      url: url.startsWith('http') ? url : `https://${url}`,
       icon: iconUrl || previewIcon || getFaviconUrl(url),
       description,
       openMode: isPopupMode ? 'popup' : 'tab',
       bgColor: selectedBgColor !== 'transparent' ? selectedBgColor : undefined,
     });
     
-    // 重置表单
     resetForm();
     onClose();
   };
@@ -70,14 +99,13 @@ export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalPr
     
     onSave({
       name,
-      url,
+      url: url.startsWith('http') ? url : `https://${url}`,
       icon: iconUrl || previewIcon || getFaviconUrl(url),
       description,
       openMode: isPopupMode ? 'popup' : 'tab',
       bgColor: selectedBgColor !== 'transparent' ? selectedBgColor : undefined,
     });
     
-    // 重置表单但不关闭
     resetForm();
   };
 
@@ -97,43 +125,23 @@ export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalPr
     onClose();
   };
 
-  return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="" width="700px">
-      <div className="flex flex-col gap-4">
-        {/* 标签页切换 */}
-        <div className="flex items-center gap-2 mb-2">
-          <button
-            onClick={() => setActiveTab('online')}
-            className={`px-4 py-2 rounded-full text-sm border-none cursor-pointer transition-colors ${
-              activeTab === 'online'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            在线添加
-          </button>
-          <button
-            onClick={() => setActiveTab('manual')}
-            className={`px-4 py-2 rounded-full text-sm border-none cursor-pointer transition-colors ${
-              activeTab === 'manual'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            手动添加
-          </button>
-          <button
-            onClick={() => setActiveTab('widget')}
-            className={`px-4 py-2 rounded-full text-sm border-none cursor-pointer transition-colors ${
-              activeTab === 'widget'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            卡片组件
-          </button>
-        </div>
+  // 处理文件上传
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const result = event.target?.result as string;
+        setIconUrl(result);
+        setPreviewIcon(result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
+  return (
+    <Modal isOpen={isOpen} onClose={handleClose} title="" width="700px" closeOnBackdrop={false}>
+      <div className="flex flex-col gap-4">
         {/* 表单内容 */}
         <div className="flex flex-col gap-4">
           {/* 网络地址 */}
@@ -145,7 +153,7 @@ export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalPr
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="请输入带http开头的网址"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-400"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-400 pr-16"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
                 {url.length} / 1000
@@ -153,9 +161,10 @@ export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalPr
             </div>
             <button
               onClick={handleFetchIcon}
-              className="px-4 py-2 text-blue-500 bg-transparent border border-blue-500 rounded-lg text-sm cursor-pointer hover:bg-blue-50"
+              disabled={!url || isLoading}
+              className="px-4 py-2 text-blue-500 bg-transparent border border-blue-500 rounded-lg text-sm cursor-pointer hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              获取图标
+              {isLoading ? '获取中...' : '获取图标'}
             </button>
           </div>
 
@@ -168,7 +177,7 @@ export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalPr
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="标签名称"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-400"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-400 pr-16"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
                 {name.length} / 100
@@ -185,7 +194,7 @@ export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalPr
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="简单介绍标签（非必填）"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-400"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-400 pr-16"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
                 {description.length} / 200
@@ -200,12 +209,12 @@ export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalPr
               <input
                 type="text"
                 value={textIcon}
-                onChange={(e) => setTextIcon(e.target.value)}
-                placeholder="请输入1-5个字符的图标内容（可选项，当标签图标获取不到时可使用文字图标代替）"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-400"
+                onChange={(e) => setTextIcon(e.target.value.slice(0, 5))}
+                placeholder="请输入1-5个字符（当图标获取不到时使用）"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-400 pr-16"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
-                {textIcon.length} / 30
+                {textIcon.length} / 5
               </span>
             </div>
           </div>
@@ -217,14 +226,23 @@ export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalPr
               <input
                 type="text"
                 value={iconUrl}
-                onChange={(e) => setIconUrl(e.target.value)}
+                onChange={(e) => {
+                  setIconUrl(e.target.value);
+                  setPreviewIcon(e.target.value);
+                }}
                 placeholder="请上传或粘贴标签图标地址,支持png,jpg,ico,svg,webp格式"
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-400"
               />
             </div>
-            <button className="px-4 py-2 text-blue-500 bg-transparent border border-blue-500 rounded-lg text-sm cursor-pointer hover:bg-blue-50">
+            <label className="px-4 py-2 text-blue-500 bg-transparent border border-blue-500 rounded-lg text-sm cursor-pointer hover:bg-blue-50">
               手动上传
-            </button>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+            </label>
           </div>
 
           {/* 选择图标预览 */}
@@ -235,7 +253,14 @@ export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalPr
               style={{ backgroundColor: selectedBgColor === 'transparent' ? '#fbbf24' : selectedBgColor }}
             >
               {previewIcon ? (
-                <img src={previewIcon} alt="icon" className="w-10 h-10 object-contain" />
+                <img 
+                  src={previewIcon} 
+                  alt="icon" 
+                  className="w-10 h-10 object-contain"
+                  onError={() => setPreviewIcon('')}
+                />
+              ) : textIcon ? (
+                <span className="text-white text-lg font-bold">{textIcon}</span>
               ) : (
                 <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
@@ -280,7 +305,7 @@ export function AddShortcutModal({ isOpen, onClose, onSave }: AddShortcutModalPr
                 }`}
               >
                 <span
-                  className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                  className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${
                     isPopupMode ? 'left-7' : 'left-1'
                   }`}
                 />
