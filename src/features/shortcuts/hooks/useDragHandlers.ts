@@ -123,7 +123,7 @@ export function createDragHandlers({
       targetGrid.col < 0 || targetGrid.row < 0 || 
       targetGrid.col + colSpan > columns || targetGrid.row + rowSpan > rows;
 
-    const manager = new GridManager(columns, unit, gap);
+    const manager = new GridManager(columns, rows, unit, gap);
     manager.initFromItems(items, draggedItemId);
     
     const targetCol = Math.max(0, Math.min(targetGrid.col, columns - colSpan));

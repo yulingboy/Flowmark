@@ -6,7 +6,7 @@ import { ShortcutCard } from './ShortcutCard';
 import { ShortcutFolder } from './ShortcutFolder';
 import { FolderPopup } from './FolderPopup';
 import { PluginCard } from '@/plugins';
-import { getItemSize } from '../utils/gridUtils';
+import { getItemSize, canResizeItem, GridManager, pixelToGrid, getGridSpan } from '../utils/gridUtils';
 import { useShortcutItems } from '../hooks/useShortcutItems';
 import { createDragHandlers } from '../hooks/useDragHandlers';
 import { createFolderHandlers } from '../hooks/useFolderHandlers';
@@ -39,7 +39,7 @@ export function ShortcutsContainer({
   const selectedIds = useShortcutsStore((state) => state.selectedIds);
   const toggleSelection = useShortcutsStore((state) => state.toggleSelection);
 
-  const { items, setItems, itemsMap } = useShortcutItems({ shortcuts, columns, unit, gap });
+  const { items, setItems, itemsMap } = useShortcutItems({ shortcuts, columns, rows, unit, gap });
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -52,10 +52,29 @@ export function ShortcutsContainer({
   });
 
   const { handleFolderOpen, handleCloseFolder, handleFolderItemsChange, handleItemDragOut } = createFolderHandlers({
-    items, setItems, itemsMap, columns, unit, gap, setOpenFolder, onShortcutsChange,
+    items, setItems, itemsMap, columns, rows, unit, gap, setOpenFolder, onShortcutsChange,
   });
 
   const handleResizeItem = (item: GridItem, size: ShortcutSize) => {
+    const position = item.position || { x: 0, y: 0 };
+    
+    // 边界验证：检查新尺寸是否会超出网格边界
+    if (!canResizeItem(position, size, { columns, rows, unit, gap })) {
+      console.warn(`Cannot resize item ${item.id} to ${size}: would overflow grid boundaries`);
+      return; // 拒绝操作
+    }
+    
+    // 碰撞验证：检查新尺寸是否会与其他卡片冲突
+    const { col, row } = pixelToGrid(position.x, position.y, unit, gap);
+    const { colSpan, rowSpan } = getGridSpan(size);
+    const manager = new GridManager(columns, rows, unit, gap);
+    manager.initFromItems(items, item.id); // 排除当前卡片
+    
+    if (!manager.canPlace(col, row, colSpan, rowSpan)) {
+      console.warn(`Cannot resize item ${item.id} to ${size}: would collide with other items`);
+      return; // 拒绝操作
+    }
+    
     const newItems = items.map(s => (s.id === item.id ? { ...s, size } : s));
     setItems(newItems);
     onShortcutsChange?.(newItems);
