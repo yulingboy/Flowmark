@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import type { ShortcutItem, ShortcutSize } from '@/types';
 import { isShortcutFolder } from '@/types';
 import { IframeModal, ContextMenu } from '@/components/common';
@@ -26,6 +26,27 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
   const shortcuts = useShortcutsStore((state) => state.shortcuts);
   const moveToFolder = useShortcutsStore((state) => state.moveToFolder);
   const isPopupMode = item.openMode === 'popup';
+  const size = item.size || '1x1';
+  const is1x1 = size === '1x1';
+
+  // 根据尺寸计算图标样式
+  const getIconStyle = useCallback(() => {
+    if (is1x1) {
+      return { className: 'w-full h-full object-cover', style: {} };
+    }
+    // 非1x1尺寸：图标居中显示，保持原比例
+    return { 
+      className: 'object-contain', 
+      style: { 
+        width: '64px', 
+        height: '64px',
+        maxWidth: '50%',
+        maxHeight: '50%',
+      } 
+    };
+  }, [is1x1]);
+
+  const iconStyle = getIconStyle();
 
   const folders = useMemo(() => 
     shortcuts.filter(isShortcutFolder).map((f) => ({ id: f.id, name: f.name })),
@@ -121,7 +142,8 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
           <img
             src={item.icon}
             alt={item.name}
-            className="w-full h-full object-cover"
+            className={iconStyle.className}
+            style={iconStyle.style}
             loading="eager"
             draggable={false}
             onError={(e) => {
