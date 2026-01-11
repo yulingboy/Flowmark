@@ -7,3 +7,7 @@ export * from './icons';
 
 // 错误边界
 export { ErrorBoundary } from './ErrorBoundary';
+
+// 懒加载图片
+export { LazyImage, LazyBackground } from './LazyImage';
+export type { LazyImageProps, LazyBackgroundProps } from './LazyImage';

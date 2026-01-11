@@ -11,8 +11,10 @@ import { PlusSquareOutlined, FolderOutlined, ReloadOutlined, EditOutlined, Setti
 import { WallpaperIcon } from '@/components/common/icons';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useShortcutsStore } from '@/stores/shortcutsStore';
+
 import type { ShortcutItem } from '@/types';
 import { GRID } from '@/constants';
+import { preloadImage } from '@/utils/imagePreloader';
 
 function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -26,13 +28,19 @@ function App() {
   const { shortcuts, setShortcuts, updateShortcut, addShortcut, addFolder, deleteShortcut, batchEditMode, toggleBatchEdit } = useShortcutsStore();
   const searchRef = useRef<HTMLInputElement>(null);
 
-  // 键盘快捷键 - 使用 useEffect 手动处理避免依赖问题
+  // 预加载背景图片
+  useEffect(() => {
+    if (backgroundUrl) {
+      preloadImage(backgroundUrl, { priority: 'high' });
+    }
+  }, [backgroundUrl]);
+
+  // 键盘快捷键
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
       const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
       
-      // Escape 键关闭弹窗
       if (e.key === 'Escape') {
         if (isSettingsOpen) setIsSettingsOpen(false);
         else if (isAddShortcutOpen) { setIsAddShortcutOpen(false); setEditingShortcut(null); }
@@ -41,21 +49,15 @@ function App() {
         return;
       }
       
-      // 输入框中不处理其他快捷键
       if (isInput) return;
       
-      // Ctrl+K 聚焦搜索
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         searchRef.current?.focus();
-      }
-      // Ctrl+, 打开设置
-      else if ((e.ctrlKey || e.metaKey) && e.key === ',') {
+      } else if ((e.ctrlKey || e.metaKey) && e.key === ',') {
         e.preventDefault();
         setIsSettingsOpen(true);
-      }
-      // Ctrl+N 添加快捷方式
-      else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
         e.preventDefault();
         setIsAddShortcutOpen(true);
       }
@@ -118,7 +120,6 @@ function App() {
         </div>
       )}
       
-      {/* 批量编辑工具栏 */}
       {batchEditMode && <BatchEditToolbar />}
     </div>
   );
