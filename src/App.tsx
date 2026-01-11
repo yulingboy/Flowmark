@@ -11,7 +11,7 @@ import { createShortcutFolder } from '@/types';
 
 // 默认快捷入口数据
 const defaultShortcuts: ShortcutEntry[] = [
-  { id: '1', name: '爱奇艺', url: 'https://www.iqiyi.com', icon: getFaviconUrl('https://www.iqiyi.com'), size: '1x1' },
+  { id: '1', name: '爱奇艺', url: 'https://www.iqiyi.com', icon: getFaviconUrl('https://www.iqiyi.com'), size: '1x1', openMode: 'popup' },
   { id: '2', name: '芒果TV', url: 'https://www.mgtv.com', icon: getFaviconUrl('https://www.mgtv.com'), size: '1x1' },
   { id: '3', name: '抖音', url: 'https://www.douyin.com', icon: getFaviconUrl('https://www.douyin.com'), size: '1x1' },
   { id: '4', name: '微博', url: 'https://weibo.com', icon: getFaviconUrl('https://weibo.com'), size: '1x1' },
