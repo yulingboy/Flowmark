@@ -33,6 +33,7 @@ interface ShortcutsState {
   deleteShortcut: (id: string) => void;
   resizeShortcut: (id: string, size: ShortcutSize) => void;
   setEditingItem: (item: ShortcutItem | null) => void;
+  moveToFolder: (itemId: string, folderId: string) => void;
 }
 
 export const useShortcutsStore = create<ShortcutsState>()(
@@ -74,6 +75,22 @@ export const useShortcutsStore = create<ShortcutsState>()(
       })),
 
       setEditingItem: (item) => set({ editingItem: item }),
+
+      moveToFolder: (itemId, folderId) => set((state) => {
+        const itemToMove = state.shortcuts.find((s) => s.id === itemId && !isShortcutFolder(s)) as ShortcutItem | undefined;
+        if (!itemToMove) return state;
+
+        const newShortcuts = state.shortcuts
+          .filter((s) => s.id !== itemId)
+          .map((s) => {
+            if (s.id === folderId && isShortcutFolder(s)) {
+              return { ...s, items: [...s.items, itemToMove] };
+            }
+            return s;
+          });
+
+        return { shortcuts: newShortcuts };
+      }),
     }),
     {
       name: 'shortcuts-storage',

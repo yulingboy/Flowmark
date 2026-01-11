@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type { ShortcutItem, ShortcutSize } from '@/types';
+import { isShortcutFolder } from '@/types';
 import { IframeModal, ContextMenu } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
+import { useShortcutsStore } from '@/stores/shortcutsStore';
 
 interface ShortcutCardProps {
   item: ShortcutItem;
@@ -69,7 +71,14 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
   const [contextMenu, setContextMenu] = useState<{ isOpen: boolean; x: number; y: number }>({
     isOpen: false, x: 0, y: 0,
   });
+  const shortcuts = useShortcutsStore((state) => state.shortcuts);
+  const moveToFolder = useShortcutsStore((state) => state.moveToFolder);
   const isPopupMode = item.openMode === 'popup';
+
+  const folders = useMemo(() => 
+    shortcuts.filter(isShortcutFolder).map((f) => ({ id: f.id, name: f.name })),
+    [shortcuts]
+  );
 
   const handleClick = () => {
     if (onClick) {
@@ -103,8 +112,14 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
     {
       icon: <MoveIcon />,
       label: '移动至分类',
-      onClick: () => console.log('移动至分类'),
+      type: 'submenu',
       rightIcon: <ArrowRightIcon />,
+      submenuItems: folders.map((folder) => ({
+        id: folder.id,
+        label: folder.name,
+        onClick: () => moveToFolder(item.id, folder.id),
+      })),
+      onClick: () => {},
     },
     {
       icon: <DockIcon />,
