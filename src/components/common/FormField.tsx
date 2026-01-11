@@ -1,3 +1,4 @@
+import { Form } from 'antd';
 import type { ReactNode } from 'react';
 
 interface FormFieldProps {
@@ -10,15 +11,14 @@ interface FormFieldProps {
 
 export function FormField({ label, error, required, children, className = '' }: FormFieldProps) {
   return (
-    <div className={`space-y-1 ${className}`}>
-      <label className="block text-sm font-medium text-gray-700">
-        {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
-      </label>
+    <Form.Item
+      label={label}
+      required={required}
+      validateStatus={error ? 'error' : undefined}
+      help={error}
+      className={className}
+    >
       {children}
-      {error && (
-        <p className="text-xs text-red-500">{error}</p>
-      )}
-    </div>
+    </Form.Item>
   );
 }

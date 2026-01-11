@@ -1,3 +1,5 @@
+import { Switch } from 'antd';
+
 interface FormToggleProps {
   label: string;
   description?: string;
@@ -19,25 +21,11 @@ export function FormToggle({ label, description, checked, onChange, disabled = f
           </p>
         )}
       </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={checked}
+      <Switch
+        checked={checked}
+        onChange={onChange}
         disabled={disabled}
-        onClick={() => !disabled && onChange(!checked)}
-        className={`
-          relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-          ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
-          ${checked ? 'bg-blue-500' : 'bg-gray-300'}
-        `}
-      >
-        <span
-          className={`
-            inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-            ${checked ? 'translate-x-6' : 'translate-x-1'}
-          `}
-        />
-      </button>
+      />
     </div>
   );
 }

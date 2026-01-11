@@ -4,7 +4,7 @@ import { Search } from '@/components/Search/Search';
 import { ShortcutsContainer, AddShortcutModal, AddFolderModal, BatchEditToolbar } from '@/components/Shortcuts';
 import { Background } from '@/components/Background/Background';
 import { SettingsButton, SettingsPanel, WallpaperModal } from '@/components/Settings';
-import { ContextMenu, ToastContainer, ErrorBoundary } from '@/components/common';
+import { ContextMenu, ErrorBoundary } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
 import { AddIcon, FolderIcon, WallpaperIcon, RefreshIcon, EditIcon, SettingsIcon } from '@/components/common/icons';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -24,7 +24,7 @@ function App() {
   const { backgroundUrl, showClock, showSearch, showShortcuts, autoFocusSearch } = useSettingsStore();
   const { shortcuts, setShortcuts, updateShortcut, addShortcut, addFolder, deleteShortcut, batchEditMode, toggleBatchEdit } = useShortcutsStore();
   const searchRef = useRef<HTMLInputElement>(null);
-  const { toasts, dismissToast, success } = useToast();
+  const { contextHolder, success } = useToast();
 
   // 键盘快捷键 - 使用 useEffect 手动处理避免依赖问题
   useEffect(() => {
@@ -121,8 +121,8 @@ function App() {
       {/* 批量编辑工具栏 */}
       {batchEditMode && <BatchEditToolbar />}
       
-      {/* Toast 容器 */}
-      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
+      {/* Antd Message 容器 */}
+      {contextHolder}
     </div>
   );
 }
