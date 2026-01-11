@@ -1,6 +1,6 @@
 import { useState } from 'react';
+import { Button, Slider } from 'antd';
 import { useSettingsStore } from '@/stores/settingsStore';
-import { Slider } from '../components/Slider';
 
 const ONLINE_WALLPAPERS = [
   'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80',
@@ -13,44 +13,23 @@ const ONLINE_WALLPAPERS = [
 
 export function WallpaperSettings() {
   const { 
-    backgroundUrl, 
-    backgroundBlur, 
-    backgroundOverlay,
-    updateBackgroundUrl, 
-    updateBackgroundBlur,
-    updateBackgroundOverlay,
-    resetBackground 
+    backgroundUrl, backgroundBlur, backgroundOverlay,
+    updateBackgroundUrl, updateBackgroundBlur, updateBackgroundOverlay, resetBackground 
   } = useSettingsStore();
   const [showOnlineWallpapers, setShowOnlineWallpapers] = useState(false);
 
   return (
     <div>
       <div className="w-full h-45 rounded-xl overflow-hidden bg-gray-100 mb-4 relative">
-        <img
-          src={backgroundUrl}
-          alt="当前壁纸"
-          className="w-full h-full object-cover"
-          style={{ filter: `blur(${backgroundBlur / 10}px)` }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{ backgroundColor: `rgba(0, 0, 0, ${backgroundOverlay / 100})` }}
-        />
+        <img src={backgroundUrl} alt="当前壁纸" className="w-full h-full object-cover" style={{ filter: `blur(${backgroundBlur / 10}px)` }} />
+        <div className="absolute inset-0" style={{ backgroundColor: `rgba(0, 0, 0, ${backgroundOverlay / 100})` }} />
       </div>
 
       <div className="flex gap-3 mb-5">
-        <button
-          onClick={() => setShowOnlineWallpapers(!showOnlineWallpapers)}
-          className="flex-1 py-2.5 px-4 text-sm bg-blue-500 text-white rounded-lg cursor-pointer"
-        >
+        <Button type="primary" onClick={() => setShowOnlineWallpapers(!showOnlineWallpapers)} block>
           在线壁纸
-        </button>
-        <button
-          onClick={resetBackground}
-          className="flex-1 py-2.5 px-4 text-sm bg-gray-100 text-gray-700 rounded-lg cursor-pointer"
-        >
-          恢复默认
-        </button>
+        </Button>
+        <Button onClick={resetBackground} block>恢复默认</Button>
       </div>
 
       {showOnlineWallpapers && (
@@ -58,18 +37,9 @@ export function WallpaperSettings() {
           <div className="text-sm text-gray-700 mb-3">选择壁纸</div>
           <div className="grid grid-cols-3 gap-2">
             {ONLINE_WALLPAPERS.map((url, index) => (
-              <button
-                key={index}
-                onClick={() => updateBackgroundUrl(url)}
-                className={`p-0 rounded-lg overflow-hidden cursor-pointer aspect-video ${
-                  backgroundUrl === url ? 'border-2 border-blue-500' : 'border-2 border-transparent'
-                }`}
-              >
-                <img
-                  src={url}
-                  alt={`壁纸 ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
+              <button key={index} onClick={() => updateBackgroundUrl(url)}
+                className={`p-0 rounded-lg overflow-hidden cursor-pointer aspect-video border-2 ${backgroundUrl === url ? 'border-blue-500' : 'border-transparent'}`}>
+                <img src={url} alt={`壁纸 ${index + 1}`} className="w-full h-full object-cover" />
               </button>
             ))}
           </div>
@@ -87,8 +57,21 @@ export function WallpaperSettings() {
         />
       </div>
 
-      <Slider value={backgroundBlur} onChange={updateBackgroundBlur} label="背景模糊值" min={0} max={100} />
-      <Slider value={backgroundOverlay} onChange={updateBackgroundOverlay} label="遮罩透明度" min={0} max={80} />
+      <div className="py-3 border-b border-gray-100">
+        <div className="flex justify-between text-sm text-gray-700 mb-2">
+          <span>背景模糊值</span>
+          <span>{backgroundBlur}%</span>
+        </div>
+        <Slider min={0} max={100} value={backgroundBlur} onChange={updateBackgroundBlur} />
+      </div>
+
+      <div className="py-3 border-b border-gray-100">
+        <div className="flex justify-between text-sm text-gray-700 mb-2">
+          <span>遮罩透明度</span>
+          <span>{backgroundOverlay}%</span>
+        </div>
+        <Slider min={0} max={80} value={backgroundOverlay} onChange={updateBackgroundOverlay} />
+      </div>
     </div>
   );
 }
