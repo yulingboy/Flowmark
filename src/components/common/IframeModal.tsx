@@ -12,17 +12,24 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        if (isFullscreen) {
+          setIsFullscreen(false);
+        } else {
+          onClose();
+        }
+      }
     };
     if (isOpen) {
       document.addEventListener('keydown', handleKeyDown);
       setIsLoading(true);
     }
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, isFullscreen]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -30,11 +37,11 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
         onClose();
       }
     };
-    if (isOpen) {
+    if (isOpen && !isFullscreen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, isFullscreen]);
 
   // 刷新页面
   const handleRefresh = () => {
@@ -49,14 +56,20 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
     window.open(url, '_blank');
   };
 
+  // 切换全屏
+  const handleToggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+  };
+
   if (!isOpen) return null;
+
+  const modalClass = isFullscreen
+    ? 'bg-white shadow-2xl overflow-hidden relative w-full h-full flex flex-col'
+    : 'bg-white rounded-2xl shadow-2xl overflow-hidden relative w-[90vw] h-[85vh] max-w-6xl flex flex-col';
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div
-        ref={modalRef}
-        className="bg-white rounded-2xl shadow-2xl overflow-hidden relative w-[90vw] h-[85vh] max-w-6xl flex flex-col"
-      >
+      <div ref={modalRef} className={modalClass}>
         {/* 标题栏 */}
         <div className="flex items-center justify-between px-4 py-3 bg-gray-100 border-b border-gray-200">
           {/* 占位 */}
@@ -76,8 +89,20 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
                 className="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-600 cursor-pointer border-none"
                 aria-label="刷新"
               />
-              <span className="absolute top-6 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+              <span className="absolute bottom-5 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                 刷新
+              </span>
+            </div>
+            
+            {/* 全屏按钮 - 蓝色 */}
+            <div className="relative group">
+              <button
+                onClick={handleToggleFullscreen}
+                className="w-3 h-3 rounded-full bg-blue-500 hover:bg-blue-600 cursor-pointer border-none"
+                aria-label={isFullscreen ? '退出全屏' : '全屏'}
+              />
+              <span className="absolute bottom-5 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                {isFullscreen ? '退出全屏' : '全屏'}
               </span>
             </div>
             
@@ -88,7 +113,7 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
                 className="w-3 h-3 rounded-full bg-green-500 hover:bg-green-600 cursor-pointer border-none"
                 aria-label="在新标签页打开"
               />
-              <span className="absolute top-6 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+              <span className="absolute bottom-5 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                 新标签页打开
               </span>
             </div>
@@ -100,7 +125,7 @@ export function IframeModal({ isOpen, onClose, url, title }: IframeModalProps) {
                 className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 cursor-pointer border-none"
                 aria-label="关闭"
               />
-              <span className="absolute top-6 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+              <span className="absolute bottom-5 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                 关闭
               </span>
             </div>
