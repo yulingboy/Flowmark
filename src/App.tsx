@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Clock } from '@/components/Clock/Clock';
 import { Search } from '@/components/Search/Search';
-import { ShortcutsContainer, AddShortcutModal } from '@/components/Shortcuts';
+import { ShortcutsContainer, AddShortcutModal, BatchEditToolbar } from '@/components/Shortcuts';
 import { Background } from '@/components/Background/Background';
 import { SettingsButton, SettingsPanel } from '@/components/Settings';
 import { ContextMenu } from '@/components/common';
@@ -55,7 +55,7 @@ function App() {
   const [contextMenu, setContextMenu] = useState({ isOpen: false, x: 0, y: 0 });
   
   const { backgroundUrl, showClock, showSearch, showShortcuts, autoFocusSearch } = useSettingsStore();
-  const { shortcuts, setShortcuts, updateShortcut, addShortcut, deleteShortcut } = useShortcutsStore();
+  const { shortcuts, setShortcuts, updateShortcut, addShortcut, deleteShortcut, batchEditMode, toggleBatchEdit } = useShortcutsStore();
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -82,7 +82,7 @@ function App() {
     { icon: <AddIcon />, label: '添加标签', onClick: () => setIsAddShortcutOpen(true) },
     { icon: <FolderIcon />, label: '新文件夹', onClick: () => console.log('新文件夹') },
     { icon: <WallpaperIcon />, label: '更换壁纸', onClick: () => console.log('更换壁纸'), rightIcon: <RefreshIcon /> },
-    { icon: <EditIcon />, label: '批量编辑', onClick: () => console.log('批量编辑') },
+    { icon: <EditIcon />, label: '批量编辑', onClick: () => toggleBatchEdit() },
     { icon: <SettingsIcon />, label: '设置', onClick: () => setIsSettingsOpen(true) },
   ];
 
@@ -104,6 +104,9 @@ function App() {
             onShortcutsChange={setShortcuts} onEditShortcut={handleEditShortcut} onDeleteShortcut={handleDeleteShortcut} />
         </div>
       )}
+      
+      {/* 批量编辑工具栏 */}
+      {batchEditMode && <BatchEditToolbar />}
     </div>
   );
 }

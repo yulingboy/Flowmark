@@ -17,6 +17,7 @@ import { createDragHandlers } from './hooks/useDragHandlers';
 import { createFolderHandlers } from './hooks/useFolderHandlers';
 import type { ShortcutEntry, ShortcutFolder as ShortcutFolderType, ShortcutItem, ShortcutSize } from '@/types';
 import { isShortcutFolder } from '@/types';
+import { useShortcutsStore } from '@/stores/shortcutsStore';
 
 interface ShortcutsContainerProps {
   shortcuts: ShortcutEntry[];
@@ -45,6 +46,11 @@ export function ShortcutsContainer({
   const [activeId, setActiveId] = useState<string | null>(null);
   const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
   const [animatingItemId, setAnimatingItemId] = useState<string | null>(null);
+
+  // 批量编辑状态
+  const batchEditMode = useShortcutsStore((state) => state.batchEditMode);
+  const selectedIds = useShortcutsStore((state) => state.selectedIds);
+  const toggleSelection = useShortcutsStore((state) => state.toggleSelection);
 
   // 使用自定义 hooks 管理项目状态
   const { items, setItems, itemsMap } = useShortcutItems({
@@ -151,6 +157,9 @@ export function ShortcutsContainer({
                 isDropTarget={isDropTarget}
                 isDragging={isDragging}
                 shouldAnimate={animatingItemId === entry.id}
+                batchEditMode={batchEditMode}
+                isSelected={selectedIds.has(entry.id)}
+                onToggleSelect={toggleSelection}
               />
             );
           })}

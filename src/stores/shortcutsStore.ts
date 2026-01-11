@@ -26,6 +26,10 @@ interface ShortcutsState {
   shortcuts: ShortcutEntry[];
   editingItem: ShortcutItem | null;
   
+  // Batch edit state
+  batchEditMode: boolean;
+  selectedIds: Set<string>;
+  
   // Actions
   setShortcuts: (shortcuts: ShortcutEntry[]) => void;
   addShortcut: (shortcut: Omit<ShortcutItem, 'id'>) => void;
@@ -34,6 +38,14 @@ interface ShortcutsState {
   resizeShortcut: (id: string, size: ShortcutSize) => void;
   setEditingItem: (item: ShortcutItem | null) => void;
   moveToFolder: (itemId: string, folderId: string) => void;
+  
+  // Batch edit actions
+  toggleBatchEdit: () => void;
+  toggleSelection: (id: string) => void;
+  selectAll: () => void;
+  clearSelection: () => void;
+  batchDelete: () => void;
+  batchMoveToFolder: (folderId: string) => void;
 }
 
 export const useShortcutsStore = create<ShortcutsState>()(
@@ -41,6 +53,8 @@ export const useShortcutsStore = create<ShortcutsState>()(
     (set) => ({
       shortcuts: defaultShortcuts,
       editingItem: null,
+      batchEditMode: false,
+      selectedIds: new Set<string>(),
 
       setShortcuts: (shortcuts) => set({ shortcuts }),
 
@@ -90,6 +104,55 @@ export const useShortcutsStore = create<ShortcutsState>()(
           });
 
         return { shortcuts: newShortcuts };
+      }),
+
+      // Batch edit actions
+      toggleBatchEdit: () => set((state) => ({
+        batchEditMode: !state.batchEditMode,
+        selectedIds: new Set<string>(),
+      })),
+
+      toggleSelection: (id) => set((state) => {
+        const newSelected = new Set(state.selectedIds);
+        if (newSelected.has(id)) {
+          newSelected.delete(id);
+        } else {
+          newSelected.add(id);
+        }
+        return { selectedIds: newSelected };
+      }),
+
+      selectAll: () => set((state) => {
+        const allIds = state.shortcuts
+          .filter((s) => !isShortcutFolder(s))
+          .map((s) => s.id);
+        return { selectedIds: new Set(allIds) };
+      }),
+
+      clearSelection: () => set({ selectedIds: new Set<string>() }),
+
+      batchDelete: () => set((state) => ({
+        shortcuts: state.shortcuts.filter((s) => !state.selectedIds.has(s.id)),
+        selectedIds: new Set<string>(),
+      })),
+
+      batchMoveToFolder: (folderId) => set((state) => {
+        const itemsToMove = state.shortcuts.filter(
+          (s) => state.selectedIds.has(s.id) && !isShortcutFolder(s)
+        ) as ShortcutItem[];
+        
+        if (itemsToMove.length === 0) return state;
+
+        const newShortcuts = state.shortcuts
+          .filter((s) => !state.selectedIds.has(s.id))
+          .map((s) => {
+            if (s.id === folderId && isShortcutFolder(s)) {
+              return { ...s, items: [...s.items, ...itemsToMove] };
+            }
+            return s;
+          });
+
+        return { shortcuts: newShortcuts, selectedIds: new Set<string>() };
       }),
     }),
     {

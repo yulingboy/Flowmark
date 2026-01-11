@@ -3,3 +3,4 @@ export { ShortcutFolder } from './ShortcutFolder';
 export { ShortcutsContainer } from './ShortcutsContainer';
 export { FolderPopup } from './FolderPopup';
 export { AddShortcutModal } from './AddShortcutModal';
+export { BatchEditToolbar } from './BatchEditToolbar';

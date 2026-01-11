@@ -12,6 +12,9 @@ interface ShortcutCardProps {
   onDelete?: (item: ShortcutItem) => void;
   onResize?: (item: ShortcutItem, size: ShortcutSize) => void;
   className?: string;
+  batchEditMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: (id: string) => void;
 }
 
 // 右键菜单图标
@@ -58,7 +61,7 @@ const ArrowRightIcon = () => (
   </svg>
 );
 
-export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, className = '' }: ShortcutCardProps) {
+export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, className = '', batchEditMode = false, isSelected = false, onToggleSelect }: ShortcutCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [contextMenu, setContextMenu] = useState<{ isOpen: boolean; x: number; y: number }>({
     isOpen: false, x: 0, y: 0,
@@ -73,6 +76,11 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
   );
 
   const handleClick = () => {
+    // 批量编辑模式下，点击切换选中状态
+    if (batchEditMode) {
+      onToggleSelect?.(item.id);
+      return;
+    }
     if (onClick) {
       onClick(item);
       return;
@@ -85,6 +93,11 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
   };
 
   const handleContextMenu = (e: React.MouseEvent) => {
+    // 批量编辑模式下禁用右键菜单
+    if (batchEditMode) {
+      e.preventDefault();
+      return;
+    }
     e.preventDefault();
     e.stopPropagation();
     setContextMenu({ isOpen: true, x: e.clientX, y: e.clientY });
@@ -137,7 +150,17 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
         className={`flex flex-col items-center gap-1 cursor-pointer group w-full h-full ${className}`}
       >
         {/* 图标卡片 */}
-        <div className="w-full flex-1 rounded-2xl overflow-hidden bg-white shadow-lg flex items-center justify-center group-hover:scale-105 transition-transform relative">
+        <div className={`w-full flex-1 rounded-2xl overflow-hidden bg-white shadow-lg flex items-center justify-center group-hover:scale-105 transition-transform relative ${batchEditMode && isSelected ? 'ring-2 ring-blue-500' : ''}`}>
+          {/* 批量编辑模式下的选中标记 */}
+          {batchEditMode && (
+            <div className={`absolute top-1 left-1 w-5 h-5 rounded-full border-2 flex items-center justify-center z-10 ${isSelected ? 'bg-blue-500 border-blue-500' : 'bg-white/80 border-gray-300'}`}>
+              {isSelected && (
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" className="w-3 h-3">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              )}
+            </div>
+          )}
           <img
             src={item.icon}
             alt={item.name}
