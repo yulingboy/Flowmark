@@ -15,7 +15,7 @@ export const weatherPlugin: Plugin = {
   
   supportedSizes: ['1x1', '2x2', '2x4'],
   defaultSize: '2x2',
-  modalSize: { width: 600, height: 520 },
+  modalSize: { width: 720, height: 520 },
   
   configSchema: {
     location: {
