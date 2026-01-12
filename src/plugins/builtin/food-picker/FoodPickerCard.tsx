@@ -3,15 +3,15 @@ import type { PluginSize } from '../../types';
 import { useFoodPicker } from './useFoodPicker';
 
 export function FoodPickerCard({ size }: { size: PluginSize }) {
-  const { currentFood, currentCategory, isSpinning, spin } = useFoodPicker();
+  const { currentFood, isSpinning, spin } = useFoodPicker();
 
-  // 1x1 尺寸：只显示图标，点击打开弹窗
+  // 1x1 尺寸
   if (size === '1x1') {
     return (
-      <div 
-        className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-orange-400/80 to-red-500/80 rounded-xl"
-      >
-        <span className={`text-2xl ${isSpinning ? 'animate-bounce' : ''}`}>🍽️</span>
+      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-orange-50 to-pink-50 rounded-xl relative overflow-hidden">
+        <div className="absolute top-2 left-2 w-1.5 h-1.5 rounded-full bg-pink-300/60" />
+        <div className="absolute bottom-3 right-2 w-1 h-1 rounded-full bg-orange-300/60" />
+        <Shuffle className={`w-6 h-6 text-orange-400 ${isSpinning ? 'animate-spin' : ''}`} />
       </div>
     );
   }
@@ -19,79 +19,57 @@ export function FoodPickerCard({ size }: { size: PluginSize }) {
   // 2x2 尺寸
   if (size === '2x2') {
     return (
-      <div className="w-full h-full flex flex-col bg-gradient-to-br from-orange-400/80 to-red-500/80 rounded-xl p-3 text-white">
-        {/* 标题 */}
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium">🍽️ 今天吃什么</span>
-        </div>
+      <div className="w-full h-full flex flex-col bg-gradient-to-br from-orange-50 to-pink-50 rounded-xl p-3 relative overflow-hidden">
+        {/* 装饰圆点 */}
+        <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-pink-300/60" />
+        <div className="absolute bottom-12 left-3 w-1.5 h-1.5 rounded-full bg-orange-300/60" />
         
-        {/* 结果显示 */}
         <div className="flex-1 flex flex-col items-center justify-center">
-          {currentFood ? (
-            <>
-              <span className="text-2xl mb-1">{currentCategory?.icon}</span>
-              <span className={`text-lg font-bold text-center ${isSpinning ? 'animate-pulse' : ''}`}>
-                {currentFood}
-              </span>
-              <span className="text-xs text-white/60 mt-1">{currentCategory?.name}</span>
-            </>
-          ) : (
-            <span className="text-sm text-white/70">点击按钮开始</span>
-          )}
+          <span className="text-sm text-gray-500 mb-1">今天吃什么？</span>
+          <span className={`text-lg font-bold text-gray-800 text-center ${isSpinning ? 'animate-pulse' : ''}`}>
+            {currentFood || '点击开始'}
+          </span>
         </div>
         
-        {/* 按钮 */}
-        <div
+        <button
           onClick={(e) => { e.stopPropagation(); spin(); }}
-          className={`flex items-center justify-center gap-1 py-2 rounded-lg cursor-pointer transition-all ${
-            isSpinning ? 'bg-white/10' : 'bg-white/20 hover:bg-white/30'
-          }`}
+          disabled={isSpinning}
+          className="flex items-center justify-center gap-1 py-2 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-white text-sm font-medium shadow-sm hover:shadow-md transition-all disabled:opacity-70"
         >
-          <Shuffle className={`w-4 h-4 ${isSpinning ? 'animate-spin' : ''}`} />
-          <span className="text-sm">{isSpinning ? '选择中...' : '随机选择'}</span>
-        </div>
+          {isSpinning && <Shuffle className="w-3 h-3 animate-spin" />}
+          <span>{isSpinning ? '选择中' : '开始'}</span>
+        </button>
       </div>
     );
   }
 
-  // 2x4 尺寸：完整显示
+  // 2x4 尺寸
   return (
-    <div className="w-full h-full flex flex-col bg-gradient-to-br from-orange-400/80 to-red-500/80 rounded-xl p-4 text-white">
-      {/* 标题 */}
-      <div className="flex items-center gap-2 mb-3">
-        <span className="text-xl">🍽️</span>
-        <span className="text-base font-medium">今天吃什么</span>
-      </div>
+    <div className="w-full h-full flex flex-col bg-gradient-to-br from-orange-50 to-pink-50 rounded-xl p-4 relative overflow-hidden">
+      {/* 装饰圆点 */}
+      <div className="absolute top-4 right-6 w-3 h-3 rounded-full bg-pink-300/60" />
+      <div className="absolute top-8 left-4 w-2 h-2 rounded-full bg-yellow-300/60" />
+      <div className="absolute bottom-16 right-4 w-2 h-2 rounded-full bg-blue-200/60" />
       
-      {/* 结果显示 */}
       <div className="flex-1 flex flex-col items-center justify-center">
-        {currentFood ? (
-          <>
-            <span className="text-4xl mb-2">{currentCategory?.icon}</span>
-            <span className={`text-2xl font-bold text-center ${isSpinning ? 'animate-pulse' : ''}`}>
-              {currentFood}
-            </span>
-            <span className="text-sm text-white/70 mt-2">{currentCategory?.name}</span>
-          </>
-        ) : (
-          <div className="text-center">
-            <span className="text-4xl block mb-2">🤔</span>
-            <span className="text-white/70">不知道吃什么？</span>
-            <span className="text-white/70 block">让我来帮你选！</span>
-          </div>
-        )}
+        <span className="text-base text-gray-500 mb-2">今天吃什么？</span>
+        <span className={`text-2xl font-bold text-gray-800 text-center ${isSpinning ? 'animate-pulse' : ''}`}>
+          {currentFood ? (
+            <span className="text-orange-500">{currentFood}!</span>
+          ) : (
+            '吃什么!'
+          )}
+        </span>
       </div>
       
-      {/* 按钮 */}
-      <div
+      <button
         onClick={(e) => { e.stopPropagation(); spin(); }}
-        className={`flex items-center justify-center gap-2 py-3 rounded-lg cursor-pointer transition-all ${
-          isSpinning ? 'bg-white/10' : 'bg-white/20 hover:bg-white/30'
-        }`}
+        disabled={isSpinning}
+        className="flex items-center justify-center gap-2 py-3 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-white font-medium shadow-md hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-70"
       >
-        <Shuffle className={`w-5 h-5 ${isSpinning ? 'animate-spin' : ''}`} />
-        <span className="text-base font-medium">{isSpinning ? '选择中...' : '随机选择'}</span>
-      </div>
+        {isSpinning && <Shuffle className="w-4 h-4 animate-spin" />}
+        <span>{isSpinning ? '选择中...' : '开始'}</span>
+      </button>
     </div>
   );
 }
