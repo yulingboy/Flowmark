@@ -1,12 +1,13 @@
 import { useState, useRef } from 'react';
 import { Modal, Menu } from 'antd';
-import { SettingOutlined, SearchOutlined, PictureOutlined, ClockCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { SettingOutlined, SearchOutlined, PictureOutlined, ClockCircleOutlined, InfoCircleOutlined, DatabaseOutlined } from '@ant-design/icons';
 import Draggable from 'react-draggable';
 import type { DraggableData, DraggableEvent } from 'react-draggable';
 import { GeneralSettings } from './tabs/GeneralSettings';
 import { SearchSettings } from './tabs/SearchSettings';
 import { WallpaperSettings } from './tabs/WallpaperSettings';
 import { DateTimeSettings } from './tabs/DateTimeSettings';
+import { DataSettings } from './tabs/DataSettings';
 import { AboutSettings } from './tabs/AboutSettings';
 
 interface SettingsPanelProps {
@@ -14,13 +15,14 @@ interface SettingsPanelProps {
   onClose: () => void;
 }
 
-type SettingsTab = 'general' | 'search' | 'wallpaper' | 'datetime' | 'about';
+type SettingsTab = 'general' | 'search' | 'wallpaper' | 'datetime' | 'data' | 'about';
 
 const menuItems = [
   { key: 'general', icon: <SettingOutlined />, label: '常规设置' },
   { key: 'search', icon: <SearchOutlined />, label: '搜索设置' },
   { key: 'wallpaper', icon: <PictureOutlined />, label: '壁纸设置' },
   { key: 'datetime', icon: <ClockCircleOutlined />, label: '时间日期' },
+  { key: 'data', icon: <DatabaseOutlined />, label: '数据管理' },
   { key: 'about', icon: <InfoCircleOutlined />, label: '关于我们' },
 ];
 
@@ -48,6 +50,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
     search: <SearchSettings />,
     wallpaper: <WallpaperSettings />,
     datetime: <DateTimeSettings />,
+    data: <DataSettings />,
     about: <AboutSettings />,
   };
 
