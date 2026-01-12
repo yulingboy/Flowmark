@@ -6,7 +6,7 @@ import { ShortcutCard } from './ShortcutCard';
 import { ShortcutFolder } from './ShortcutFolder';
 import { FolderPopup } from './FolderPopup';
 import { PluginCard } from '@/plugins';
-import { getItemSize, canResizeItem, GridManager, pixelToGrid, getGridSpan } from '../utils/gridUtils';
+import { getItemSize, canResizeItem, GridManager, pixelToGrid, getGridSpan, TEXT_HEIGHT } from '../utils/gridUtils';
 import { useShortcutItems } from '../hooks/useShortcutItems';
 import { createDragHandlers } from '../hooks/useDragHandlers';
 import { createFolderHandlers } from '../hooks/useFolderHandlers';
@@ -96,8 +96,9 @@ export function ShortcutsContainer({
     onShortcutsChange?.(newItems);
   };
 
-  const containerWidth = columns * unit + (columns - 1) * gap;
-  const containerHeight = rows * unit + (rows - 1) * gap;
+  const hGap = gap + TEXT_HEIGHT;  // 水平间距包含文字高度
+  const containerWidth = columns * unit + (columns - 1) * hGap;
+  const containerHeight = rows * (unit + TEXT_HEIGHT) + (rows - 1) * gap;
 
   return (
     <div className={`relative ${className}`}>
