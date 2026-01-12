@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "新标签页",
+  "name": "Flowmark",
   "version": "1.0.0",
-  "description": "一个美观、可定制的浏览器新标签页",
+  "description": "简洁高效的浏览器起始页",
   "icons": {
     "128": "icons/icon.svg"
   },
