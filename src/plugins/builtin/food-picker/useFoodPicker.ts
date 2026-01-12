@@ -57,7 +57,7 @@ export function useFoodPicker() {
       ? config.enabledCategories.filter(id => id !== categoryId)
       : [...config.enabledCategories, categoryId];
     
-    usePluginStore.getState().setPluginConfig(PLUGIN_ID, 'enabledCategories', newEnabled);
+    usePluginStore.getState().setPluginConfig(PLUGIN_ID, { enabledCategories: newEnabled });
   }, [config.enabledCategories]);
 
   return {

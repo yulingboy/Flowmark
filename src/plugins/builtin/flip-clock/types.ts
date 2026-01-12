@@ -56,7 +56,12 @@ export async function getLunarDate(): Promise<string> {
     const now = new Date();
     const solar = SolarDay.fromYmd(now.getFullYear(), now.getMonth() + 1, now.getDate());
     const lunar = solar.getLunarDay();
-    return `${lunar.getMonth().getName()}${lunar.getName()}`;
+    const month = lunar.getMonth();
+    const monthName = typeof month === 'object' && month !== null && 'getName' in month 
+      ? (month as { getName: () => string }).getName() 
+      : LUNAR_MONTHS[now.getMonth() % 12];
+    const dayName = typeof lunar.getName === 'function' ? lunar.getName() : LUNAR_DAYS[(now.getDate() - 1) % 30];
+    return `${monthName}月${dayName}`;
   } catch {
     // 简化版本：显示固定格式
     const now = new Date();

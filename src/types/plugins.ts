@@ -21,7 +21,7 @@ export interface PluginConfig {
 
 // 配置项 Schema
 export interface PluginConfigSchemaItem {
-  type: 'string' | 'number' | 'boolean' | 'select';
+  type: 'string' | 'number' | 'boolean' | 'select' | 'multiselect';
   label: string;
   default: unknown;
   options?: Array<{ label: string; value: unknown }>;
