@@ -1,7 +1,7 @@
 import { useRef, useState, useCallback, useMemo, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { SearchOutlined, ClockCircleOutlined, CloseCircleOutlined, LinkOutlined } from '@ant-design/icons';
 import { performSearch, SEARCH_ENGINE_ICONS } from '../utils/search';
-import { useSearchStore } from '@/features/settings/store/searchStore';
+import { useSearchStore } from '../store/searchStore';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useClickOutside } from '@/hooks/useClickOutside';
 

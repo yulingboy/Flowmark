@@ -1,5 +1,5 @@
-import { GridManager, pixelToGrid, gridToPixel, findValidPositionInBounds } from '../utils/gridUtils';
-import type { GridConfig } from '../utils/gridUtils';
+import { GridManager, pixelToGrid, gridToPixel, findValidPositionInBounds } from '@/utils/gridUtils';
+import type { GridConfig } from '@/utils/gridUtils';
 import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, ShortcutSize, GridItem } from '@/types';
 import { isShortcutFolder } from '@/types';
 

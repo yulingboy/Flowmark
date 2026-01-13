@@ -1,4 +1,4 @@
-import type { PluginAPI, PluginConfig } from '../types';
+import type { PluginAPI, PluginConfig } from '@/types';
 import { usePluginStore } from '../store';
 
 export function createPluginAPI(pluginId: string, defaultConfig?: PluginConfig): PluginAPI {

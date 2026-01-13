@@ -1,4 +1,4 @@
-import type { Plugin, PluginAPI, PluginConfig } from '../types';
+import type { Plugin, PluginAPI, PluginConfig } from '@/types';
 import { usePluginStore } from '../store';
 import { createPluginAPI } from './pluginAPI';
 

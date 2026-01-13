@@ -1,5 +1,5 @@
 import { RefreshCw, Quote } from 'lucide-react';
-import type { PluginSize } from '../../types';
+import type { PluginSize } from '@/types';
 import { useHitokoto } from './useHitokoto';
 import { getTypeName } from './types';
 

@@ -1,5 +1,5 @@
 import { Play, Pause, RotateCcw, Timer } from 'lucide-react';
-import type { PluginSize } from '../../types';
+import type { PluginSize } from '@/types';
 import { usePomodoro } from './usePomodoro';
 import { formatTime, STATUS_NAMES, STATUS_COLORS, STATUS_ACCENT } from './types';
 

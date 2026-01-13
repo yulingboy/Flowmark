@@ -1,5 +1,5 @@
 import { Check, Target, Plus, Minus } from 'lucide-react';
-import type { PluginSize } from '../../types';
+import type { PluginSize } from '@/types';
 import { useHabit } from './useHabit';
 import type { Habit } from './types';
 import { getStreak, isHabitCompleted, getHabitProgress } from './types';

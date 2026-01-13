@@ -68,6 +68,7 @@ export function getItemSize(item: GridItem, unit: number, gap: number): { width:
   };
 }
 
+
 /**
  * 将像素坐标转换为网格坐标
  * @param x 像素 X 坐标
@@ -221,6 +222,7 @@ export function findValidPositionInBounds(
   
   return null;
 }
+
 
 /**
  * 网格管理器 - 用于管理网格布局中的卡片位置和碰撞检测

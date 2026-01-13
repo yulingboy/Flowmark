@@ -1,6 +1,6 @@
 import { Image } from 'lucide-react';
-import { useBackgroundStore } from '@/features/settings/store/backgroundStore';
-import type { PluginSize } from '../../types';
+import { useBackgroundStore } from '@/components/Background';
+import type { PluginSize } from '@/types';
 
 interface WallpaperCardProps {
   size: PluginSize;

@@ -1,6 +1,6 @@
 import { Badge, List, Card, Empty } from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
-import type { PluginSize } from '../../types';
+import type { PluginSize } from '@/types';
 import { useNotes } from './useNotes';
 
 // 卡片视图

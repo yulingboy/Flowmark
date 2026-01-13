@@ -1,6 +1,6 @@
 import { pluginManager } from '../core/pluginManager';
 import { useShortcutsStore } from '@/features/shortcuts';
-import { isPluginCard } from '../types';
+import { isPluginCard } from '@/types';
 import { weatherPlugin } from './weather';
 import { todoPlugin } from './todo';
 import { notesPlugin } from './notes';

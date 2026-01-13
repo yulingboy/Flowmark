@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { message } from 'antd';
 import { Clock } from '@/features/clock';
-import { Search } from '@/features/search';
+import { Search, useSearchStore } from '@/features/search';
 import { ShortcutsContainer, AddShortcutModal, AddFolderModal, BatchEditToolbar, useShortcutsStore } from '@/features/shortcuts';
-import { SettingsButton, SettingsPanel, WallpaperModal, useGeneralStore, useBackgroundStore, useSearchStore } from '@/features/settings';
-import { Background } from '@/components/Background/Background';
+import { SettingsButton, SettingsPanel, WallpaperModal, useGeneralStore } from '@/features/settings';
+import { Background, useBackgroundStore } from '@/components/Background';
 import { ContextMenu, ErrorBoundary } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
 import { PlusSquareOutlined, FolderOutlined, ReloadOutlined, EditOutlined, SettingOutlined } from '@ant-design/icons';

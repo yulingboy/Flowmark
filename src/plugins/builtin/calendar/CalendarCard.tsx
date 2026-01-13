@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { SolarDay } from 'tyme4ts';
-import type { PluginSize } from '../../types';
+import type { PluginSize } from '@/types';
 
 /** 农历月份名称 */
 const LUNAR_MONTH_NAMES = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '腊'];

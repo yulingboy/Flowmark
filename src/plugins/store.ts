@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { PluginConfig } from './types';
+import type { PluginConfig } from '@/types';
 
 interface PluginState {
   pluginConfigs: Record<string, PluginConfig>;

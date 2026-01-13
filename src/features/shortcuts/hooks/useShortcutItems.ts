@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { GridManager, pixelToGrid, gridToPixel, getGridSpan } from '../utils/gridUtils';
+import { GridManager, pixelToGrid, gridToPixel, getGridSpan } from '@/utils/gridUtils';
 import type { GridItem } from '@/types';
 
 interface UseShortcutItemsOptions {

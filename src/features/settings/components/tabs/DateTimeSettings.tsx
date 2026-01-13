@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Radio, ColorPicker, Button, Switch } from 'antd';
-import { useClockStore } from '../../store/clockStore';
+import { useClockStore } from '@/features/clock';
 
 // 将 SettingRow 移到组件外部
 function SettingRow({ label, children }: { label: string; children: React.ReactNode }) {

@@ -3,6 +3,10 @@ export { MacModal } from './MacModal';
 export { ContextMenu } from './ContextMenu';
 export type { ContextMenuItem } from './ContextMenu';
 
+// Modal 行为 Hook
+export { useModalBehavior } from './Modal/useModalBehavior';
+export type { UseModalBehaviorOptions, UseModalBehaviorResult } from './Modal/useModalBehavior';
+
 // 图标库
 export * from './icons';
 

@@ -1,12 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 import { pluginManager } from '../core/pluginManager';
 import { ContextMenu, MacModal } from '@/components/common';
 import type { ContextMenuItem } from '@/components/common';
 import { LayoutIcon } from '@/components/common/icons';
-import type { PluginCardItem, PluginSize, CardSize } from '../types';
-import type { Position, ShortcutSize } from '@/types';
-import { pixelToGrid, getValidSizesForPosition, ALL_SIZES } from '@/features/shortcuts/utils/gridUtils';
+import type { PluginCardItem, PluginSize, CardSize, Position, ShortcutSize } from '@/types';
+import { useCardBehavior } from '@/features/shortcuts/hooks/useCardBehavior';
 
 interface GridConfig {
   columns: number;
@@ -39,21 +38,37 @@ export function PluginCard({
   position
 }: PluginCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [contextMenu, setContextMenu] = useState<{ isOpen: boolean; x: number; y: number }>({
-    isOpen: false, x: 0, y: 0,
-  });
 
   const plugin = pluginManager.getPlugin(item.pluginId);
   const api = pluginManager.getPluginAPI(item.pluginId);
   const isSystem = plugin?.isSystem === true;
 
-  // 计算禁用的布局选项
-  const disabledLayouts = useMemo(() => {
-    if (!gridConfig || !position) return [];
-    const { col, row } = pixelToGrid(position.x, position.y, gridConfig.unit, gridConfig.gap);
-    const validSizes = getValidSizesForPosition(col, row, gridConfig.columns, gridConfig.rows, item.size as ShortcutSize);
-    return ALL_SIZES.filter(size => !validSizes.includes(size));
-  }, [gridConfig, position, item.size]);
+  // 使用 useCardBehavior hook
+  const {
+    contextMenu,
+    handleContextMenu: baseHandleContextMenu,
+    closeContextMenu,
+    disabledLayouts,
+    handleBatchClick,
+    cardContainerClassName,
+    selectionIndicatorClassName,
+  } = useCardBehavior({
+    size: (item.size || '2x2') as ShortcutSize,
+    gridConfig,
+    position,
+    batchEditMode,
+    isSelected,
+    disableContextMenu: isSystem,
+  });
+
+  // 系统插件禁用右键菜单
+  const handleContextMenu = (e: React.MouseEvent) => {
+    if (isSystem) {
+      e.preventDefault();
+      return;
+    }
+    baseHandleContextMenu(e);
+  };
 
   if (!plugin || !api) {
     return (
@@ -64,23 +79,10 @@ export function PluginCard({
   }
 
   const handleClick = () => {
-    if (batchEditMode) {
-      onToggleSelect?.(item.id);
-      return;
-    }
+    if (handleBatchClick(onToggleSelect, item.id)) return;
     if (plugin.renderModal) {
       setIsModalOpen(true);
     }
-  };
-
-  const handleContextMenu = (e: React.MouseEvent) => {
-    if (batchEditMode || isSystem) {
-      e.preventDefault();
-      return;
-    }
-    e.preventDefault();
-    e.stopPropagation();
-    setContextMenu({ isOpen: true, x: e.clientX, y: e.clientY });
   };
 
   const supportedSizes = plugin.supportedSizes || ['1x1', '2x2'];
@@ -119,9 +121,9 @@ export function PluginCard({
         onContextMenu={handleContextMenu}
         className={`flex flex-col items-center gap-2 cursor-pointer group w-full h-full ${className}`}
       >
-        <div className={`w-full flex-1 rounded-2xl overflow-hidden bg-white shadow-lg group-hover:scale-105 transition-transform relative ${batchEditMode && isSelected ? 'ring-2 ring-blue-500' : ''}`}>
+        <div className={cardContainerClassName}>
           {batchEditMode && (
-            <div className={`absolute top-1 left-1 w-5 h-5 rounded-full border-2 flex items-center justify-center z-10 ${isSelected ? 'bg-blue-500 border-blue-500' : 'bg-white/80 border-gray-300'}`}>
+            <div className={selectionIndicatorClassName}>
               {isSelected && (
                 <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" className="w-3 h-3">
                   <polyline points="20 6 9 17 4 12" />
@@ -149,7 +151,7 @@ export function PluginCard({
         isOpen={contextMenu.isOpen}
         position={{ x: contextMenu.x, y: contextMenu.y }}
         items={contextMenuItems}
-        onClose={() => setContextMenu(prev => ({ ...prev, isOpen: false }))}
+        onClose={closeContextMenu}
       />
 
       <MacModal

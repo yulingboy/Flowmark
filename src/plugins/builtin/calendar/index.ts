@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Plugin, PluginSize } from '../../types';
+import type { Plugin, PluginSize } from '@/types';
 import { CalendarCard } from './CalendarCard';
 import { CalendarModal } from './CalendarModal';
 

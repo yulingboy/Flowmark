@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Plugin, PluginSize } from '../../types';
+import type { Plugin, PluginSize } from '@/types';
 import { FlipClockCard } from './FlipClockCard';
 import { FlipClockModal } from './FlipClockModal';
 

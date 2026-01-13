@@ -5,7 +5,9 @@ export { pluginManager } from './core/pluginManager';
 export { usePluginStore } from './store';
 export { registerBuiltinPlugins } from './builtin';
 export { PluginCard } from './components/PluginCard';
-export { isPluginCard } from './types';
+
+// 类型从 @/types 重导出，保持向后兼容
+export { isPluginCard } from '@/types';
 export type { 
   Plugin, 
   PluginAPI, 
@@ -14,4 +16,4 @@ export type {
   PluginCardItem,
   PluginSize,
   CardSize
-} from './types';
+} from '@/types';

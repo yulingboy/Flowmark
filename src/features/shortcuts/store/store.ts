@@ -8,7 +8,7 @@ import { SHORTCUTS_LIMIT } from './types';
 import type { ShortcutsState } from './types';
 import { validateAndRepairShortcuts } from './validation';
 import { createFolder, defaultShortcuts } from './defaults';
-import { GridManager, getGridSpan, gridToPixel } from '../utils/gridUtils';
+import { GridManager, getGridSpan, gridToPixel } from '@/utils/gridUtils';
 
 export const useShortcutsStore = create<ShortcutsState>()(
   persist(

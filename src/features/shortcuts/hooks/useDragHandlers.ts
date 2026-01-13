@@ -1,5 +1,5 @@
 import type { DragStartEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
-import { GridManager, pixelToGrid, gridToPixel, getGridSpan } from '../utils/gridUtils';
+import { GridManager, pixelToGrid, gridToPixel, getGridSpan } from '@/utils/gridUtils';
 import type { ShortcutItem, GridItem } from '@/types';
 import { isShortcutFolder, isPluginCard } from '@/types';
 

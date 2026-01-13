@@ -1,6 +1,6 @@
 import { Badge, List, Tag, Empty } from 'antd';
 import { CheckCircleOutlined } from '@ant-design/icons';
-import type { PluginSize } from '../../types';
+import type { PluginSize } from '@/types';
 import { useTodos } from './useTodos';
 
 export function TodoCard({ size }: { size: PluginSize }) {

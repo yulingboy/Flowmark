@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { Modal, Tabs, Input, Button, Slider } from 'antd';
 import { UploadOutlined, CheckOutlined } from '@ant-design/icons';
-import { useBackgroundStore } from '../store/backgroundStore';
+import { useBackgroundStore } from '@/components/Background';
 import { PRESET_WALLPAPERS } from '@/constants';
 
 interface WallpaperModalProps {

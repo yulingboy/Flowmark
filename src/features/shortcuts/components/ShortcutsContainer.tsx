@@ -6,7 +6,7 @@ import { ShortcutCard } from './ShortcutCard';
 import { ShortcutFolder } from './ShortcutFolder';
 import { FolderPopup } from './FolderPopup';
 import { PluginCard } from '@/plugins';
-import { getItemSize, canResizeItem, GridManager, pixelToGrid, getGridSpan, TEXT_HEIGHT } from '../utils/gridUtils';
+import { getItemSize, canResizeItem, GridManager, pixelToGrid, getGridSpan, TEXT_HEIGHT } from '@/utils/gridUtils';
 import { useShortcutItems } from '../hooks/useShortcutItems';
 import { createDragHandlers } from '../hooks/useDragHandlers';
 import { createFolderHandlers } from '../hooks/useFolderHandlers';

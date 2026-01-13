@@ -1,5 +1,5 @@
 import { Shuffle } from 'lucide-react';
-import type { PluginSize } from '../../types';
+import type { PluginSize } from '@/types';
 import { useFoodPicker } from './useFoodPicker';
 
 export function FoodPickerCard({ size }: { size: PluginSize }) {

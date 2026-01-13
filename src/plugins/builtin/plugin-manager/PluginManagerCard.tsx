@@ -1,5 +1,5 @@
 import { Package } from 'lucide-react';
-import type { PluginSize } from '../../types';
+import type { PluginSize } from '@/types';
 
 export function PluginManagerCard({ size }: { size: PluginSize }) {
   if (size === '1x1') {

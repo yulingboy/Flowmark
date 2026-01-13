@@ -2,8 +2,8 @@ import { Button, Empty } from 'antd';
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import { pluginManager } from '../../core/pluginManager';
 import { useShortcutsStore } from '@/features/shortcuts';
-import { isPluginCard } from '../../types';
-import type { Plugin, PluginSize } from '../../types';
+import { isPluginCard } from '@/types';
+import type { Plugin, PluginSize } from '@/types';
 
 function PluginItem({ plugin }: { plugin: Plugin }) {
   const shortcuts = useShortcutsStore(state => state.shortcuts);

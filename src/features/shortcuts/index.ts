@@ -18,9 +18,12 @@ export { SHORTCUTS_LIMIT } from './store/types';
 // Utils
 export { getFaviconUrl, getFaviconUrlAsync, generatePlaceholder, preloadFavicons, clearFaviconCache, getCacheStats } from './utils/faviconService';
 export { extractSiteInfo, SITE_INFO } from './utils/siteInfo';
-export { getGridSpan, getItemSize, pixelToGrid, gridToPixel, GridManager, getValidSizesForPosition, ALL_SIZES, TEXT_HEIGHT } from './utils/gridUtils';
+// Grid utils re-exported from @/utils for backward compatibility
+export { getGridSpan, getItemSize, pixelToGrid, gridToPixel, GridManager, getValidSizesForPosition, ALL_SIZES, TEXT_HEIGHT } from '@/utils/gridUtils';
 
 // Hooks
 export { useShortcutItems } from './hooks/useShortcutItems';
 export { createDragHandlers } from './hooks/useDragHandlers';
 export { createFolderHandlers } from './hooks/useFolderHandlers';
+export { useCardBehavior } from './hooks/useCardBehavior';
+export type { UseCardBehaviorOptions, UseCardBehaviorResult } from './hooks/useCardBehavior';

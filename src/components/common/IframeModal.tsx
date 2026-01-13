@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Spin } from 'antd';
+import { useModalBehavior } from './Modal/useModalBehavior';
 
 // 位置缓存
 interface ModalPosition {
@@ -49,18 +50,43 @@ export function IframeModal({
   minSize = { width: SIZE_CONSTRAINTS.minWidth, height: SIZE_CONSTRAINTS.minHeight },
   maxSize = { width: SIZE_CONSTRAINTS.maxWidth, height: SIZE_CONSTRAINTS.maxHeight },
 }: IframeModalProps) {
-  const modalRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
   const [size, setSize] = useState({ width: 900, height: 600 });
-  const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const dragStartRef = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
   const resizeStartRef = useRef({ x: 0, y: 0, width: 0, height: 0 });
   const originalOverflowRef = useRef<string>('');
 
+  // 计算初始位置（从缓存恢复）
+  const initialPosition = useMemo(() => {
+    if (rememberPosition) {
+      const cacheKey = getCacheKey(url);
+      const cached = positionCache.get(cacheKey);
+      if (cached) {
+        return { x: cached.x, y: cached.y };
+      }
+    }
+    return { x: 0, y: 0 };
+  }, [url, rememberPosition]);
+
+  // 使用 useModalBehavior hook
+  const {
+    position,
+    setPosition,
+    isFullscreen,
+    setIsFullscreen,
+    handlePointerDown,
+    modalRef,
+    isDragging,
+  } = useModalBehavior({
+    isOpen,
+    onClose,
+    enableDrag: true,
+    enableFullscreen: true,
+    enableClickOutside: !isResizing, // resize 时不关闭
+    enableEscapeKey: true,
+    initialPosition,
+  });
 
   // Body 滚动锁定
   useEffect(() => {
@@ -76,37 +102,25 @@ export function IframeModal({
     };
   }, [isOpen]);
 
-  // 打开时恢复位置或重置 - 使用 useMemo 计算初始值
-  const initialState = useMemo(() => {
-    if (!isOpen) return null;
-    
-    if (rememberPosition) {
-      const cacheKey = getCacheKey(url);
-      const cached = positionCache.get(cacheKey);
-      if (cached) {
-        return {
-          position: { x: cached.x, y: cached.y },
-          size: { width: cached.width, height: cached.height }
-        };
-      }
-    }
-    return {
-      position: { x: 0, y: 0 },
-      size: { width: 900, height: 600 }
-    };
-  }, [isOpen, url, rememberPosition]);
-
-  // 当 isOpen 变化时更新状态
+  // 打开时恢复尺寸
   const prevIsOpenRef = useRef(isOpen);
   useEffect(() => {
-    if (isOpen && !prevIsOpenRef.current && initialState) {
+    if (isOpen && !prevIsOpenRef.current) {
       setIsLoading(true);
-      setPosition(initialState.position);
-      setSize(initialState.size);
+      if (rememberPosition) {
+        const cacheKey = getCacheKey(url);
+        const cached = positionCache.get(cacheKey);
+        if (cached) {
+          setSize({ width: cached.width, height: cached.height });
+        } else {
+          setSize({ width: 900, height: 600 });
+        }
+      } else {
+        setSize({ width: 900, height: 600 });
+      }
     }
     prevIsOpenRef.current = isOpen;
-     
-  }, [isOpen, initialState]);
+  }, [isOpen, url, rememberPosition]);
 
   // 保存位置到缓存
   const savePosition = useCallback(() => {
@@ -121,35 +135,14 @@ export function IframeModal({
     }
   }, [rememberPosition, url, position, size, isFullscreen]);
 
-  // 拖拽处理
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    if (isFullscreen) return;
-    e.stopPropagation();
-    setIsDragging(true);
-    dragStartRef.current = { x: e.clientX, y: e.clientY, posX: position.x, posY: position.y };
-  }, [isFullscreen, position]);
-
+  // 拖拽结束时保存位置
   useEffect(() => {
-    if (!isDragging) return;
-    const handleMouseMove = (e: MouseEvent) => {
-      setPosition({
-        x: dragStartRef.current.posX + (e.clientX - dragStartRef.current.x),
-        y: dragStartRef.current.posY + (e.clientY - dragStartRef.current.y),
-      });
-    };
-    const handleMouseUp = () => {
-      setIsDragging(false);
+    if (!isDragging) {
       savePosition();
-    };
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
+    }
   }, [isDragging, savePosition]);
 
-  // 调整大小处理
+  // 调整大小处理（IframeModal 特有逻辑）
   const handleResizeStart = useCallback((e: React.PointerEvent) => {
     if (isFullscreen) return;
     e.stopPropagation();
@@ -178,32 +171,6 @@ export function IframeModal({
       document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [isResizing, minSize, maxSize, savePosition]);
-
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (isFullscreen) {
-          setIsFullscreen(false);
-        } else {
-          onClose();
-        }
-      }
-    };
-    if (isOpen) document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose, isFullscreen]);
-
-  // 点击外部关闭
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (!isDragging && !isResizing && modalRef.current && !modalRef.current.contains(e.target as Node)) {
-        onClose();
-      }
-    };
-    if (isOpen && !isFullscreen) document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen, onClose, isFullscreen, isDragging, isResizing]);
 
   const handleRefresh = () => {
     if (iframeRef.current) { setIsLoading(true); iframeRef.current.src = url; }

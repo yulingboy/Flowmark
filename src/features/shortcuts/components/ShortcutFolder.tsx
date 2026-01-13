@@ -5,7 +5,7 @@ import type { ContextMenuItem } from '@/components/common';
 import { DeleteOutlined } from '@ant-design/icons';
 import { LayoutIcon, UnfoldIcon, EmptyFolderIcon } from '@/components/common/icons';
 import { useShortcutsStore } from '../store';
-import { pixelToGrid, getValidSizesForPosition } from '../utils/gridUtils';
+import { pixelToGrid, getValidSizesForPosition } from '@/utils/gridUtils';
 
 interface GridConfig {
   columns: number;

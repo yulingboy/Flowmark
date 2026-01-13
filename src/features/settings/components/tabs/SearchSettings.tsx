@@ -1,5 +1,5 @@
 import { Button, Switch } from 'antd';
-import { useSearchStore } from '../../store/searchStore';
+import { useSearchStore } from '@/features/search';
 import { SEARCH_ENGINE_ICONS } from '@/features/search/utils/search';
 import { SettingRow } from '../SettingRow';
 import type { SearchEngine } from '@/types';

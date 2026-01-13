@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Plugin } from '../../types';
+import type { Plugin } from '@/types';
 import { PluginManagerCard } from './PluginManagerCard';
 import { PluginManagerModal } from './PluginManagerModal';
 

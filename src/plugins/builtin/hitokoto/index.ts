@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Plugin, PluginSize } from '../../types';
+import type { Plugin, PluginSize } from '@/types';
 import { HitokotoCard } from './HitokotoCard';
 import { HitokotoModal } from './HitokotoModal';
 import { HITOKOTO_TYPES } from './types';

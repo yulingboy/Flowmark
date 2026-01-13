@@ -3,3 +3,6 @@ export { Clock } from './components/Clock';
 export { useClock } from './hooks/useClock';
 export { formatTime, formatDate, formatYear, getWeekday, getLunarDate } from './utils/clock';
 export { formatCacheAge } from './utils/formatTime';
+
+// Store
+export { useClockStore } from './store/clockStore';

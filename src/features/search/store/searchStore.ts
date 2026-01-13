@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { SearchEngine } from '@/types';
-import { addToHistory, removeFromHistory } from '@/features/search/utils/searchHistory';
+import { addToHistory, removeFromHistory } from '../utils/searchHistory';
 import { DEFAULTS } from '@/constants';
 
 interface SearchState {

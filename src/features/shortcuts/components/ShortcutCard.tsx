@@ -6,7 +6,7 @@ import type { ContextMenuItem } from '@/components/common';
 import { EditOutlined, DeleteOutlined, FolderOutlined, RightOutlined } from '@ant-design/icons';
 import { OpenTabIcon, LayoutIcon, OpenModeIndicator } from '@/components/common/icons';
 import { useShortcutsStore } from '../store';
-import { pixelToGrid, getValidSizesForPosition, ALL_SIZES } from '../utils/gridUtils';
+import { useCardBehavior } from '../hooks/useCardBehavior';
 
 interface GridConfig {
   columns: number;
@@ -31,18 +31,27 @@ interface ShortcutCardProps {
 
 export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, className = '', batchEditMode = false, isSelected = false, onToggleSelect, gridConfig, position }: ShortcutCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [contextMenu, setContextMenu] = useState<{ isOpen: boolean; x: number; y: number }>({ isOpen: false, x: 0, y: 0 });
   const shortcuts = useShortcutsStore((state) => state.shortcuts);
   const moveToFolder = useShortcutsStore((state) => state.moveToFolder);
   const isPopupMode = item.openMode === 'popup';
   const is1x1 = (item.size || '1x1') === '1x1';
 
-  const disabledLayouts = useMemo(() => {
-    if (!gridConfig || !position) return [];
-    const { col, row } = pixelToGrid(position.x, position.y, gridConfig.unit, gridConfig.gap);
-    const validSizes = getValidSizesForPosition(col, row, gridConfig.columns, gridConfig.rows, item.size);
-    return ALL_SIZES.filter(size => !validSizes.includes(size));
-  }, [gridConfig, position, item.size]);
+  // 使用 useCardBehavior hook
+  const {
+    contextMenu,
+    handleContextMenu,
+    closeContextMenu,
+    disabledLayouts,
+    handleBatchClick,
+    cardContainerClassName,
+    selectionIndicatorClassName,
+  } = useCardBehavior({
+    size: item.size || '1x1',
+    gridConfig,
+    position,
+    batchEditMode,
+    isSelected,
+  });
 
   const iconStyle = is1x1
     ? { className: 'w-full h-full object-cover', style: {} }
@@ -54,16 +63,9 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
   );
 
   const handleClick = () => {
-    if (batchEditMode) { onToggleSelect?.(item.id); return; }
+    if (handleBatchClick(onToggleSelect, item.id)) return;
     if (onClick) { onClick(item); return; }
     if (isPopupMode) { setIsModalOpen(true); } else { window.open(item.url, '_blank'); }
-  };
-
-  const handleContextMenu = (e: React.MouseEvent) => {
-    if (batchEditMode) { e.preventDefault(); return; }
-    e.preventDefault();
-    e.stopPropagation();
-    setContextMenu({ isOpen: true, x: e.clientX, y: e.clientY });
   };
 
   const contextMenuItems: ContextMenuItem[] = [
@@ -80,9 +82,9 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
     <>
       <button onClick={handleClick} onContextMenu={handleContextMenu}
         className={`flex flex-col items-center gap-2 cursor-pointer group w-full h-full ${className}`}>
-        <div className={`w-full flex-1 rounded-2xl overflow-hidden bg-white shadow-lg flex items-center justify-center group-hover:scale-105 transition-transform relative ${batchEditMode && isSelected ? 'ring-2 ring-blue-500' : ''}`}>
+        <div className={`${cardContainerClassName} flex items-center justify-center`}>
           {batchEditMode && (
-            <div className={`absolute top-1 left-1 w-5 h-5 rounded-full border-2 flex items-center justify-center z-10 ${isSelected ? 'bg-blue-500 border-blue-500' : 'bg-white/80 border-gray-300'}`}>
+            <div className={selectionIndicatorClassName}>
               {isSelected && <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" className="w-3 h-3"><polyline points="20 6 9 17 4 12" /></svg>}
             </div>
           )}
@@ -93,7 +95,7 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
         <span className="text-white text-xs truncate drop-shadow w-full text-center flex-shrink-0">{item.name}</span>
       </button>
       <ContextMenu isOpen={contextMenu.isOpen} position={{ x: contextMenu.x, y: contextMenu.y }} items={contextMenuItems}
-        onClose={() => setContextMenu(prev => ({ ...prev, isOpen: false }))} />
+        onClose={closeContextMenu} />
       <IframeModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} url={item.url} title={item.name} />
     </>
   );

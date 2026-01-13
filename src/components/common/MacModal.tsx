@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, useCallback, type ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { useModalBehavior } from './Modal/useModalBehavior';
 
 interface MacModalProps {
   isOpen: boolean;
@@ -18,82 +19,34 @@ export function MacModal({
   width = 400,
   height = 500
 }: MacModalProps) {
-  const modalRef = useRef<HTMLDivElement>(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStartRef = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
+  const {
+    position,
+    isFullscreen,
+    setIsFullscreen,
+    toggleFullscreen,
+    handlePointerDown,
+    modalRef,
+  } = useModalBehavior({
+    isOpen,
+    onClose,
+    enableDrag: true,
+    enableFullscreen: true,
+    enableClickOutside: true,
+    enableEscapeKey: true,
+  });
 
-  // 重置状态 - 使用 ref 追踪
-  const prevIsOpenRef = useRef(isOpen);
+  // 阻止全局右键菜单（MacModal 特有逻辑）
   useEffect(() => {
-    if (isOpen && !prevIsOpenRef.current) {
-      setPosition({ x: 0, y: 0 });
-      setIsFullscreen(false);
-    }
-    prevIsOpenRef.current = isOpen;
-     
-  }, [isOpen]);
-
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    if (isFullscreen) return;
-    e.stopPropagation();
-    setIsDragging(true);
-    dragStartRef.current = { x: e.clientX, y: e.clientY, posX: position.x, posY: position.y };
-  }, [isFullscreen, position]);
-
-  useEffect(() => {
-    if (!isDragging) return;
-    const handleMouseMove = (e: MouseEvent) => {
-      setPosition({
-        x: dragStartRef.current.posX + (e.clientX - dragStartRef.current.x),
-        y: dragStartRef.current.posY + (e.clientY - dragStartRef.current.y),
-      });
-    };
-    const handleMouseUp = () => setIsDragging(false);
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (isFullscreen) {
-          setIsFullscreen(false);
-        } else {
-          onClose();
-        }
-      }
-    };
-    // 阻止全局右键菜单
     const handleContextMenu = (e: MouseEvent) => {
       e.preventDefault();
     };
     if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
       document.addEventListener('contextmenu', handleContextMenu, true);
     }
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('contextmenu', handleContextMenu, true);
     };
-  }, [isOpen, onClose, isFullscreen]);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      // 只响应左键点击 (button === 0)，忽略右键 (button === 2)
-      if (e.button !== 0) return;
-      if (!isDragging && modalRef.current && !modalRef.current.contains(e.target as Node)) {
-        onClose();
-      }
-    };
-    if (isOpen && !isFullscreen) document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen, onClose, isFullscreen, isDragging]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -133,7 +86,7 @@ export function MacModal({
               title="最小化" 
             />
             <button 
-              onClick={() => setIsFullscreen(!isFullscreen)} 
+              onClick={toggleFullscreen} 
               className="w-3 h-3 rounded-full bg-[#28c840] hover:bg-[#1db954] border-none cursor-pointer" 
               title={isFullscreen ? '退出全屏' : '全屏'} 
             />

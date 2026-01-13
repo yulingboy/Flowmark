@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { PluginSize } from '../../types';
+import type { PluginSize } from '@/types';
 import { useFlipClock } from './useFlipClock';
 import './flip-clock.css';
 

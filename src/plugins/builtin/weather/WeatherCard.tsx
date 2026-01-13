@@ -1,5 +1,5 @@
 import { RefreshCw } from 'lucide-react';
-import type { PluginSize } from '../../types';
+import type { PluginSize } from '@/types';
 import { useWeather } from './useWeather';
 import { WeatherIcon } from './WeatherIcons';
 
