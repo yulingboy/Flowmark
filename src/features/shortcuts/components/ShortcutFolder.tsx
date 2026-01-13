@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
 import type { ShortcutFolder as ShortcutFolderType, ShortcutSize, Position } from '@/types';
-import { ContextMenu } from '@/components/common';
-import type { ContextMenuItem } from '@/components/common';
+import { ContextMenu } from '@/components';
+import type { ContextMenuItem } from '@/components';
 import { DeleteOutlined } from '@ant-design/icons';
-import { LayoutIcon, UnfoldIcon, EmptyFolderIcon } from '@/components/common/icons';
+import { LayoutIcon, UnfoldIcon, EmptyFolderIcon } from '@/components/icons';
 import { useShortcutsStore } from '../store';
 import { pixelToGrid, getValidSizesForPosition } from '@/utils/gridUtils';
 

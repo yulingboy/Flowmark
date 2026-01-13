@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import type { ShortcutFolder as ShortcutFolderType, ShortcutItem } from '@/types';
-import { IframeModal } from '@/components/common';
-import { OpenModeIndicator, EmptyFolderIcon } from '@/components/common/icons';
+import { IframeModal } from '@/components';
+import { OpenModeIndicator, EmptyFolderIcon } from '@/components/icons';
 
 interface FolderPopupProps {
   folder: ShortcutFolderType;

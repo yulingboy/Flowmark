@@ -5,10 +5,10 @@ import { Search, useSearchStore } from '@/features/search';
 import { ShortcutsContainer, AddShortcutModal, AddFolderModal, BatchEditToolbar, useShortcutsStore } from '@/features/shortcuts';
 import { SettingsButton, SettingsPanel, WallpaperModal, useGeneralStore } from '@/features/settings';
 import { Background, useBackgroundStore } from '@/features/background';
-import { ContextMenu, ErrorBoundary } from '@/components/common';
-import type { ContextMenuItem } from '@/components/common';
+import { ContextMenu, ErrorBoundary } from '@/components';
+import type { ContextMenuItem } from '@/components';
 import { PlusSquareOutlined, FolderOutlined, ReloadOutlined, EditOutlined, SettingOutlined } from '@ant-design/icons';
-import { WallpaperIcon } from '@/components/common/icons';
+import { WallpaperIcon } from '@/components/icons';
 import { registerBuiltinPlugins } from '@/plugins/builtin';
 import { useModals, useKeyboardShortcuts, useContextMenu } from '@/hooks';
 

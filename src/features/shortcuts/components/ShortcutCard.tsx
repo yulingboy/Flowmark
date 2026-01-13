@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react';
 import type { ShortcutItem, ShortcutSize, Position } from '@/types';
 import { isShortcutFolder } from '@/types';
-import { IframeModal, ContextMenu } from '@/components/common';
-import type { ContextMenuItem } from '@/components/common';
+import { IframeModal, ContextMenu } from '@/components';
+import type { ContextMenuItem } from '@/components';
 import { EditOutlined, DeleteOutlined, FolderOutlined, RightOutlined } from '@ant-design/icons';
-import { OpenTabIcon, LayoutIcon, OpenModeIndicator } from '@/components/common/icons';
+import { OpenTabIcon, LayoutIcon, OpenModeIndicator } from '@/components/icons';
 import { useShortcutsStore } from '../store';
 import { useCardBehavior } from '../hooks/useCardBehavior';
 

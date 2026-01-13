@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 import { pluginManager } from '../core/pluginManager';
-import { ContextMenu, MacModal } from '@/components/common';
-import type { ContextMenuItem } from '@/components/common';
-import { LayoutIcon } from '@/components/common/icons';
+import { ContextMenu, MacModal } from '@/components';
+import type { ContextMenuItem } from '@/components';
+import { LayoutIcon } from '@/components/icons';
 import type { PluginCardItem, PluginSize, CardSize, Position, ShortcutSize } from '@/types';
 import { useCardBehavior } from '@/features/shortcuts/hooks/useCardBehavior';
 
