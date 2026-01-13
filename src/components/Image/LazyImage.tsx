@@ -1,17 +1,6 @@
 import { memo } from 'react';
 import { useImageLoader } from '@/hooks/useImageLoader';
-
-export interface LazyImageProps {
-  src: string;
-  alt: string;
-  placeholder?: string;
-  fallback?: string;
-  className?: string;
-  style?: React.CSSProperties;
-  preload?: boolean;
-  onLoad?: () => void;
-  onError?: () => void;
-}
+import type { LazyImageProps, LazyBackgroundProps } from './types';
 
 /**
  * 懒加载图片组件
@@ -35,7 +24,6 @@ export const LazyImage = memo(function LazyImage({
     preload,
   });
 
-  // 触发回调
   if (!isLoading && !isError && onLoad) {
     onLoad();
   }
@@ -58,16 +46,6 @@ export const LazyImage = memo(function LazyImage({
  * 懒加载背景图片组件
  * 用于需要背景图的容器
  */
-export interface LazyBackgroundProps {
-  src: string;
-  placeholder?: string;
-  fallback?: string;
-  className?: string;
-  style?: React.CSSProperties;
-  preload?: boolean;
-  children?: React.ReactNode;
-}
-
 export const LazyBackground = memo(function LazyBackground({
   src,
   placeholder,

@@ -3,25 +3,7 @@ import { persist } from 'zustand/middleware';
 import type { SearchEngine } from '@/types';
 import { addToHistory, removeFromHistory } from '../utils/searchHistory';
 import { DEFAULTS } from '@/constants';
-
-interface SearchState {
-  searchEngine: SearchEngine;
-  searchInNewTab: boolean;
-  autoFocusSearch: boolean;
-  showSearchSuggestions: boolean;
-  searchHistoryEnabled: boolean;
-  searchHistory: string[];
-  
-  updateSearchEngine: (engine: SearchEngine) => void;
-  updateSearchInNewTab: (value: boolean) => void;
-  updateAutoFocusSearch: (value: boolean) => void;
-  updateShowSearchSuggestions: (value: boolean) => void;
-  updateSearchHistoryEnabled: (value: boolean) => void;
-  addSearchHistory: (query: string) => void;
-  removeSearchHistoryItem: (query: string) => void;
-  clearSearchHistory: () => void;
-  resetSearch: () => void;
-}
+import type { SearchState } from './types';
 
 const DEFAULT_SEARCH = {
   searchEngine: DEFAULTS.SEARCH_ENGINE as SearchEngine,

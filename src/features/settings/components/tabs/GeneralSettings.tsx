@@ -1,5 +1,5 @@
 import { Switch } from 'antd';
-import { useGeneralStore } from '../../store/generalStore';
+import { useGeneralStore } from '../../store';
 import { SettingRow } from '../SettingRow';
 
 export function GeneralSettings() {

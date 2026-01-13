@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { formatTime, formatDate, formatYear, getWeekday, getLunarDate } from '../utils/clock';
-import { useClockStore } from '../store/clockStore';
+import { useClockStore } from '../store';
 import { usePageVisibility } from '@/hooks/usePageVisibility';
 import type { ClockData } from '@/types';
 

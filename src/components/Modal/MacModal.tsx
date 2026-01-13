@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { useModalBehavior } from './Modal/useModalBehavior';
+import { useModalBehavior } from './useModalBehavior';
 
 interface MacModalProps {
   isOpen: boolean;
@@ -22,7 +22,6 @@ export function MacModal({
   const {
     position,
     isFullscreen,
-    setIsFullscreen,
     toggleFullscreen,
     handlePointerDown,
     modalRef,

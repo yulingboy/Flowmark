@@ -1,19 +1,11 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Spin } from 'antd';
-import { useModalBehavior } from './Modal/useModalBehavior';
-
-// 位置缓存
-interface ModalPosition {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
+import { useModalBehavior } from './useModalBehavior';
+import type { ModalPosition } from './types';
 
 const positionCache = new Map<string, ModalPosition>();
 
-// 尺寸约束
 const SIZE_CONSTRAINTS = {
   minWidth: 400,
   minHeight: 300,
@@ -21,7 +13,6 @@ const SIZE_CONSTRAINTS = {
   maxHeight: window.innerHeight - 100,
 };
 
-// 获取缓存键
 function getCacheKey(url: string): string {
   try {
     const urlObj = new URL(url);
@@ -57,7 +48,6 @@ export function IframeModal({
   const resizeStartRef = useRef({ x: 0, y: 0, width: 0, height: 0 });
   const originalOverflowRef = useRef<string>('');
 
-  // 计算初始位置（从缓存恢复）
   const initialPosition = useMemo(() => {
     if (rememberPosition) {
       const cacheKey = getCacheKey(url);
@@ -69,7 +59,6 @@ export function IframeModal({
     return { x: 0, y: 0 };
   }, [url, rememberPosition]);
 
-  // 使用 useModalBehavior hook
   const {
     position,
     setPosition,
@@ -83,12 +72,11 @@ export function IframeModal({
     onClose,
     enableDrag: true,
     enableFullscreen: true,
-    enableClickOutside: !isResizing, // resize 时不关闭
+    enableClickOutside: !isResizing,
     enableEscapeKey: true,
     initialPosition,
   });
 
-  // Body 滚动锁定
   useEffect(() => {
     if (isOpen) {
       originalOverflowRef.current = document.body.style.overflow;
@@ -96,13 +84,11 @@ export function IframeModal({
     } else {
       document.body.style.overflow = originalOverflowRef.current;
     }
-    
     return () => {
       document.body.style.overflow = originalOverflowRef.current;
     };
   }, [isOpen]);
 
-  // 打开时恢复尺寸
   const prevIsOpenRef = useRef(isOpen);
   useEffect(() => {
     if (isOpen && !prevIsOpenRef.current) {
@@ -122,7 +108,6 @@ export function IframeModal({
     prevIsOpenRef.current = isOpen;
   }, [isOpen, url, rememberPosition]);
 
-  // 保存位置到缓存
   const savePosition = useCallback(() => {
     if (rememberPosition && !isFullscreen) {
       const cacheKey = getCacheKey(url);
@@ -135,14 +120,12 @@ export function IframeModal({
     }
   }, [rememberPosition, url, position, size, isFullscreen]);
 
-  // 拖拽结束时保存位置
   useEffect(() => {
     if (!isDragging) {
       savePosition();
     }
   }, [isDragging, savePosition]);
 
-  // 调整大小处理（IframeModal 特有逻辑）
   const handleResizeStart = useCallback((e: React.PointerEvent) => {
     if (isFullscreen) return;
     e.stopPropagation();
@@ -238,7 +221,8 @@ export function IframeModal({
         <div className="flex-1 relative overflow-hidden">
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center bg-white">
-              <Spin tip="加载中..." />
+              <Spin size="large" />
+              <span className="ml-2 text-gray-500">加载中...</span>
             </div>
           )}
           <iframe 
@@ -250,7 +234,6 @@ export function IframeModal({
             sandbox="allow-same-origin allow-scripts allow-popups allow-forms" 
           />
         </div>
-        {/* 调整大小手柄 */}
         {!isFullscreen && (
           <div
             className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize"

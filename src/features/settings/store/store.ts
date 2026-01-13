@@ -1,21 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { DEFAULTS } from '@/constants';
-
-interface GeneralState {
-  openInNewTab: boolean;
-  showClock: boolean;
-  showSearch: boolean;
-  showShortcuts: boolean;
-  language: 'zh-CN' | 'en-US';
-  
-  updateOpenInNewTab: (value: boolean) => void;
-  updateShowClock: (value: boolean) => void;
-  updateShowSearch: (value: boolean) => void;
-  updateShowShortcuts: (value: boolean) => void;
-  updateLanguage: (value: 'zh-CN' | 'en-US') => void;
-  resetGeneral: () => void;
-}
+import type { GeneralState } from './types';
 
 const DEFAULT_GENERAL = {
   openInNewTab: true,

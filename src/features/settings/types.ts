@@ -30,16 +30,4 @@ export interface WallpaperModalProps {
   onClose: () => void;
 }
 
-/** 通用设置 Store 状态 */
-export interface GeneralState {
-  openInNewTab: boolean;
-  showClock: boolean;
-  showSearch: boolean;
-  showShortcuts: boolean;
-  
-  updateOpenInNewTab: (value: boolean) => void;
-  updateShowClock: (value: boolean) => void;
-  updateShowSearch: (value: boolean) => void;
-  updateShowShortcuts: (value: boolean) => void;
-  resetGeneral: () => void;
-}
+// GeneralState 定义在 store/types.ts 中

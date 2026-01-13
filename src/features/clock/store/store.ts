@@ -1,27 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { DEFAULTS } from '@/constants';
-
-interface ClockState {
-  showSeconds: boolean;
-  show24Hour: boolean;
-  showLunar: boolean;
-  showDate: boolean;
-  showWeekday: boolean;
-  showYear: boolean;
-  clockColor: string;
-  clockFontSize: 'small' | 'medium' | 'large';
-  
-  updateShowSeconds: (value: boolean) => void;
-  updateShow24Hour: (value: boolean) => void;
-  updateShowLunar: (value: boolean) => void;
-  updateShowDate: (value: boolean) => void;
-  updateShowWeekday: (value: boolean) => void;
-  updateShowYear: (value: boolean) => void;
-  updateClockColor: (value: string) => void;
-  updateClockFontSize: (value: 'small' | 'medium' | 'large') => void;
-  resetClock: () => void;
-}
+import type { ClockState } from './types';
 
 const DEFAULT_CLOCK = {
   showSeconds: true,

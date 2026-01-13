@@ -25,7 +25,7 @@ export function AddFolderModal({ isOpen, onClose, onSave }: AddFolderModalProps)
 
   return (
     <Modal title="新建文件夹" open={isOpen} onOk={handleOk} onCancel={handleCancel}
-      okText="创建" cancelText="取消" okButtonProps={{ disabled: !name.trim() }} destroyOnClose>
+      okText="创建" cancelText="取消" okButtonProps={{ disabled: !name.trim() }} destroyOnHidden>
       <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="文件夹名称" autoFocus onPressEnter={handleOk} />
     </Modal>
   );

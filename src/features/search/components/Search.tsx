@@ -1,9 +1,10 @@
 import { useRef, useState, useCallback, useMemo, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { SearchOutlined, ClockCircleOutlined, CloseCircleOutlined, LinkOutlined } from '@ant-design/icons';
 import { performSearch, SEARCH_ENGINE_ICONS } from '../utils/search';
-import { useSearchStore } from '../store/searchStore';
+import { useSearchStore } from '../store';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useClickOutside } from '@/hooks/useClickOutside';
+import type { SearchEngine } from '@/types';
 
 interface SearchProps {
   placeholder?: string;
@@ -65,8 +66,8 @@ export function Search({ placeholder = '搜索...', className = '', inputRef, de
     if (!debouncedQuery.trim()) return searchHistory;
     const lowerQuery = debouncedQuery.toLowerCase();
     return searchHistory
-      .filter(item => item.toLowerCase().includes(lowerQuery))
-      .sort((a, b) => {
+      .filter((item: string) => item.toLowerCase().includes(lowerQuery))
+      .sort((a: string, b: string) => {
         const aIndex = a.toLowerCase().indexOf(lowerQuery);
         const bIndex = b.toLowerCase().indexOf(lowerQuery);
         return aIndex - bIndex;
@@ -157,7 +158,7 @@ export function Search({ placeholder = '搜索...', className = '', inputRef, de
         style={{ width: 560, height: 40, padding: '0 14px', gap: '6px' }}
       >
         <img 
-          src={SEARCH_ENGINE_ICONS[searchEngine]} 
+          src={SEARCH_ENGINE_ICONS[searchEngine as SearchEngine]} 
           alt={searchEngine} 
           style={{ width: 20, height: 20, flexShrink: 0 }}
         />
@@ -200,7 +201,7 @@ export function Search({ placeholder = '搜索...', className = '', inputRef, de
             </button>
           </div>
           <ul>
-            {filteredHistory.map((item, index) => (
+            {filteredHistory.map((item: string, index: number) => (
               <li key={item}>
                 <div 
                   className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 cursor-pointer group ${

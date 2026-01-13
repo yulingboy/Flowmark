@@ -8,14 +8,4 @@ export interface BackgroundProps {
   className?: string;
 }
 
-/** 背景 Store 状态 */
-export interface BackgroundState {
-  backgroundUrl: string;
-  backgroundBlur: number;
-  backgroundOverlay: number;
-  
-  updateBackgroundUrl: (url: string) => void;
-  updateBackgroundBlur: (value: number) => void;
-  updateBackgroundOverlay: (value: number) => void;
-  resetBackground: () => void;
-}
+// BackgroundState 定义在 store/types.ts 中

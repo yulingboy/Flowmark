@@ -1,30 +1,26 @@
 // Common components barrel export
 
-// Types
+// Modal 组件
+export { MacModal, IframeModal, useModalBehavior } from './Modal';
 export type { 
   ModalPosition, 
   MacModalProps, 
   IframeModalProps, 
-  ErrorBoundaryProps, 
-  ErrorBoundaryState 
-} from './types';
+  UseModalBehaviorOptions, 
+  UseModalBehaviorResult 
+} from './Modal';
 
-// Components
-export { IframeModal } from './IframeModal';
-export { MacModal } from './MacModal';
-export { ContextMenu } from './ContextMenu';
-export type { ContextMenuItem } from './ContextMenu';
+// Menu 组件
+export { ContextMenu } from './Menu';
+export type { ContextMenuItem, ContextMenuProps } from './Menu';
 
-// Modal 行为 Hook
-export { useModalBehavior } from './Modal/useModalBehavior';
-export type { UseModalBehaviorOptions, UseModalBehaviorResult } from './Modal/useModalBehavior';
+// Image 组件
+export { LazyImage, LazyBackground } from './Image';
+export type { LazyImageProps, LazyBackgroundProps } from './Image';
 
 // 图标库
 export * from './icons';
 
 // 错误边界
 export { ErrorBoundary } from './ErrorBoundary';
-
-// 懒加载图片
-export { LazyImage, LazyBackground } from './LazyImage';
-export type { LazyImageProps, LazyBackgroundProps } from './LazyImage';
+export type { ErrorBoundaryProps, ErrorBoundaryState } from './types';

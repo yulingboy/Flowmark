@@ -2,28 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from 'antd';
 import type { ShortcutSize } from '@/types';
-
-export interface ContextMenuItem {
-  icon: React.ReactNode;
-  label: string;
-  onClick: () => void;
-  rightIcon?: React.ReactNode;
-  type?: 'normal' | 'layout' | 'submenu';
-  layoutOptions?: ShortcutSize[];
-  disabledLayouts?: ShortcutSize[];  // 禁用的布局选项（超出边界）
-  currentLayout?: ShortcutSize;
-  onLayoutSelect?: (size: ShortcutSize) => void;
-  submenuItems?: { id: string; label: string; onClick: () => void }[];
-  disabled?: boolean;
-}
-
-interface ContextMenuProps {
-  isOpen: boolean;
-  position: { x: number; y: number };
-  items: ContextMenuItem[];
-  onClose: () => void;
-  ariaLabel?: string;
-}
+import type { ContextMenuItem, ContextMenuProps } from './types';
 
 export function ContextMenu({ isOpen, position, items, onClose, ariaLabel = '上下文菜单' }: ContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
@@ -31,13 +10,11 @@ export function ContextMenu({ isOpen, position, items, onClose, ariaLabel = '上
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [menuPosition, setMenuPosition] = useState(position);
 
-  // 获取可选择的菜单项索引
   const selectableIndices = items
     .map((item, index) => ({ item, index }))
     .filter(({ item }) => item.type !== 'layout' && !item.disabled)
     .map(({ index }) => index);
 
-  // 键盘导航
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!isOpen) return;
 
@@ -88,7 +65,6 @@ export function ContextMenu({ isOpen, position, items, onClose, ariaLabel = '上
     }
   }, [isOpen, items, selectedIndex, selectableIndices, activeSubmenu, onClose]);
 
-
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -109,7 +85,6 @@ export function ContextMenu({ isOpen, position, items, onClose, ariaLabel = '上
     };
   }, [isOpen, onClose, handleKeyDown]);
 
-  // 重置选中状态
   const prevIsOpenRef = useRef(isOpen);
   useEffect(() => {
     if (isOpen && !prevIsOpenRef.current) {
@@ -119,7 +94,6 @@ export function ContextMenu({ isOpen, position, items, onClose, ariaLabel = '上
     prevIsOpenRef.current = isOpen;
   }, [isOpen]);
 
-  // 调整位置，防止超出屏幕（带翻转逻辑）
   useEffect(() => {
     if (isOpen && menuRef.current) {
       const menu = menuRef.current;
@@ -130,22 +104,18 @@ export function ContextMenu({ isOpen, position, items, onClose, ariaLabel = '上
       let x = position.x;
       let y = position.y;
       
-      // 水平翻转：如果右边放不下，翻转到左边
       if (x + rect.width > vw) {
         x = Math.max(10, position.x - rect.width);
       }
       
-      // 垂直翻转：如果下边放不下，翻转到上边
       if (y + rect.height > vh) {
         y = Math.max(10, position.y - rect.height);
       }
 
       setMenuPosition({ x, y });
     }
-     
   }, [isOpen, position]);
 
-  // 聚焦菜单以接收键盘事件
   useEffect(() => {
     if (isOpen && menuRef.current) {
       menuRef.current.focus();
@@ -206,7 +176,6 @@ export function ContextMenu({ isOpen, position, items, onClose, ariaLabel = '上
         </div>
       );
     }
-
 
     if (item.type === 'submenu' && item.submenuItems) {
       return (

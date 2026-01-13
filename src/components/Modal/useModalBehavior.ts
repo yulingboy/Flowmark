@@ -1,35 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import type { UseModalBehaviorOptions, UseModalBehaviorResult } from './types';
 
-export interface UseModalBehaviorOptions {
-  isOpen: boolean;
-  onClose: () => void;
-  enableDrag?: boolean;
-  enableFullscreen?: boolean;
-  enableClickOutside?: boolean;
-  enableEscapeKey?: boolean;
-  initialPosition?: { x: number; y: number };
-}
-
-export interface UseModalBehaviorResult {
-  // 位置状态
-  position: { x: number; y: number };
-  setPosition: (pos: { x: number; y: number }) => void;
-  
-  // 全屏状态
-  isFullscreen: boolean;
-  setIsFullscreen: (value: boolean) => void;
-  toggleFullscreen: () => void;
-  
-  // 拖拽状态
-  isDragging: boolean;
-  handlePointerDown: (e: React.PointerEvent) => void;
-  
-  // Refs
-  modalRef: React.RefObject<HTMLDivElement | null>;
-  
-  // 重置
-  reset: () => void;
-}
+export type { UseModalBehaviorOptions, UseModalBehaviorResult };
 
 /**
  * Modal 行为 Hook
