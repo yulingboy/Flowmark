@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Input, Button, Badge } from 'antd';
 import { CheckOutlined, LinkOutlined, ReloadOutlined, ExpandOutlined } from '@ant-design/icons';
-import { useBackgroundStore } from '@/components/Background';
+import { useBackgroundStore } from '@/features/background';
 import { PRESET_WALLPAPERS, WALLPAPER_CATEGORIES } from '@/constants';
 
 export function WallpaperModal() {

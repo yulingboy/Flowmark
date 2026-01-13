@@ -1,5 +1,5 @@
 import { Slider } from 'antd';
-import { useBackgroundStore } from '@/components/Background';
+import { useBackgroundStore } from '@/features/background';
 
 export function WallpaperSettings() {
   const { 

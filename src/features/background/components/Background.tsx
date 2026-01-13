@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useBackgroundStore } from './store/backgroundStore';
+import { useBackgroundStore } from '../store/backgroundStore';
 
 interface BackgroundProps {
   imageUrl: string;
