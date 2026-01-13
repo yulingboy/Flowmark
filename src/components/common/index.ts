@@ -1,3 +1,15 @@
+// Common components barrel export
+
+// Types
+export type { 
+  ModalPosition, 
+  MacModalProps, 
+  IframeModalProps, 
+  ErrorBoundaryProps, 
+  ErrorBoundaryState 
+} from './types';
+
+// Components
 export { IframeModal } from './IframeModal';
 export { MacModal } from './MacModal';
 export { ContextMenu } from './ContextMenu';

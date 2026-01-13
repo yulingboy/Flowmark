@@ -1,5 +1,9 @@
 // Shortcuts feature module - barrel export
 
+// Types
+export type { GridConfig, ValidationResult } from './types';
+export { SHORTCUTS_LIMIT } from './types';
+
 // Components
 export { ShortcutCard } from './components/ShortcutCard';
 export { ShortcutFolder } from './components/ShortcutFolder';
@@ -12,8 +16,7 @@ export { DraggableItem } from './components/DraggableItem';
 
 // Store
 export { useShortcutsStore } from './store';
-export type { ShortcutsState, ValidationResult } from './store/types';
-export { SHORTCUTS_LIMIT } from './store/types';
+export type { ShortcutsState } from './store/types';
 
 // Utils
 export { getFaviconUrl, getFaviconUrlAsync, generatePlaceholder, preloadFavicons, clearFaviconCache, getCacheStats } from './utils/faviconService';
