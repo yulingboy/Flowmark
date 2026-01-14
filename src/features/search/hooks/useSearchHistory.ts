@@ -1,5 +1,5 @@
 /**
- * Hook for managing search history filtering and selection
+ * 管理搜索历史过滤和选择的 Hook
  */
 import { useMemo, useCallback, useState } from 'react';
 import { useSearchStore } from '../store';
@@ -16,13 +16,13 @@ export interface UseSearchHistoryReturn {
 }
 
 /**
- * Custom hook for managing search history filtering and selection
+ * 管理搜索历史过滤和选择的自定义 Hook
  * 
- * @param query - Current search query
- * @param debouncedQuery - Debounced search query for filtering
- * @param setQuery - Function to update query state
- * @param inputRef - Reference to the input element
- * @returns Object containing filtered history and handler functions
+ * @param query - 当前搜索查询
+ * @param debouncedQuery - 用于过滤的防抖查询
+ * @param setQuery - 更新查询状态的函数
+ * @param inputRef - 输入元素的引用
+ * @returns 包含过滤后的历史记录和处理函数的对象
  * 
  * @example
  * const {

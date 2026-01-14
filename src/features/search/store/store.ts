@@ -19,7 +19,7 @@ const DEFAULT_SEARCH = {
  * 错误日志记录
  */
 function logError(type: string, error: unknown, context?: string) {
-  console.error('[Search Module]', type, context || '', error);
+  console.error('[搜索模块]', type, context || '', error);
 }
 
 export const useSearchStore = create<SearchState>()(
@@ -44,7 +44,7 @@ export const useSearchStore = create<SearchState>()(
               : state.searchHistory,
           }));
         } catch (error) {
-          logError('HISTORY_ERROR', error, 'Failed to add search history');
+          logError('历史记录错误', error, '添加搜索历史失败');
         }
       },
       removeSearchHistoryItem: (query) => {
@@ -53,14 +53,14 @@ export const useSearchStore = create<SearchState>()(
             searchHistory: removeFromHistory(state.searchHistory, query),
           }));
         } catch (error) {
-          logError('HISTORY_ERROR', error, 'Failed to remove search history item');
+          logError('历史记录错误', error, '删除搜索历史项失败');
         }
       },
       clearSearchHistory: () => {
         try {
           set({ searchHistory: [] });
         } catch (error) {
-          logError('HISTORY_ERROR', error, 'Failed to clear search history');
+          logError('历史记录错误', error, '清除搜索历史失败');
         }
       },
       resetSearch: () => set(DEFAULT_SEARCH),
@@ -69,7 +69,7 @@ export const useSearchStore = create<SearchState>()(
       name: 'newtab-search',
       onRehydrateStorage: () => (_state, error) => {
         if (error) {
-          logError('STORAGE_ERROR', error, 'Failed to load search state from storage');
+          logError('存储错误', error, '从存储加载搜索状态失败');
         }
       },
     }

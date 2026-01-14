@@ -1,5 +1,5 @@
 /**
- * Main search component with input, history, and keyboard navigation
+ * 主搜索组件，包含输入框、历史记录和键盘导航
  */
 import { useRef } from 'react';
 import { useSearchStore } from '../store';
@@ -19,13 +19,13 @@ interface SearchProps {
 }
 
 /**
- * Search component with integrated history and keyboard navigation
+ * 集成历史记录和键盘导航的搜索组件
  * 
- * @param placeholder - Placeholder text for input
- * @param className - Additional CSS classes
- * @param inputRef - External ref for input element
- * @param debounceMs - Debounce delay in milliseconds
- * @returns Search component
+ * @param placeholder - 输入框占位符文本
+ * @param className - 额外的 CSS 类名
+ * @param inputRef - 输入元素的外部引用
+ * @param debounceMs - 防抖延迟（毫秒）
+ * @returns 搜索组件
  */
 export function Search({ 
   placeholder = '搜索...', 

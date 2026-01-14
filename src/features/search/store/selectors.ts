@@ -1,11 +1,11 @@
 /**
- * Memoized selectors for search store
+ * 搜索 store 的记忆化选择器
  */
 import { useSearchStore } from './store';
 import type { SearchState } from './types';
 
 /**
- * Select search configuration
+ * 选择搜索配置
  */
 export const selectSearchConfig = (state: SearchState) => ({
   searchEngine: state.searchEngine,
@@ -16,29 +16,29 @@ export const selectSearchConfig = (state: SearchState) => ({
 });
 
 /**
- * Select search history
+ * 选择搜索历史
  */
 export const selectSearchHistory = (state: SearchState) => state.searchHistory;
 
 /**
- * Select search engine
+ * 选择搜索引擎
  */
 export const selectSearchEngine = (state: SearchState) => state.searchEngine;
 
 /**
- * Select history enabled status
+ * 选择历史记录启用状态
  */
 export const selectHistoryEnabled = (state: SearchState) => state.searchHistoryEnabled;
 
 /**
- * Hook to get search configuration
+ * 获取搜索配置的 Hook
  */
 export function useSearchConfig() {
   return useSearchStore(selectSearchConfig);
 }
 
 /**
- * Hook to get search history
+ * 获取搜索历史的 Hook
  */
 export function useSearchHistoryData() {
   return useSearchStore(selectSearchHistory);

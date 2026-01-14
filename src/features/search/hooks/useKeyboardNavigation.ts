@@ -1,5 +1,5 @@
 /**
- * Hook for handling keyboard navigation through search history
+ * 处理搜索历史键盘导航的 Hook
  */
 import { useState, useCallback, type KeyboardEvent } from 'react';
 
@@ -10,13 +10,13 @@ export interface UseKeyboardNavigationReturn {
 }
 
 /**
- * Custom hook for handling keyboard navigation
+ * 处理键盘导航的自定义 Hook
  * 
- * @param filteredHistory - Array of filtered history items
- * @param onSelect - Callback when an item is selected with Enter
- * @param onSearch - Callback when Enter is pressed without selection
- * @param onClose - Callback when Escape is pressed
- * @returns Object containing selected index and keyboard handler
+ * @param filteredHistory - 过滤后的历史记录数组
+ * @param onSelect - 按 Enter 选择项时的回调
+ * @param onSearch - 未选择项时按 Enter 的回调
+ * @param onClose - 按 Escape 时的回调
+ * @returns 包含选中索引和键盘处理函数的对象
  * 
  * @example
  * const { selectedIndex, handleKeyDown } = useKeyboardNavigation(

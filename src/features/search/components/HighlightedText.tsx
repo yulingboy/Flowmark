@@ -1,5 +1,5 @@
 /**
- * Component for highlighting matching text in search results
+ * 在搜索结果中高亮匹配文本的组件
  */
 import React from 'react';
 
@@ -10,12 +10,12 @@ export interface HighlightedTextProps {
 }
 
 /**
- * Highlights matching text within a string
+ * 在字符串中高亮匹配的文本
  * 
- * @param text - The full text to display
- * @param query - The query string to highlight
- * @param highlightClassName - Optional CSS class for highlighted text
- * @returns React element with highlighted matches
+ * @param text - 要显示的完整文本
+ * @param query - 要高亮的查询字符串
+ * @param highlightClassName - 高亮文本的可选 CSS 类名
+ * @returns 带有高亮匹配项的 React 元素
  * 
  * @example
  * <HighlightedText text="Hello World" query="world" />

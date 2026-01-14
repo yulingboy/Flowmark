@@ -1,5 +1,5 @@
 /**
- * Hook for managing search input state and handlers
+ * 管理搜索输入状态和处理函数的 Hook
  */
 import { useState, useCallback, type ChangeEvent } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -20,11 +20,11 @@ export interface UseSearchInputReturn {
 }
 
 /**
- * Custom hook for managing search input state and handlers
+ * 管理搜索输入状态和处理函数的自定义 Hook
  * 
- * @param debounceMs - Debounce delay in milliseconds (default: 300)
- * @param inputRef - Reference to the input element
- * @returns Object containing query state and handler functions
+ * @param debounceMs - 防抖延迟（毫秒，默认：300）
+ * @param inputRef - 输入元素的引用
+ * @returns 包含查询状态和处理函数的对象
  * 
  * @example
  * const {

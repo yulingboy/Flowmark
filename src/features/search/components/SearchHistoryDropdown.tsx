@@ -1,5 +1,5 @@
 /**
- * Search history dropdown component with virtualization support
+ * 支持虚拟化的搜索历史下拉组件
  */
 import React from 'react';
 import { ClockCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
@@ -16,10 +16,10 @@ export interface SearchHistoryDropdownProps {
 }
 
 /**
- * Dropdown component for displaying search history
+ * 显示搜索历史的下拉组件
  * 
- * @param props - Component props
- * @returns Search history dropdown component
+ * @param props - 组件属性
+ * @returns 搜索历史下拉组件
  */
 export function SearchHistoryDropdown({
   items,

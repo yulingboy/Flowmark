@@ -1,5 +1,5 @@
 /**
- * Hook for URL detection and normalization
+ * URL 检测和规范化的 Hook
  */
 import { useMemo } from 'react';
 import { isValidUrl, normalizeUrl } from '../utils/urlValidation';
@@ -10,10 +10,10 @@ export interface UseUrlDetectionReturn {
 }
 
 /**
- * Custom hook for detecting and normalizing URLs
+ * 检测和规范化 URL 的自定义 Hook
  * 
- * @param query - The search query to check
- * @returns Object containing isUrl boolean and normalizeUrl function
+ * @param query - 要检查的搜索查询
+ * @returns 包含 isUrl 布尔值和 normalizeUrl 函数的对象
  * 
  * @example
  * const { isUrl, normalizeUrl } = useUrlDetection(query);

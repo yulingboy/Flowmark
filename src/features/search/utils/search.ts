@@ -1,7 +1,7 @@
 import type { SearchEngine } from '@/types';
 
 /**
- * Search engine configuration interface
+ * 搜索引擎配置接口
  */
 export interface SearchEngineConfig {
   name: string;
@@ -10,7 +10,7 @@ export interface SearchEngineConfig {
 }
 
 /**
- * Search engine configurations
+ * 搜索引擎配置
  */
 export const SEARCH_ENGINE_CONFIGS: Record<SearchEngine, SearchEngineConfig> = {
   bing: {
@@ -30,20 +30,6 @@ export const SEARCH_ENGINE_CONFIGS: Record<SearchEngine, SearchEngineConfig> = {
   },
 };
 
-// 搜索引擎 URL 模板（向后兼容）
-const SEARCH_ENGINES: Record<SearchEngine, string> = {
-  bing: SEARCH_ENGINE_CONFIGS.bing.urlTemplate,
-  google: SEARCH_ENGINE_CONFIGS.google.urlTemplate,
-  baidu: SEARCH_ENGINE_CONFIGS.baidu.urlTemplate,
-};
-
-// 搜索引擎图标（向后兼容）
-export const SEARCH_ENGINE_ICONS: Record<SearchEngine, string> = {
-  bing: SEARCH_ENGINE_CONFIGS.bing.faviconUrl,
-  google: SEARCH_ENGINE_CONFIGS.google.faviconUrl,
-  baidu: SEARCH_ENGINE_CONFIGS.baidu.faviconUrl,
-};
-
 /**
  * 生成搜索 URL
  * @param query 搜索查询
@@ -51,12 +37,16 @@ export const SEARCH_ENGINE_ICONS: Record<SearchEngine, string> = {
  * @returns 完整的搜索 URL
  */
 export function generateSearchUrl(query: string, engine: SearchEngine = 'bing'): string {
+  const config = SEARCH_ENGINE_CONFIGS[engine];
   const encodedQuery = encodeURIComponent(query);
-  return `${SEARCH_ENGINES[engine]}${encodedQuery}`;
+  return `${config.urlTemplate}${encodedQuery}`;
 }
 
 /**
  * 执行搜索
+ * @param query 搜索查询
+ * @param engine 搜索引擎
+ * @param newTab 是否在新标签页打开
  */
 export function performSearch(query: string, engine: SearchEngine = 'bing', newTab = true): void {
   if (!query.trim()) return;
@@ -67,3 +57,4 @@ export function performSearch(query: string, engine: SearchEngine = 'bing', newT
     window.location.href = url;
   }
 }
+

@@ -1,5 +1,5 @@
 /**
- * Search input component with search engine icon and URL indicator
+ * 带搜索引擎图标和 URL 指示器的搜索输入组件
  */
 import React, { type KeyboardEvent } from 'react';
 import { SearchOutlined, LinkOutlined } from '@ant-design/icons';
@@ -22,10 +22,10 @@ export interface SearchInputProps {
 }
 
 /**
- * Search input field with search engine selector and URL indicator
+ * 带搜索引擎选择器和 URL 指示器的搜索输入框
  * 
- * @param props - Component props
- * @returns Search input component
+ * @param props - 组件属性
+ * @returns 搜索输入组件
  */
 export function SearchInput({
   value,
