@@ -1,16 +1,9 @@
 import { useCallback } from 'react';
-import { useShallow } from 'zustand/react/shallow';
-import { usePluginStore } from '../../store';
 import { useHabitStore } from './store';
-import type { HabitConfig } from './types';
-import { PLUGIN_ID, DEFAULT_CONFIG, getTodayString } from './types';
+import { getTodayString } from './types';
 
 export function useHabit() {
-  const { habits, addHabit, removeHabit, updateHabit, toggleCheck, incrementCount, decrementCount } = useHabitStore();
-  const storedConfig = usePluginStore(
-    useShallow(state => state.pluginConfigs[PLUGIN_ID] || {})
-  );
-  const config: HabitConfig = { ...DEFAULT_CONFIG, ...storedConfig };
+  const { habits, config, addHabit, removeHabit, updateHabit, toggleCheck, incrementCount, decrementCount } = useHabitStore();
 
   /** 检查今天是否已完成 */
   const isCompletedToday = useCallback((id: string) => {

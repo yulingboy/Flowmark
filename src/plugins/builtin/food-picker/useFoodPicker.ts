@@ -1,14 +1,11 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useShallow } from 'zustand/react/shallow';
-import { usePluginStore } from '../../store';
-import type { FoodPickerConfig, FoodCategory } from './types';
-import { PLUGIN_ID, DEFAULT_CONFIG, DEFAULT_CATEGORIES, pickRandomFood } from './types';
+import { useFoodPickerStore } from './store';
+import type { FoodCategory } from './types';
+import { DEFAULT_CATEGORIES, pickRandomFood } from './types';
 
 export function useFoodPicker() {
-  const storedConfig = usePluginStore(
-    useShallow(state => state.pluginConfigs[PLUGIN_ID] || {})
-  );
-  const config: FoodPickerConfig = { ...DEFAULT_CONFIG, ...storedConfig };
+  const config = useFoodPickerStore(state => state.config);
+  const setConfig = useFoodPickerStore(state => state.setConfig);
 
   const [currentFood, setCurrentFood] = useState<string | null>(null);
   const [currentCategory, setCurrentCategory] = useState<FoodCategory | null>(null);
@@ -57,8 +54,8 @@ export function useFoodPicker() {
       ? config.enabledCategories.filter(id => id !== categoryId)
       : [...config.enabledCategories, categoryId];
     
-    usePluginStore.getState().setPluginConfig(PLUGIN_ID, { enabledCategories: newEnabled });
-  }, [config.enabledCategories]);
+    setConfig({ enabledCategories: newEnabled });
+  }, [config.enabledCategories, setConfig]);
 
   return {
     currentFood,

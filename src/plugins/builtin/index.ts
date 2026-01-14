@@ -1,6 +1,5 @@
 import { useShortcutsStore } from '@/features/shortcuts';
 import { isPluginCard } from '@/types';
-import { usePluginStore } from '../store';
 import { weatherPlugin } from './weather';
 import { todoPlugin } from './todo';
 import { notesPlugin } from './notes';
@@ -32,17 +31,11 @@ export const builtinPlugins = [
  */
 export function registerBuiltinPlugins() {
   const shortcutsStore = useShortcutsStore.getState();
-  const pluginStore = usePluginStore.getState();
   const shortcuts = shortcutsStore.shortcuts;
   
   const hasAnyPluginCard = shortcuts.some(s => isPluginCard(s));
   
   builtinPlugins.forEach(plugin => {
-    // 初始化插件配置
-    if (!pluginStore.pluginConfigs[plugin.metadata.id] && plugin.defaultConfig) {
-      pluginStore.setPluginConfig(plugin.metadata.id, plugin.defaultConfig);
-    }
-    
     // 首次运行时，为所有内置插件添加卡片
     if (!hasAnyPluginCard) {
       shortcutsStore.addPluginCard(

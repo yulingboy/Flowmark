@@ -1,14 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { useShallow } from 'zustand/react/shallow';
-import { usePluginStore } from '../../store';
-import type { FlipClockConfig } from './types';
-import { PLUGIN_ID, DEFAULT_CONFIG, getCurrentTime, getCurrentDate } from './types';
+import { useFlipClockStore } from './store';
+import { getCurrentTime, getCurrentDate } from './types';
 
 export function useFlipClock() {
-  const storedConfig = usePluginStore(
-    useShallow(state => state.pluginConfigs[PLUGIN_ID] || {})
-  );
-  const config: FlipClockConfig = { ...DEFAULT_CONFIG, ...storedConfig };
+  const config = useFlipClockStore(state => state.config);
 
   const [time, setTime] = useState(() => getCurrentTime(config.use24Hour));
   const [date, setDate] = useState(() => getCurrentDate(config.showLunar));

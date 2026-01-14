@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { PomodoroData } from './types';
+import type { PomodoroData, PomodoroConfig } from './types';
 import { DEFAULT_CONFIG } from './types';
 
 const DEFAULT_DATA: PomodoroData = {
@@ -14,14 +14,20 @@ const DEFAULT_DATA: PomodoroData = {
 
 interface PomodoroState {
   data: PomodoroData;
+  config: PomodoroConfig;
   setData: (data: PomodoroData) => void;
+  setConfig: (config: Partial<PomodoroConfig>) => void;
 }
 
 export const usePomodoroStore = create<PomodoroState>()(
   persist(
     (set) => ({
       data: DEFAULT_DATA,
-      setData: (data) => set({ data })
+      config: DEFAULT_CONFIG,
+      setData: (data) => set({ data }),
+      setConfig: (newConfig) => set((state) => ({ 
+        config: { ...state.config, ...newConfig } 
+      }))
     }),
     { name: 'pomodoro-plugin-data' }
   )

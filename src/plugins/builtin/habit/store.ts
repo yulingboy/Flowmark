@@ -1,22 +1,25 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Habit, HabitType } from './types';
-import { generateId, getTodayString, HABIT_COLORS } from './types';
+import type { Habit, HabitType, HabitConfig } from './types';
+import { generateId, getTodayString, HABIT_COLORS, DEFAULT_CONFIG } from './types';
 
 interface HabitState {
   habits: Habit[];
+  config: HabitConfig;
   addHabit: (name: string, color?: string, type?: HabitType, targetCount?: number) => void;
   removeHabit: (id: string) => void;
   updateHabit: (id: string, updates: Partial<Omit<Habit, 'id' | 'createdAt'>>) => void;
   toggleCheck: (id: string, date?: string) => void;
   incrementCount: (id: string, date?: string) => void;
   decrementCount: (id: string, date?: string) => void;
+  setConfig: (config: Partial<HabitConfig>) => void;
 }
 
 export const useHabitStore = create<HabitState>()(
   persist(
     (set) => ({
       habits: [],
+      config: DEFAULT_CONFIG,
 
       addHabit: (name, color, type = 'check', targetCount) => {
         const newHabit: Habit = {
@@ -78,7 +81,11 @@ export const useHabitStore = create<HabitState>()(
             return { ...h, records: newRecords };
           })
         }));
-      }
+      },
+
+      setConfig: (newConfig) => set((state) => ({ 
+        config: { ...state.config, ...newConfig } 
+      }))
     }),
     { name: 'habit-plugin-data' }
   )

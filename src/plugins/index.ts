@@ -1,11 +1,7 @@
 // 插件系统入口
 // 删除此目录即可完全移除插件功能
 
-// 内部类型
-export type { PluginState } from './types';
-
 // 核心
-export { usePluginStore } from './store';
 export { registerBuiltinPlugins, builtinPlugins } from './builtin';
 export { PluginCard } from './components/PluginCard';
 

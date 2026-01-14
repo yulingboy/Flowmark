@@ -1,15 +1,7 @@
 ﻿import { useState, useEffect, useCallback } from 'react';
-import { useShallow } from 'zustand/react/shallow';
-import { usePluginStore } from '../../store';
 import { useWeatherStore } from './store';
-import type { WeatherResponse, WeatherConfig, WeatherCache, WeatherData, HourlyForecast, DailyForecast } from './types';
-import { PLUGIN_ID, getWeekday } from './types';
-
-const DEFAULT_CONFIG: WeatherConfig = { 
-  location: 'Beijing', 
-  unit: 'celsius', 
-  updateInterval: 30 
-};
+import type { WeatherResponse, WeatherCache, WeatherData, HourlyForecast, DailyForecast } from './types';
+import { getWeekday } from './types';
 
 /** 格式化缓存时间 */
 function formatCacheAge(timestamp: number): string {
@@ -116,10 +108,7 @@ function parseWeatherResponse(data: WeatherApiResponse, unit: 'celsius' | 'fahre
 
 export function useWeather() {
   const weatherCache = useWeatherStore(state => state.weatherCache);
-  const storedConfig = usePluginStore(
-    useShallow(state => state.pluginConfigs[PLUGIN_ID] || {})
-  );
-  const config: WeatherConfig = { ...DEFAULT_CONFIG, ...storedConfig };
+  const config = useWeatherStore(state => state.config);
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

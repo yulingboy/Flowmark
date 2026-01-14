@@ -1,22 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useShallow } from 'zustand/react/shallow';
-import { usePluginStore } from '../../store';
 import { useHitokotoStore } from './store';
-import type { HitokotoData, HitokotoConfig, HitokotoCache } from './types';
-import { PLUGIN_ID } from './types';
-
-const DEFAULT_CONFIG: HitokotoConfig = {
-  types: ['a', 'b', 'c', 'd', 'i'],
-  autoRefresh: false,
-  refreshInterval: 30,
-};
+import type { HitokotoData, HitokotoCache } from './types';
 
 export function useHitokoto() {
   const cache = useHitokotoStore(state => state.cache);
-  const storedConfig = usePluginStore(
-    useShallow(state => state.pluginConfigs[PLUGIN_ID] || {})
-  );
-  const config: HitokotoConfig = { ...DEFAULT_CONFIG, ...storedConfig };
+  const config = useHitokotoStore(state => state.config);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

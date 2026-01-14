@@ -1,9 +1,7 @@
-import { useEffect, useCallback, useRef, useMemo } from 'react';
-import { useShallow } from 'zustand/react/shallow';
-import { usePluginStore } from '../../store';
+import { useEffect, useCallback, useRef } from 'react';
 import { usePomodoroStore } from './store';
-import type { PomodoroData, PomodoroConfig, PomodoroStatus } from './types';
-import { PLUGIN_ID, DEFAULT_CONFIG } from './types';
+import type { PomodoroData, PomodoroStatus } from './types';
+import { DEFAULT_CONFIG } from './types';
 
 const DEFAULT_DATA: PomodoroData = {
   status: 'idle',
@@ -21,11 +19,8 @@ interface WebkitWindow extends Window {
 export function usePomodoro() {
   const data = usePomodoroStore(state => state.data);
   const setData = usePomodoroStore(state => state.setData);
-  const storedConfig = usePluginStore(
-    useShallow(state => state.pluginConfigs[PLUGIN_ID] || {})
-  );
+  const config = usePomodoroStore(state => state.config);
   
-  const config: PomodoroConfig = useMemo(() => ({ ...DEFAULT_CONFIG, ...storedConfig }), [storedConfig]);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // 播放提示音
