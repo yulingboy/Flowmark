@@ -1,6 +1,7 @@
 ﻿import { useState, useEffect, useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { usePluginStore } from '../../store';
+import { useWeatherStore } from './store';
 import type { WeatherResponse, WeatherConfig, WeatherCache, WeatherData, HourlyForecast, DailyForecast } from './types';
 import { PLUGIN_ID, getWeekday } from './types';
 
@@ -114,9 +115,7 @@ function parseWeatherResponse(data: WeatherApiResponse, unit: 'celsius' | 'fahre
 }
 
 export function useWeather() {
-  const weatherCache = usePluginStore(
-    useShallow(state => (state.pluginData[PLUGIN_ID]?.weatherCache as WeatherCache) || null)
-  );
+  const weatherCache = useWeatherStore(state => state.weatherCache);
   const storedConfig = usePluginStore(
     useShallow(state => state.pluginConfigs[PLUGIN_ID] || {})
   );
@@ -152,7 +151,7 @@ export function useWeather() {
         timestamp: Date.now(),
         location: config.location,
       };
-      usePluginStore.getState().setPluginData(PLUGIN_ID, 'weatherCache', cache);
+      useWeatherStore.getState().setWeatherCache(cache);
     } catch {
       setError('获取失败，请稍后重试');
     } finally {

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { usePluginStore } from '../../store';
+import { useHitokotoStore } from './store';
 import type { HitokotoData, HitokotoConfig, HitokotoCache } from './types';
 import { PLUGIN_ID } from './types';
 
@@ -11,9 +12,7 @@ const DEFAULT_CONFIG: HitokotoConfig = {
 };
 
 export function useHitokoto() {
-  const cache = usePluginStore(
-    useShallow(state => (state.pluginData[PLUGIN_ID]?.cache as HitokotoCache) || null)
-  );
+  const cache = useHitokotoStore(state => state.cache);
   const storedConfig = usePluginStore(
     useShallow(state => state.pluginConfigs[PLUGIN_ID] || {})
   );
@@ -42,7 +41,7 @@ export function useHitokoto() {
         timestamp: Date.now(),
       };
       
-      usePluginStore.getState().setPluginData(PLUGIN_ID, 'cache', newCache);
+      useHitokotoStore.getState().setCache(newCache);
     } catch {
       setError('获取一言失败');
     } finally {

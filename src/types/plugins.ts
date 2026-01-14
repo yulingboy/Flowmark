@@ -40,8 +40,6 @@ export type PluginSize = '1x1' | '2x2' | '2x4';
 export interface PluginAPI {
   getConfig: <T = PluginConfig>() => T;
   setConfig: (config: Partial<PluginConfig>) => void;
-  getStorage: <T>(key: string) => T | null;
-  setStorage: <T>(key: string, value: T) => void;
 }
 
 // 插件接口

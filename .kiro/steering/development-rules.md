@@ -72,8 +72,39 @@ src/plugins/builtin/[plugin-name]/
 ├── index.ts          # 插件入口，导出 Plugin 对象
 ├── [Name]Card.tsx    # 卡片组件（支持 1x1、2x2、2x4 尺寸）
 ├── [Name]Modal.tsx   # 弹窗组件（可选）
+├── store.ts          # 插件独立 store（可选）
 ├── use[Name].ts      # 数据 Hook（可选）
 └── types.ts          # 类型定义（可选）
+```
+
+### 插件数据管理
+- 每个插件使用独立的 Zustand store 管理自己的数据
+- Store 文件命名：`store.ts`
+- 使用 `persist` 中间件持久化数据
+- 存储键名：`[plugin-name]-plugin-data`
+- 全局 `pluginStore` 只管理插件配置，不存储插件数据
+
+### 插件 Store 示例
+```typescript
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+interface MyPluginState {
+  data: string[];
+  addData: (item: string) => void;
+}
+
+export const useMyPluginStore = create<MyPluginState>()(
+  persist(
+    (set) => ({
+      data: [],
+      addData: (item) => set((state) => ({ 
+        data: [...state.data, item] 
+      }))
+    }),
+    { name: 'my-plugin-data' }
+  )
+);
 ```
 
 ### 插件入口示例

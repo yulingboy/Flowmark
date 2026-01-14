@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useEffect, useCallback, useRef, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { usePluginStore } from '../../store';
+import { usePomodoroStore } from './store';
 import type { PomodoroData, PomodoroConfig, PomodoroStatus } from './types';
 import { PLUGIN_ID, DEFAULT_CONFIG } from './types';
 
@@ -17,31 +18,15 @@ interface WebkitWindow extends Window {
   webkitAudioContext?: typeof AudioContext;
 }
 
-// 获取初始数据
-function getInitialData(): PomodoroData {
-  const stored = usePluginStore.getState().pluginData[PLUGIN_ID]?.data as PomodoroData | undefined;
-  return stored || DEFAULT_DATA;
-}
-
 export function usePomodoro() {
+  const data = usePomodoroStore(state => state.data);
+  const setData = usePomodoroStore(state => state.setData);
   const storedConfig = usePluginStore(
     useShallow(state => state.pluginConfigs[PLUGIN_ID] || {})
   );
   
   const config: PomodoroConfig = useMemo(() => ({ ...DEFAULT_CONFIG, ...storedConfig }), [storedConfig]);
-  
-  // 使用函数初始化，避免每次渲染都读取 store
-  const [data, setData] = useState<PomodoroData>(getInitialData);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const isMountedRef = useRef(false);
-
-  // 标记组件已挂载
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
 
   // 播放提示音
   const playSound = useCallback(() => {
@@ -91,81 +76,53 @@ export function usePomodoro() {
 
   // 开始计时
   const start = useCallback(() => {
-    setData(prev => {
-      const newData: PomodoroData = {
-        ...prev,
-        status: 'working',
-        startedAt: Date.now(),
-        pausedAt: null,
-        timeLeft: prev.status === 'idle' ? config.workDuration * 60 : prev.timeLeft,
-      };
-      
-      setTimeout(() => {
-        usePluginStore.getState().setPluginData(PLUGIN_ID, 'data', newData);
-      }, 0);
-      
-      return newData;
-    });
-  }, [config.workDuration]);
+    const newData: PomodoroData = {
+      ...data,
+      status: 'working',
+      startedAt: Date.now(),
+      pausedAt: null,
+      timeLeft: data.status === 'idle' ? config.workDuration * 60 : data.timeLeft,
+    };
+    setData(newData);
+  }, [data, config.workDuration, setData]);
 
   // 暂停
   const pause = useCallback(() => {
-    setData(prev => {
-      const newData: PomodoroData = {
-        ...prev,
-        status: 'paused',
-        pausedAt: Date.now(),
-      };
-      
-      setTimeout(() => {
-        usePluginStore.getState().setPluginData(PLUGIN_ID, 'data', newData);
-      }, 0);
-      
-      return newData;
-    });
-  }, []);
+    const newData: PomodoroData = {
+      ...data,
+      status: 'paused',
+      pausedAt: Date.now(),
+    };
+    setData(newData);
+  }, [data, setData]);
 
   // 重置
   const reset = useCallback(() => {
-    setData(prev => {
-      const newData: PomodoroData = {
-        ...DEFAULT_DATA,
-        timeLeft: config.workDuration * 60,
-        completedPomodoros: prev.completedPomodoros,
-        totalPomodoros: prev.totalPomodoros,
-      };
-      
-      setTimeout(() => {
-        usePluginStore.getState().setPluginData(PLUGIN_ID, 'data', newData);
-      }, 0);
-      
-      return newData;
-    });
-  }, [config.workDuration]);
+    const newData: PomodoroData = {
+      ...DEFAULT_DATA,
+      timeLeft: config.workDuration * 60,
+      completedPomodoros: data.completedPomodoros,
+      totalPomodoros: data.totalPomodoros,
+    };
+    setData(newData);
+  }, [config.workDuration, data.completedPomodoros, data.totalPomodoros, setData]);
 
   // 跳过当前阶段
   const skip = useCallback(() => {
-    setData(prev => {
-      const nextStatus = getNextStatus(prev.status, prev.completedPomodoros);
-      const newCompleted = prev.status === 'working' ? prev.completedPomodoros + 1 : prev.completedPomodoros;
-      
-      const newData: PomodoroData = {
-        ...prev,
-        status: 'idle',
-        timeLeft: getDuration(nextStatus),
-        completedPomodoros: newCompleted,
-        totalPomodoros: prev.status === 'working' ? prev.totalPomodoros + 1 : prev.totalPomodoros,
-        startedAt: null,
-        pausedAt: null,
-      };
-      
-      setTimeout(() => {
-        usePluginStore.getState().setPluginData(PLUGIN_ID, 'data', newData);
-      }, 0);
-      
-      return newData;
-    });
-  }, [getNextStatus, getDuration]);
+    const nextStatus = getNextStatus(data.status, data.completedPomodoros);
+    const newCompleted = data.status === 'working' ? data.completedPomodoros + 1 : data.completedPomodoros;
+    
+    const newData: PomodoroData = {
+      ...data,
+      status: 'idle',
+      timeLeft: getDuration(nextStatus),
+      completedPomodoros: newCompleted,
+      totalPomodoros: data.status === 'working' ? data.totalPomodoros + 1 : data.totalPomodoros,
+      startedAt: null,
+      pausedAt: null,
+    };
+    setData(newData);
+  }, [data, getNextStatus, getDuration, setData]);
 
   // 计时器逻辑
   useEffect(() => {
@@ -178,43 +135,30 @@ export function usePomodoro() {
     }
 
     intervalRef.current = setInterval(() => {
-      setData(prev => {
-        if (prev.timeLeft <= 1) {
-          playSound();
-          
-          const nextStatus = getNextStatus(prev.status, prev.completedPomodoros);
-          const newCompleted = prev.status === 'working' ? prev.completedPomodoros + 1 : prev.completedPomodoros;
-          const shouldAutoStart = 
-            (prev.status === 'working' && config.autoStartBreak) ||
-            ((prev.status === 'shortBreak' || prev.status === 'longBreak') && config.autoStartWork);
-          
-          const newData: PomodoroData = {
-            ...prev,
-            status: shouldAutoStart ? nextStatus : 'idle',
-            timeLeft: getDuration(nextStatus),
-            completedPomodoros: newCompleted,
-            totalPomodoros: prev.status === 'working' ? prev.totalPomodoros + 1 : prev.totalPomodoros,
-            startedAt: shouldAutoStart ? Date.now() : null,
-          };
-          
-          setTimeout(() => {
-            usePluginStore.getState().setPluginData(PLUGIN_ID, 'data', newData);
-          }, 0);
-          
-          return newData;
-        }
+      const currentData = usePomodoroStore.getState().data;
+      
+      if (currentData.timeLeft <= 1) {
+        playSound();
         
-        const newData = { ...prev, timeLeft: prev.timeLeft - 1 };
+        const nextStatus = getNextStatus(currentData.status, currentData.completedPomodoros);
+        const newCompleted = currentData.status === 'working' ? currentData.completedPomodoros + 1 : currentData.completedPomodoros;
+        const shouldAutoStart = 
+          (currentData.status === 'working' && config.autoStartBreak) ||
+          ((currentData.status === 'shortBreak' || currentData.status === 'longBreak') && config.autoStartWork);
         
-        // 每 5 秒同步一次到 store，减少写入频率
-        if (prev.timeLeft % 5 === 0) {
-          setTimeout(() => {
-            usePluginStore.getState().setPluginData(PLUGIN_ID, 'data', newData);
-          }, 0);
-        }
+        const newData: PomodoroData = {
+          ...currentData,
+          status: shouldAutoStart ? nextStatus : 'idle',
+          timeLeft: getDuration(nextStatus),
+          completedPomodoros: newCompleted,
+          totalPomodoros: currentData.status === 'working' ? currentData.totalPomodoros + 1 : currentData.totalPomodoros,
+          startedAt: shouldAutoStart ? Date.now() : null,
+        };
         
-        return newData;
-      });
+        setData(newData);
+      } else {
+        setData({ ...currentData, timeLeft: currentData.timeLeft - 1 });
+      }
     }, 1000);
 
     return () => {
