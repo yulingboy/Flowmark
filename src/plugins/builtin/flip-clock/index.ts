@@ -47,6 +47,6 @@ export const flipClockPlugin: Plugin = {
     showLunar: true,
   },
 
-  renderCard: (_api, size: PluginSize) => React.createElement(FlipClockCard, { size }),
+  renderCard: (size: PluginSize) => React.createElement(FlipClockCard, { size }),
   renderModal: () => React.createElement(FlipClockModal),
 };

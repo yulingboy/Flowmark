@@ -73,6 +73,6 @@ export const pomodoroPlugin: Plugin = {
     soundEnabled: true,
   },
 
-  renderCard: (_api, size: PluginSize) => React.createElement(PomodoroCard, { size }),
+  renderCard: (size: PluginSize) => React.createElement(PomodoroCard, { size }),
   renderModal: () => React.createElement(PomodoroModal),
 };

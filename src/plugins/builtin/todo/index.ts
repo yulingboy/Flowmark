@@ -18,6 +18,6 @@ export const todoPlugin: Plugin = {
   
   modalSize: { width: 800, height: 560 },
   
-  renderCard: (_api, size: PluginSize) => React.createElement(TodoCard, { size }),
+  renderCard: (size: PluginSize) => React.createElement(TodoCard, { size }),
   renderModal: () => React.createElement(TodoModal)
 };

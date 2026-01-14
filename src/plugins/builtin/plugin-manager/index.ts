@@ -21,6 +21,6 @@ export const pluginManagerPlugin: Plugin = {
   
   modalSize: { width: 640, height: 480 },
   
-  renderCard: (_api, size) => React.createElement(PluginManagerCard, { size }),
+  renderCard: (size) => React.createElement(PluginManagerCard, { size }),
   renderModal: () => React.createElement(PluginManagerModal)
 };

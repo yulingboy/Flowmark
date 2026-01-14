@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 import { builtinPlugins } from '../builtin';
-import { createPluginAPI } from '../pluginAPI';
 import { ContextMenu, MacModal } from '@/components';
 import type { ContextMenuItem } from '@/components';
 import { LayoutIcon } from '@/components/icons';
@@ -71,7 +70,6 @@ export function PluginCard({
   const { ref: visibilityRef, isVisible } = useIntersectionObserver();
 
   const plugin = builtinPlugins.find(p => p.metadata.id === item.pluginId);
-  const api = plugin ? createPluginAPI(item.pluginId, plugin.defaultConfig) : undefined;
   const isSystem = plugin?.isSystem === true;
 
   // 使用 useCardBehavior hook
@@ -101,7 +99,7 @@ export function PluginCard({
     baseHandleContextMenu(e);
   };
 
-  if (!plugin || !api) {
+  if (!plugin) {
     return (
       <div className={`w-full h-full rounded-2xl bg-white shadow-lg flex items-center justify-center ${className}`}>
         <span className="text-gray-400 text-sm">插件未找到</span>
@@ -167,7 +165,7 @@ export function PluginCard({
           {/* 懒加载：只有可见时才渲染插件内容 */}
           {isVisible ? (
             plugin.renderCard ? (
-              plugin.renderCard(api, pluginSize)
+              plugin.renderCard(pluginSize)
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center p-2">
                 <span className="text-2xl">{plugin.metadata.icon || '🔌'}</span>
@@ -202,7 +200,7 @@ export function PluginCard({
         width={plugin.modalSize?.width || 450}
         height={plugin.modalSize?.height || 500}
       >
-        {plugin.renderModal?.(api)}
+        {plugin.renderModal?.()}
       </MacModal>
     </>
   );

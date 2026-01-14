@@ -20,6 +20,6 @@ export const foodPickerPlugin: Plugin = {
   configSchema: {},
   defaultConfig: {},
 
-  renderCard: (_api, size: PluginSize) => React.createElement(FoodPickerCard, { size }),
+  renderCard: (size: PluginSize) => React.createElement(FoodPickerCard, { size }),
   renderModal: () => React.createElement(FoodPickerModal),
 };

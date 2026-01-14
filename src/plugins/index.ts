@@ -6,7 +6,6 @@ export type { PluginState } from './types';
 
 // 核心
 export { usePluginStore } from './store';
-export { createPluginAPI } from './pluginAPI';
 export { registerBuiltinPlugins, builtinPlugins } from './builtin';
 export { PluginCard } from './components/PluginCard';
 
@@ -14,7 +13,6 @@ export { PluginCard } from './components/PluginCard';
 export { isPluginCard } from '@/types';
 export type { 
   Plugin, 
-  PluginAPI, 
   PluginConfig, 
   PluginMetadata,
   PluginCardItem,

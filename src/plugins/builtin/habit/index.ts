@@ -29,6 +29,6 @@ export const habitPlugin: Plugin = {
     showStreak: true,
   },
 
-  renderCard: (_api, size: PluginSize) => React.createElement(HabitCard, { size }),
+  renderCard: (size: PluginSize) => React.createElement(HabitCard, { size }),
   renderModal: () => React.createElement(HabitModal),
 };

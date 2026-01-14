@@ -42,6 +42,6 @@ export const calendarPlugin: Plugin = {
     showFestival: true
   },
   
-  renderCard: (_api, size: PluginSize) => React.createElement(CalendarCard, { size }),
+  renderCard: (size: PluginSize) => React.createElement(CalendarCard, { size }),
   renderModal: () => React.createElement(CalendarModal)
 };

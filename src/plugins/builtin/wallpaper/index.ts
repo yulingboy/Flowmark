@@ -18,6 +18,6 @@ export const wallpaperPlugin: Plugin = {
   
   modalSize: { width: 760, height: 560 },
   
-  renderCard: (_api, size: PluginSize) => React.createElement(WallpaperCard, { size }),
+  renderCard: (size: PluginSize) => React.createElement(WallpaperCard, { size }),
   renderModal: () => React.createElement(WallpaperModal)
 };

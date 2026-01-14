@@ -47,6 +47,6 @@ export const weatherPlugin: Plugin = {
     updateInterval: 30
   },
   
-  renderCard: (_api, size: PluginSize) => React.createElement(WeatherCard, { size }),
+  renderCard: (size: PluginSize) => React.createElement(WeatherCard, { size }),
   renderModal: () => React.createElement(WeatherModal)
 };

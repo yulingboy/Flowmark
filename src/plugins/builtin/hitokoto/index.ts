@@ -48,6 +48,6 @@ export const hitokotoPlugin: Plugin = {
     refreshInterval: 30,
   },
 
-  renderCard: (_api, size: PluginSize) => React.createElement(HitokotoCard, { size }),
+  renderCard: (size: PluginSize) => React.createElement(HitokotoCard, { size }),
   renderModal: () => React.createElement(HitokotoModal),
 };

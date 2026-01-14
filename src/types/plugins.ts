@@ -36,19 +36,13 @@ export interface PluginConfigSchema {
 // 插件支持的尺寸
 export type PluginSize = '1x1' | '2x2' | '2x4';
 
-// 插件 API 接口
-export interface PluginAPI {
-  getConfig: <T = PluginConfig>() => T;
-  setConfig: (config: Partial<PluginConfig>) => void;
-}
-
 // 插件接口
 export interface Plugin {
   metadata: PluginMetadata;
   configSchema?: PluginConfigSchema;
   defaultConfig?: PluginConfig;
-  renderCard?: (api: PluginAPI, size: PluginSize) => ReactNode;
-  renderModal?: (api: PluginAPI) => ReactNode;
+  renderCard?: (size: PluginSize) => ReactNode;
+  renderModal?: () => ReactNode;
   supportedSizes?: PluginSize[];
   defaultSize?: PluginSize;
   isSystem?: boolean; // 系统插件，不可删除
