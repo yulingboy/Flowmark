@@ -1,17 +1,47 @@
 import type { SearchEngine } from '@/types';
 
-// 搜索引擎 URL 模板
-const SEARCH_ENGINES: Record<SearchEngine, string> = {
-  bing: 'https://www.bing.com/search?q=',
-  google: 'https://www.google.com/search?q=',
-  baidu: 'https://www.baidu.com/s?wd=',
+/**
+ * Search engine configuration interface
+ */
+export interface SearchEngineConfig {
+  name: string;
+  urlTemplate: string;
+  faviconUrl: string;
+}
+
+/**
+ * Search engine configurations
+ */
+export const SEARCH_ENGINE_CONFIGS: Record<SearchEngine, SearchEngineConfig> = {
+  bing: {
+    name: 'Bing',
+    urlTemplate: 'https://www.bing.com/search?q=',
+    faviconUrl: 'https://www.bing.com/favicon.ico',
+  },
+  google: {
+    name: 'Google',
+    urlTemplate: 'https://www.google.com/search?q=',
+    faviconUrl: 'https://www.google.com/favicon.ico',
+  },
+  baidu: {
+    name: 'Baidu',
+    urlTemplate: 'https://www.baidu.com/s?wd=',
+    faviconUrl: 'https://www.baidu.com/favicon.ico',
+  },
 };
 
-// 搜索引擎图标（使用 favicon）
+// 搜索引擎 URL 模板（向后兼容）
+const SEARCH_ENGINES: Record<SearchEngine, string> = {
+  bing: SEARCH_ENGINE_CONFIGS.bing.urlTemplate,
+  google: SEARCH_ENGINE_CONFIGS.google.urlTemplate,
+  baidu: SEARCH_ENGINE_CONFIGS.baidu.urlTemplate,
+};
+
+// 搜索引擎图标（向后兼容）
 export const SEARCH_ENGINE_ICONS: Record<SearchEngine, string> = {
-  bing: 'https://www.bing.com/favicon.ico',
-  google: 'https://www.google.com/favicon.ico',
-  baidu: 'https://www.baidu.com/favicon.ico',
+  bing: SEARCH_ENGINE_CONFIGS.bing.faviconUrl,
+  google: SEARCH_ENGINE_CONFIGS.google.faviconUrl,
+  baidu: SEARCH_ENGINE_CONFIGS.baidu.faviconUrl,
 };
 
 /**
