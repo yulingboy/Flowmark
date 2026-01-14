@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
-import { builtinPlugins } from '../builtin';
+import { builtinPlugins } from '@/plugins/builtin';
 import { ContextMenu, MacModal } from '@/components';
 import type { ContextMenuItem } from '@/components';
 import { LayoutIcon } from '@/components/icons';
 import type { PluginCardItem, PluginSize, CardSize, Position, ShortcutSize } from '@/types';
-import { useCardBehavior } from '@/features/shortcuts/hooks/useCardBehavior';
+import { useCardBehavior } from '../hooks/useCardBehavior';
 
 interface GridConfig {
   columns: number;

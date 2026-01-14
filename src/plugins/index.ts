@@ -3,7 +3,6 @@
 
 // 核心
 export { registerBuiltinPlugins, builtinPlugins } from './builtin';
-export { PluginCard } from './components/PluginCard';
 
 // 类型从 @/types 重导出，保持向后兼容
 export { isPluginCard } from '@/types';

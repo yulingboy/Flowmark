@@ -1,7 +1,7 @@
 import { useDraggable } from '@dnd-kit/core';
 import { ShortcutCard } from './ShortcutCard';
 import { ShortcutFolder } from './ShortcutFolder';
-import { PluginCard } from '@/plugins';
+import { PluginCard } from './PluginCard';
 import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, ShortcutSize, Position, GridItem } from '@/types';
 import { isShortcutFolder, isPluginCard } from '@/types';
 
