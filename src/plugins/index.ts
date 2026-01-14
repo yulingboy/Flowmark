@@ -5,10 +5,9 @@
 export type { PluginState } from './types';
 
 // 核心
-export { pluginManager } from './core/pluginManager';
-export type { PluginValidationResult, PluginRegistrationResult } from './core/pluginManager';
 export { usePluginStore } from './store';
-export { registerBuiltinPlugins } from './builtin';
+export { createPluginAPI } from './pluginAPI';
+export { registerBuiltinPlugins, builtinPlugins } from './builtin';
 export { PluginCard } from './components/PluginCard';
 
 // 类型从 @/types 重导出，保持向后兼容

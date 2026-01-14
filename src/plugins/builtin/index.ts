@@ -1,6 +1,6 @@
-import { pluginManager } from '../core/pluginManager';
 import { useShortcutsStore } from '@/features/shortcuts';
 import { isPluginCard } from '@/types';
+import { usePluginStore } from '../store';
 import { weatherPlugin } from './weather';
 import { todoPlugin } from './todo';
 import { notesPlugin } from './notes';
@@ -13,16 +13,35 @@ import { flipClockPlugin } from './flip-clock';
 import { habitPlugin } from './habit';
 import { foodPickerPlugin } from './food-picker';
 
-export const builtinPlugins = [pluginManagerPlugin, weatherPlugin, todoPlugin, notesPlugin, wallpaperPlugin, calendarPlugin, hitokotoPlugin, pomodoroPlugin, flipClockPlugin, habitPlugin, foodPickerPlugin];
+export const builtinPlugins = [
+  pluginManagerPlugin,
+  weatherPlugin,
+  todoPlugin,
+  notesPlugin,
+  wallpaperPlugin,
+  calendarPlugin,
+  hitokotoPlugin,
+  pomodoroPlugin,
+  flipClockPlugin,
+  habitPlugin,
+  foodPickerPlugin
+];
 
+/**
+ * 注册所有内置插件
+ */
 export function registerBuiltinPlugins() {
   const shortcutsStore = useShortcutsStore.getState();
+  const pluginStore = usePluginStore.getState();
   const shortcuts = shortcutsStore.shortcuts;
   
   const hasAnyPluginCard = shortcuts.some(s => isPluginCard(s));
   
   builtinPlugins.forEach(plugin => {
-    pluginManager.register(plugin);
+    // 初始化插件配置
+    if (!pluginStore.pluginConfigs[plugin.metadata.id] && plugin.defaultConfig) {
+      pluginStore.setPluginConfig(plugin.metadata.id, plugin.defaultConfig);
+    }
     
     // 首次运行时，为所有内置插件添加卡片
     if (!hasAnyPluginCard) {
@@ -48,4 +67,16 @@ export function registerBuiltinPlugins() {
   });
 }
 
-export { weatherPlugin, todoPlugin, notesPlugin, pluginManagerPlugin, wallpaperPlugin, calendarPlugin, hitokotoPlugin, pomodoroPlugin, flipClockPlugin, habitPlugin, foodPickerPlugin };
+export {
+  weatherPlugin,
+  todoPlugin,
+  notesPlugin,
+  pluginManagerPlugin,
+  wallpaperPlugin,
+  calendarPlugin,
+  hitokotoPlugin,
+  pomodoroPlugin,
+  flipClockPlugin,
+  habitPlugin,
+  foodPickerPlugin
+};

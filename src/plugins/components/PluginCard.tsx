@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
-import { pluginManager } from '../core/pluginManager';
+import { builtinPlugins } from '../builtin';
+import { createPluginAPI } from '../pluginAPI';
 import { ContextMenu, MacModal } from '@/components';
 import type { ContextMenuItem } from '@/components';
 import { LayoutIcon } from '@/components/icons';
@@ -69,8 +70,8 @@ export function PluginCard({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { ref: visibilityRef, isVisible } = useIntersectionObserver();
 
-  const plugin = pluginManager.getPlugin(item.pluginId);
-  const api = pluginManager.getPluginAPI(item.pluginId);
+  const plugin = builtinPlugins.find(p => p.metadata.id === item.pluginId);
+  const api = plugin ? createPluginAPI(item.pluginId, plugin.defaultConfig) : undefined;
   const isSystem = plugin?.isSystem === true;
 
   // 使用 useCardBehavior hook

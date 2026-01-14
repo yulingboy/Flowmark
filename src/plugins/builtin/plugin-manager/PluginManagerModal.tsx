@@ -1,6 +1,6 @@
 import { Button, Empty } from 'antd';
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
-import { pluginManager } from '../../core/pluginManager';
+import { builtinPlugins } from '../../builtin';
 import { useShortcutsStore } from '@/features/shortcuts';
 import { isPluginCard } from '@/types';
 import type { Plugin, PluginSize } from '@/types';
@@ -49,7 +49,7 @@ function PluginItem({ plugin }: { plugin: Plugin }) {
 }
 
 export function PluginManagerModal() {
-  const plugins = pluginManager.getPlugins().filter(p => p.metadata.id !== 'plugin-manager');
+  const plugins = builtinPlugins.filter(p => p.metadata.id !== 'plugin-manager');
 
   if (plugins.length === 0) {
     return (
