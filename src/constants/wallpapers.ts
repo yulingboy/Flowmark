@@ -1,32 +1,10 @@
 /**
- * 全局常量模块
+ * 壁纸相关常量
  */
 
-// 网格布局常量
-export const GRID = {
-  COLUMNS: 12,
-  ROWS: 4,
-  UNIT: 72,
-  GAP: 20,
-} as const;
-
-// 搜索配置常量
-export const SEARCH = {
-  MAX_HISTORY_ITEMS: 10,
-} as const;
-
-// 默认设置常量
-export const DEFAULTS = {
-  BACKGROUND_URL: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80',
-  BACKGROUND_BLUR: 0,
-  BACKGROUND_OVERLAY: 20,
-  SEARCH_ENGINE: 'bing' as const,
-  CLOCK_FONT_SIZE: 'large' as const,
-  CLOCK_COLOR: '#ffffff',
-  LANGUAGE: 'zh-CN' as const,
-} as const;
-
-// 壁纸分类
+/**
+ * 壁纸分类
+ */
 export const WALLPAPER_CATEGORIES = [
   { id: 'all', name: '全部', icon: '🎨' },
   { id: 'nature', name: '自然', icon: '🏔️' },
@@ -35,7 +13,9 @@ export const WALLPAPER_CATEGORIES = [
   { id: 'minimal', name: '简约', icon: '◻️' },
 ] as const;
 
-// 预设壁纸列表
+/**
+ * 预设壁纸列表
+ */
 export const PRESET_WALLPAPERS = [
   // 自然风景
   { id: '1', url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80', name: '山峰', category: 'nature' },

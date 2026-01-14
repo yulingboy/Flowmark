@@ -14,9 +14,3 @@ export interface PluginState {
   getPluginData: <T>(pluginId: string, key: string) => T | null;
   setPluginData: <T>(pluginId: string, key: string, value: T) => void;
 }
-
-/** 插件卡片 Props */
-export interface PluginCardProps {
-  pluginId: string;
-  size: '1x1' | '2x2' | '2x4';
-}

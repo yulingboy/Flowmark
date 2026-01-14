@@ -15,8 +15,8 @@ export { ContextMenu } from './Menu';
 export type { ContextMenuItem, ContextMenuProps } from './Menu';
 
 // Image 组件
-export { LazyImage, LazyBackground } from './Image';
-export type { LazyImageProps, LazyBackgroundProps } from './Image';
+export { LazyImage, LazyBackground, ProgressiveImage, ProgressiveBackground } from './Image';
+export type { LazyImageProps, LazyBackgroundProps, ProgressiveImageProps, ProgressiveBackgroundProps } from './Image';
 
 // 图标库
 export * from './icons';

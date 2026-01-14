@@ -1,8 +1,9 @@
 // Shortcuts feature module - barrel export
 
 // Types
-export type { GridConfig, ValidationResult } from './types';
-export { SHORTCUTS_LIMIT } from './types';
+export type { GridConfig } from './types';
+export type { ValidationResult } from './store/types';
+export { SHORTCUTS_LIMIT } from './store/types';
 
 // Components
 export { ShortcutCard } from './components/ShortcutCard';

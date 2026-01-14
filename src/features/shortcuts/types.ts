@@ -10,11 +10,4 @@ export interface GridConfig {
   gap: number;
 }
 
-/** 验证结果 */
-export interface ValidationResult {
-  isValid: boolean;
-  errors: string[];
-}
-
-/** 快捷方式数量限制 */
-export const SHORTCUTS_LIMIT = 100;
+// ValidationResult 和 SHORTCUTS_LIMIT 定义在 store/types.ts 中

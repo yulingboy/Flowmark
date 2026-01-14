@@ -3,11 +3,15 @@
 // Types
 export type { ContextMenuState, KeyboardShortcutsOptions, ModalsState } from './types';
 
-// Hooks
+// State hooks - 状态管理相关
+export { useModals } from './useModals';
+
+// Behavior hooks - 行为相关
 export { useClickOutside } from './useClickOutside';
+export { useContextMenu } from './useContextMenu';
+export { useKeyboardShortcuts } from './useKeyboardShortcuts';
+
+// Utility hooks - 工具类
 export { useDebounce } from './useDebounce';
 export { useImageLoader } from './useImageLoader';
 export { usePageVisibility } from './usePageVisibility';
-export { useModals } from './useModals';
-export { useKeyboardShortcuts } from './useKeyboardShortcuts';
-export { useContextMenu } from './useContextMenu';

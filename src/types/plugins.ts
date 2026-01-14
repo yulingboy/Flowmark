@@ -44,8 +44,22 @@ export interface PluginAPI {
   setStorage: <T>(key: string, value: T) => void;
 }
 
+// 插件生命周期接口
+export interface PluginLifecycle {
+  /** 插件挂载时调用 */
+  onMount?: () => void | Promise<void>;
+  /** 插件卸载时调用 */
+  onUnmount?: () => void | Promise<void>;
+  /** 配置变更时调用 */
+  onConfigChange?: (oldConfig: PluginConfig, newConfig: PluginConfig) => void;
+  /** 插件启用时调用 */
+  onEnable?: () => void;
+  /** 插件禁用时调用 */
+  onDisable?: () => void;
+}
+
 // 插件接口
-export interface Plugin {
+export interface Plugin extends PluginLifecycle {
   metadata: PluginMetadata;
   configSchema?: PluginConfigSchema;
   defaultConfig?: PluginConfig;

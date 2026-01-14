@@ -1,5 +1,6 @@
 import type { PluginAPI, PluginConfig } from '@/types';
 import { usePluginStore } from '../store';
+import { pluginLifecycleManager } from './pluginLifecycle';
 
 export function createPluginAPI(pluginId: string, defaultConfig?: PluginConfig): PluginAPI {
   return {
@@ -9,7 +10,13 @@ export function createPluginAPI(pluginId: string, defaultConfig?: PluginConfig):
     },
 
     setConfig: (config: Partial<PluginConfig>) => {
-      usePluginStore.getState().setPluginConfig(pluginId, config);
+      const store = usePluginStore.getState();
+      const oldConfig = { ...defaultConfig, ...store.getPluginConfig(pluginId) };
+      store.setPluginConfig(pluginId, config);
+      const newConfig = { ...defaultConfig, ...store.getPluginConfig(pluginId) };
+      
+      // 通知配置变更
+      pluginLifecycleManager.notifyConfigChange(pluginId, oldConfig, newConfig);
     },
 
     getStorage: <T>(key: string): T | null => {

@@ -13,7 +13,6 @@ export type {
   ShortcutEntry,
   ShortcutSize 
 } from './shortcuts';
-export { isShortcutFolder, isShortcutItem } from './shortcuts';
 
 // 插件类型
 export type {
@@ -23,10 +22,13 @@ export type {
   PluginConfigSchema,
   PluginSize,
   PluginAPI,
+  PluginLifecycle,
   Plugin,
   PluginCardItem
 } from './plugins';
-export { isPluginCard } from './plugins';
+
+// 类型守卫（统一从 guards.ts 导出）
+export { isShortcutFolder, isShortcutItem, isPluginCard } from './guards';
 
 // 网格项目（快捷方式条目或插件卡片）
 import type { ShortcutEntry } from './shortcuts';

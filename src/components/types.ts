@@ -7,6 +7,10 @@ import type { ReactNode } from 'react';
 export interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;
+  /** 错误发生时的回调 */
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
+  /** 重置时的回调 */
+  onReset?: () => void;
 }
 
 /** 错误边界状态 */

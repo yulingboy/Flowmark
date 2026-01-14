@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 import { pluginManager } from '../core/pluginManager';
 import { ContextMenu, MacModal } from '@/components';
@@ -26,6 +26,35 @@ interface PluginCardProps {
   position?: Position;
 }
 
+/**
+ * 使用 Intersection Observer 实现懒加载
+ */
+function useIntersectionObserver(options?: IntersectionObserverInit) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect(); // 一旦可见就停止观察
+        }
+      },
+      { threshold: 0.1, rootMargin: '50px', ...options }
+    );
+
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, [options]);
+
+  return { ref, isVisible };
+}
+
 export function PluginCard({ 
   item, 
   onResize, 
@@ -38,6 +67,7 @@ export function PluginCard({
   position
 }: PluginCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { ref: visibilityRef, isVisible } = useIntersectionObserver();
 
   const plugin = pluginManager.getPlugin(item.pluginId);
   const api = pluginManager.getPluginAPI(item.pluginId);
@@ -117,6 +147,7 @@ export function PluginCard({
   return (
     <>
       <button
+        ref={visibilityRef as React.RefObject<HTMLButtonElement>}
         onClick={handleClick}
         onContextMenu={handleContextMenu}
         className={`flex flex-col items-center gap-2 cursor-pointer group w-full h-full ${className}`}
@@ -132,12 +163,21 @@ export function PluginCard({
             </div>
           )}
           
-          {plugin.renderCard ? (
-            plugin.renderCard(api, pluginSize)
+          {/* 懒加载：只有可见时才渲染插件内容 */}
+          {isVisible ? (
+            plugin.renderCard ? (
+              plugin.renderCard(api, pluginSize)
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center p-2">
+                <span className="text-2xl">{plugin.metadata.icon || '🔌'}</span>
+                <span className="text-sm text-gray-600">{plugin.metadata.name}</span>
+              </div>
+            )
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center p-2">
-              <span className="text-2xl">{plugin.metadata.icon || '🔌'}</span>
-              <span className="text-sm text-gray-600">{plugin.metadata.name}</span>
+            // 占位符：未可见时显示
+            <div className="w-full h-full flex flex-col items-center justify-center p-2 animate-pulse">
+              <div className="w-8 h-8 bg-gray-200 rounded-full" />
+              <div className="w-16 h-3 bg-gray-200 rounded mt-2" />
             </div>
           )}
         </div>
