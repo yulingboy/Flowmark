@@ -22,7 +22,6 @@ export type {
   PluginConfigSchema,
   PluginSize,
   PluginAPI,
-  PluginLifecycle,
   Plugin,
   PluginCardItem
 } from './plugins';

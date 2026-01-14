@@ -7,7 +7,6 @@ export type { PluginState } from './types';
 // 核心
 export { pluginManager } from './core/pluginManager';
 export type { PluginValidationResult, PluginRegistrationResult } from './core/pluginManager';
-export { pluginLifecycleManager } from './core/pluginLifecycle';
 export { usePluginStore } from './store';
 export { registerBuiltinPlugins } from './builtin';
 export { PluginCard } from './components/PluginCard';
@@ -21,6 +20,5 @@ export type {
   PluginMetadata,
   PluginCardItem,
   PluginSize,
-  PluginLifecycle,
   CardSize
 } from '@/types';
