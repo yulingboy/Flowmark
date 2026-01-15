@@ -29,6 +29,12 @@
   font-size: 56px;
 }
 
+.flip-group-xl .flip-digit {
+  width: 80px;
+  height: 120px;
+  font-size: 80px;
+}
+
 .flip-digit {
   position: relative;
   perspective: 300px;
@@ -227,6 +233,15 @@
 
 .flip-separator-lg {
   gap: 12px;
+}
+
+.flip-separator-xl .flip-separator-dot {
+  width: 14px;
+  height: 14px;
+}
+
+.flip-separator-xl {
+  gap: 16px;
 }
 
 /* 日期显示 */
