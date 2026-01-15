@@ -19,7 +19,7 @@ export { SearchEngineSelector } from './components/SearchEngineSelector';
 export * from './hooks';
 
 // Utils
-export { performSearch, generateSearchUrl, SEARCH_ENGINE_ICONS, SEARCH_ENGINE_CONFIGS } from './utils/search';
+export { performSearch, generateSearchUrl, SEARCH_ENGINE_CONFIGS } from './utils/search';
 export type { SearchEngineConfig } from './utils/search';
 export { addToHistory, removeFromHistory } from './utils/searchHistory';
 export { isValidUrl, normalizeUrl } from './utils/urlValidation';

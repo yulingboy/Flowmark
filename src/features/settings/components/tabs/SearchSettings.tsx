@@ -1,6 +1,6 @@
 import { Button, Switch } from 'antd';
 import { useSearchStore } from '@/features/search';
-import { SEARCH_ENGINE_ICONS } from '@/features/search/utils/search';
+import { SEARCH_ENGINE_CONFIGS } from '@/features/search/utils/search';
 import { SettingRow } from '../SettingRow';
 import type { SearchEngine } from '@/types';
 
@@ -24,7 +24,7 @@ export function SearchSettings() {
           {SEARCH_ENGINES.map(({ value, label }) => (
             <button key={value} onClick={() => updateSearchEngine(value)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer ${searchEngine === value ? 'border-2 border-blue-500 bg-blue-50' : 'border border-gray-200 bg-white'}`}>
-              <img src={SEARCH_ENGINE_ICONS[value]} alt={label} className="w-4 h-4" />
+              <img src={SEARCH_ENGINE_CONFIGS[value].faviconUrl} alt={label} className="w-4 h-4" />
               <span className="text-sm text-gray-700">{label}</span>
             </button>
           ))}
