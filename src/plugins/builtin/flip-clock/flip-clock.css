@@ -12,24 +12,18 @@
 }
 
 .flip-group-sm .flip-digit {
-  width: 24px;
-  height: 36px;
-  font-size: 24px;
+  width: 40px;
+  height: 60px;
+  font-size: 40px;
 }
 
 .flip-group-md .flip-digit {
-  width: 36px;
-  height: 52px;
-  font-size: 36px;
+  width: 60px;
+  height: 90px;
+  font-size: 60px;
 }
 
 .flip-group-lg .flip-digit {
-  width: 56px;
-  height: 80px;
-  font-size: 56px;
-}
-
-.flip-group-xl .flip-digit {
   width: 80px;
   height: 120px;
   font-size: 80px;
@@ -202,46 +196,35 @@
 }
 
 .flip-separator-dot {
-  width: 6px;
-  height: 6px;
   background: #666;
   border-radius: 50%;
 }
 
 .flip-separator-sm .flip-separator-dot {
-  width: 4px;
-  height: 4px;
-}
-
-.flip-separator-sm {
-  gap: 4px;
-}
-
-.flip-separator-md .flip-separator-dot {
   width: 6px;
   height: 6px;
 }
 
-.flip-separator-md {
-  gap: 8px;
+.flip-separator-sm {
+  gap: 6px;
 }
 
-.flip-separator-lg .flip-separator-dot {
+.flip-separator-md .flip-separator-dot {
   width: 10px;
   height: 10px;
 }
 
-.flip-separator-lg {
-  gap: 12px;
+.flip-separator-md {
+  gap: 10px;
 }
 
-.flip-separator-xl .flip-separator-dot {
+.flip-separator-lg .flip-separator-dot {
   width: 14px;
   height: 14px;
 }
 
-.flip-separator-xl {
-  gap: 16px;
+.flip-separator-lg {
+  gap: 14px;
 }
 
 /* 日期显示 */

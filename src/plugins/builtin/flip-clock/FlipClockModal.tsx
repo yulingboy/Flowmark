@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useFlipClock } from './useFlipClock';
 import './flip-clock.css';
 
@@ -42,9 +42,11 @@ function FlipDigit({ digit, prevDigit }: { digit: string; prevDigit: string }) {
 }
 
 /** 两位数字组 */
-function FlipGroup({ value, prevValue }: { value: string; prevValue: string }) {
+function FlipGroup({ value, prevValue, size }: { value: string; prevValue: string; size: 'sm' | 'md' | 'lg' }) {
+  const sizeClass = size === 'sm' ? 'flip-group-sm' : size === 'md' ? 'flip-group-md' : 'flip-group-lg';
+  
   return (
-    <div className="flip-group flip-group-xl">
+    <div className={`flip-group ${sizeClass}`}>
       <FlipDigit digit={value[0]} prevDigit={prevValue[0]} />
       <FlipDigit digit={value[1]} prevDigit={prevValue[1]} />
     </div>
@@ -52,9 +54,11 @@ function FlipGroup({ value, prevValue }: { value: string; prevValue: string }) {
 }
 
 /** 分隔符 - 两个点 */
-function Separator() {
+function Separator({ size }: { size: 'sm' | 'md' | 'lg' }) {
+  const sizeClass = `flip-separator-${size}`;
+
   return (
-    <div className="flip-separator flip-separator-xl">
+    <div className={`flip-separator ${sizeClass}`}>
       <div className="flip-separator-dot" />
       <div className="flip-separator-dot" />
     </div>
@@ -63,27 +67,63 @@ function Separator() {
 
 export function FlipClockModal() {
   const { time, prevTime, date, config } = useFlipClock();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const checkSize = () => {
+      if (containerRef.current) {
+        const { width, height } = containerRef.current.getBoundingClientRect();
+        // 如果宽度大于 600 或高度大于 400，认为是全屏或大窗口
+        const newIsFullscreen = width > 600 || height > 400;
+        setIsFullscreen(newIsFullscreen);
+      }
+    };
+
+    checkSize();
+
+    // 使用 ResizeObserver 监听容器尺寸变化
+    const resizeObserver = new ResizeObserver(() => {
+      checkSize();
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
+  // 根据是否全屏选择尺寸
+  const clockSize = isFullscreen ? 'lg' : 'sm';
+  const gapClass = isFullscreen ? 'gap-3' : 'gap-1.5';
+  const periodClass = isFullscreen ? 'text-3xl ml-4' : 'text-lg ml-2';
+  const dateClass = isFullscreen ? 'text-xl mt-8' : 'text-sm mt-3';
 
   return (
-    <div className="h-full flex flex-col items-center justify-center bg-neutral-900 text-white">
+    <div ref={containerRef} className="h-full flex flex-col items-center justify-center bg-neutral-900 text-white">
       {/* 翻页时钟 */}
-      <div className="flex items-center gap-3">
-        <FlipGroup value={time.hours} prevValue={prevTime.hours} />
-        <Separator />
-        <FlipGroup value={time.minutes} prevValue={prevTime.minutes} />
+      <div className={`flex items-center ${gapClass}`}>
+        <FlipGroup value={time.hours} prevValue={prevTime.hours} size={clockSize} />
+        <Separator size={clockSize} />
+        <FlipGroup value={time.minutes} prevValue={prevTime.minutes} size={clockSize} />
         {config.showSeconds && (
           <>
-            <Separator />
-            <FlipGroup value={time.seconds} prevValue={prevTime.seconds} />
+            <Separator size={clockSize} />
+            <FlipGroup value={time.seconds} prevValue={prevTime.seconds} size={clockSize} />
           </>
         )}
         {!config.use24Hour && time.period && (
-          <span className="text-3xl text-neutral-500 ml-4">{time.period}</span>
+          <span className={`${periodClass} text-neutral-500`}>
+            {time.period}
+          </span>
         )}
       </div>
       
       {config.showDate && (
-        <div className="text-xl text-neutral-500 mt-8">
+        <div className={`${dateClass} text-neutral-500`}>
           {date.formatted}
         </div>
       )}
