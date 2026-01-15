@@ -4,7 +4,7 @@
 // 核心
 export { registerBuiltinPlugins, builtinPlugins } from './builtin';
 
-// 类型从 @/types 重导出，保持向后兼容
+// 类型重导出
 export { isPluginCard } from '@/types';
 export type { 
   Plugin, 

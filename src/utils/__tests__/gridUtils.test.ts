@@ -12,7 +12,7 @@ import {
   GridManager,
   TEXT_HEIGHT,
 } from '../gridUtils';
-import type { ShortcutSize, GridItem } from '@/types';
+import type { CardSize, GridItem } from '@/types';
 
 describe('gridUtils', () => {
   describe('getGridSpan', () => {
@@ -225,7 +225,7 @@ describe('gridUtils', () => {
     });
 
     it('应该拒绝超出边界的尺寸', () => {
-      const result = findValidPositionInBounds(0, 0, '2x4' as ShortcutSize, {
+      const result = findValidPositionInBounds(0, 0, '2x4' as CardSize, {
         ...gridConfig,
         rows: 3,
       });

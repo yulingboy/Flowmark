@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { ShortcutItem, ShortcutSize, PluginCardItem } from '@/types';
+import type { ShortcutItem, CardSize, PluginCardItem } from '@/types';
 import { isShortcutFolder, isPluginCard } from '@/types';
 import { GRID } from '@/constants';
 
@@ -50,7 +50,7 @@ export const useShortcutsStore = create<ShortcutsState>()(
         gridManager.initFromItems(state.shortcuts);
         
         // 尝试的尺寸列表：首选尺寸 + 支持的其他尺寸（按面积从大到小排序）
-        const sizesToTry: ShortcutSize[] = [size];
+        const sizesToTry: CardSize[] = [size];
         if (supportedSizes) {
           // 按面积从大到小排序
           const sortedSizes = [...supportedSizes]
@@ -123,7 +123,7 @@ export const useShortcutsStore = create<ShortcutsState>()(
         return {
           shortcuts: [
             ...state.shortcuts.filter((s) => s.id !== folderId),
-            ...folder.items.map((item) => ({ ...item, size: '1x1' as ShortcutSize })),
+            ...folder.items.map((item) => ({ ...item, size: '1x1' as CardSize })),
           ],
         };
       }),

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from 'antd';
-import type { ShortcutSize } from '@/types';
+import type { CardSize } from '@/types';
 import type { ContextMenuItem, ContextMenuProps } from './types';
 
 export function ContextMenu({ isOpen, position, items, onClose, ariaLabel = '上下文菜单' }: ContextMenuProps) {
@@ -124,7 +124,7 @@ export function ContextMenu({ isOpen, position, items, onClose, ariaLabel = '上
 
   if (!isOpen) return null;
 
-  const allLayoutSizes: { size: ShortcutSize; cols: number; rows: number }[] = [
+  const allLayoutSizes: { size: CardSize; cols: number; rows: number }[] = [
     { size: '1x1', cols: 1, rows: 1 },
     { size: '1x2', cols: 1, rows: 2 },
     { size: '2x1', cols: 2, rows: 1 },

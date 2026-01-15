@@ -4,7 +4,7 @@ import { builtinPlugins } from '@/plugins/builtin';
 import { ContextMenu, MacModal } from '@/components';
 import type { ContextMenuItem } from '@/components';
 import { LayoutIcon } from '@/components/icons';
-import type { PluginCardItem, PluginSize, CardSize, Position, ShortcutSize } from '@/types';
+import type { PluginCardItem, PluginSize, CardSize, Position } from '@/types';
 import { useCardBehavior } from '../hooks/useCardBehavior';
 
 interface GridConfig {
@@ -82,7 +82,7 @@ export function PluginCard({
     cardContainerClassName,
     selectionIndicatorClassName,
   } = useCardBehavior({
-    size: (item.size || '2x2') as ShortcutSize,
+    size: (item.size || '2x2') as CardSize,
     gridConfig,
     position,
     batchEditMode,

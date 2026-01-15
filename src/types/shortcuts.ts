@@ -37,6 +37,3 @@ export function isShortcutItem(entry: unknown): entry is ShortcutItem {
   if (typeof entry !== 'object' || entry === null) return false;
   return !isShortcutFolder(entry) && !('isPlugin' in entry);
 }
-
-// 快捷方式尺寸别名（向后兼容）
-export type ShortcutSize = CardSize;

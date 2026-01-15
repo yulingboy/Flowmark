@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import type { ShortcutFolder as ShortcutFolderType, ShortcutSize, Position } from '@/types';
+import type { ShortcutFolder as ShortcutFolderType, CardSize, Position } from '@/types';
 import { ContextMenu } from '@/components';
 import type { ContextMenuItem } from '@/components';
 import { DeleteOutlined } from '@ant-design/icons';
@@ -17,14 +17,14 @@ interface GridConfig {
 interface ShortcutFolderProps {
   folder: ShortcutFolderType;
   onOpen?: (folder: ShortcutFolderType) => void;
-  onResize?: (folder: ShortcutFolderType, size: ShortcutSize) => void;
+  onResize?: (folder: ShortcutFolderType, size: CardSize) => void;
   className?: string;
   isDropTarget?: boolean;
   gridConfig?: GridConfig;
   position?: Position;
 }
 
-function getPreviewConfig(size: ShortcutSize = '1x1') {
+function getPreviewConfig(size: CardSize = '1x1') {
   switch (size) {
     case '1x1': return { cols: 2, rows: 2, maxItems: 4 };
     case '2x2': return { cols: 2, rows: 2, maxItems: 4 };
@@ -45,7 +45,7 @@ export function ShortcutFolder({ folder, onOpen, onResize, className = '', isDro
     if (!gridConfig || !position) return [];
     const { col, row } = pixelToGrid(position.x, position.y, gridConfig.unit, gridConfig.gap);
     const validSizes = getValidSizesForPosition(col, row, gridConfig.columns, gridConfig.rows, folder.size);
-    const folderSizes: ShortcutSize[] = ['1x1', '2x2', '2x4'];
+    const folderSizes: CardSize[] = ['1x1', '2x2', '2x4'];
     return folderSizes.filter(s => !validSizes.includes(s));
   }, [gridConfig, position, folder.size]);
   

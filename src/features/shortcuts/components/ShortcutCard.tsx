@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import type { ShortcutItem, ShortcutSize, Position } from '@/types';
+import type { ShortcutItem, CardSize, Position } from '@/types';
 import { isShortcutFolder } from '@/types';
 import { IframeModal, ContextMenu } from '@/components';
 import type { ContextMenuItem } from '@/components';
@@ -20,7 +20,7 @@ interface ShortcutCardProps {
   onClick?: (item: ShortcutItem) => void;
   onEdit?: (item: ShortcutItem) => void;
   onDelete?: (item: ShortcutItem) => void;
-  onResize?: (item: ShortcutItem, size: ShortcutSize) => void;
+  onResize?: (item: ShortcutItem, size: CardSize) => void;
   className?: string;
   batchEditMode?: boolean;
   isSelected?: boolean;

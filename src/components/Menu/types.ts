@@ -2,7 +2,7 @@
  * Menu 组件类型定义
  */
 import type { ReactNode } from 'react';
-import type { ShortcutSize } from '@/types';
+import type { CardSize } from '@/types';
 
 /** 右键菜单项 */
 export interface ContextMenuItem {
@@ -11,10 +11,10 @@ export interface ContextMenuItem {
   onClick: () => void;
   rightIcon?: ReactNode;
   type?: 'normal' | 'layout' | 'submenu';
-  layoutOptions?: ShortcutSize[];
-  disabledLayouts?: ShortcutSize[];
-  currentLayout?: ShortcutSize;
-  onLayoutSelect?: (size: ShortcutSize) => void;
+  layoutOptions?: CardSize[];
+  disabledLayouts?: CardSize[];
+  currentLayout?: CardSize;
+  onLayoutSelect?: (size: CardSize) => void;
   submenuItems?: { id: string; label: string; onClick: () => void }[];
   disabled?: boolean;
 }

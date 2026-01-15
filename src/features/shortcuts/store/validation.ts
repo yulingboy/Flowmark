@@ -1,4 +1,4 @@
-import type { GridItem, ShortcutEntry, ShortcutFolder, ShortcutItem, ShortcutSize, PluginCardItem } from '@/types';
+import type { GridItem, ShortcutEntry, ShortcutFolder, ShortcutItem, CardSize, PluginCardItem } from '@/types';
 import type { ValidationResult } from './types';
 
 export function validateShortcutItem(item: unknown): item is ShortcutItem {
@@ -64,7 +64,7 @@ export function validateAndRepairShortcuts(shortcuts: unknown[]): ValidationResu
         name: (s.name as string) || '未命名',
         url: (s.url as string) || 'https://example.com',
         icon: (s.icon as string) || '',
-        size: ((s.size as ShortcutSize) || '1x1'),
+        size: ((s.size as CardSize) || '1x1'),
         openMode: (s.openMode as 'tab' | 'popup') || 'tab',
       };
       

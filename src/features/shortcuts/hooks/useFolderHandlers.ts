@@ -1,6 +1,6 @@
 import { GridManager, pixelToGrid, gridToPixel, findValidPositionInBounds } from '@/utils/gridUtils';
 import type { GridConfig } from '@/utils/gridUtils';
-import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, ShortcutSize, GridItem } from '@/types';
+import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, CardSize, GridItem } from '@/types';
 import { isShortcutFolder } from '@/types';
 
 interface FolderHandlersOptions {
@@ -104,7 +104,7 @@ export function createFolderHandlers({
         occupiedCells
       );
       if (targetPos) {
-        finalItem = { ...item, size: '1x1' as ShortcutSize };
+        finalItem = { ...item, size: '1x1' as CardSize };
         console.info(`Item ${item.id} resized from ${item.size} to 1x1 due to boundary constraints`);
       }
     }

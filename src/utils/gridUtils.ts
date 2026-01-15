@@ -1,10 +1,10 @@
-import type { ShortcutSize, Position, GridItem } from '@/types';
+import type { CardSize, Position, GridItem } from '@/types';
 
 /** 卡片下方文字标签的高度（像素） */
 export const TEXT_HEIGHT = 20;
 
 /** 所有可用的尺寸选项：宽x高（以网格单元为单位） */
-export const ALL_SIZES: ShortcutSize[] = ['1x1', '1x2', '2x1', '2x2', '2x4'];
+export const ALL_SIZES: CardSize[] = ['1x1', '1x2', '2x1', '2x2', '2x4'];
 
 /**
  * 解析尺寸字符串，获取列跨度和行跨度
@@ -12,7 +12,7 @@ export const ALL_SIZES: ShortcutSize[] = ['1x1', '1x2', '2x1', '2x2', '2x4'];
  * @returns { colSpan: 列跨度, rowSpan: 行跨度 }
  * @example getGridSpan('2x4') => { colSpan: 2, rowSpan: 4 }
  */
-export function getGridSpan(size: ShortcutSize = '1x1') {
+export function getGridSpan(size: CardSize = '1x1') {
   const [cols, rows] = size.split('x').map(Number);
   return { colSpan: cols, rowSpan: rows };
 }
@@ -25,13 +25,13 @@ export function getValidSizesForPosition(
   row: number,
   columns: number,
   rows: number,
-  currentSize?: ShortcutSize
-): ShortcutSize[] {
+  currentSize?: CardSize
+): CardSize[] {
   if (columns <= 0 || rows <= 0 || col < 0 || row < 0) {
     return currentSize ? [currentSize] : [];
   }
 
-  const validSizes: ShortcutSize[] = [];
+  const validSizes: CardSize[] = [];
 
   for (const size of ALL_SIZES) {
     const { colSpan, rowSpan } = getGridSpan(size);
@@ -116,7 +116,7 @@ export interface GridConfig {
  */
 export function canResizeItem(
   position: Position,
-  newSize: ShortcutSize,
+  newSize: CardSize,
   gridConfig: GridConfig
 ): boolean {
   const { col, row } = pixelToGrid(position.x, position.y, gridConfig.unit, gridConfig.gap);
@@ -183,7 +183,7 @@ function isPositionValid(
 export function findValidPositionInBounds(
   targetCol: number,
   targetRow: number,
-  size: ShortcutSize,
+  size: CardSize,
   gridConfig: GridConfig,
   occupiedCells?: Set<string>
 ): { col: number; row: number } | null {

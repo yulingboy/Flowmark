@@ -2,7 +2,7 @@ import { useDraggable } from '@dnd-kit/core';
 import { ShortcutCard } from './ShortcutCard';
 import { ShortcutFolder } from './ShortcutFolder';
 import { PluginCard } from './PluginCard';
-import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, ShortcutSize, Position, GridItem } from '@/types';
+import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, CardSize, Position, GridItem } from '@/types';
 import { isShortcutFolder, isPluginCard } from '@/types';
 
 interface GridConfig {
@@ -20,7 +20,7 @@ interface DraggableItemProps {
   onOpen?: (folder: ShortcutFolderType) => void;
   onEdit?: (item: ShortcutItem) => void;
   onDelete?: (item: ShortcutItem) => void;
-  onResize?: (item: GridItem, size: ShortcutSize) => void;
+  onResize?: (item: GridItem, size: CardSize) => void;
   onRemove?: (item: GridItem) => void;
   isDropTarget: boolean;
   isDragging: boolean;

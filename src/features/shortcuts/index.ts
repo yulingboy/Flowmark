@@ -20,9 +20,8 @@ export { useShortcutsStore } from './store';
 export type { ShortcutsState } from './store/types';
 
 // Utils
-export { getFaviconUrl, getFaviconUrlAsync, generatePlaceholder, preloadFavicons, clearFaviconCache, getCacheStats } from './utils/faviconService';
+export { getFaviconUrl, getFaviconUrlAsync, generatePlaceholder, preloadFavicons } from './utils/faviconService';
 export { extractSiteInfo, SITE_INFO } from './utils/siteInfo';
-// Grid utils re-exported from @/utils for backward compatibility
 export { getGridSpan, getItemSize, pixelToGrid, gridToPixel, GridManager, getValidSizesForPosition, ALL_SIZES, TEXT_HEIGHT } from '@/utils/gridUtils';
 
 // Hooks

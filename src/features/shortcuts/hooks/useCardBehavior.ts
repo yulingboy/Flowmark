@@ -1,7 +1,7 @@
 import { useMemo, useCallback } from 'react';
 import { useContextMenu } from '@/hooks/useContextMenu';
 import { pixelToGrid, getValidSizesForPosition, ALL_SIZES } from '@/utils/gridUtils';
-import type { Position, ShortcutSize } from '@/types';
+import type { Position, CardSize } from '@/types';
 
 interface GridConfig {
   columns: number;
@@ -12,7 +12,7 @@ interface GridConfig {
 
 export interface UseCardBehaviorOptions {
   /** 当前卡片尺寸 */
-  size: ShortcutSize;
+  size: CardSize;
   /** 网格配置 */
   gridConfig?: GridConfig;
   /** 卡片位置 */
@@ -37,7 +37,7 @@ export interface UseCardBehaviorResult {
   /** 关闭右键菜单 */
   closeContextMenu: () => void;
   /** 禁用的布局选项 */
-  disabledLayouts: ShortcutSize[];
+  disabledLayouts: CardSize[];
   /** 批量编辑点击处理 */
   handleBatchClick: (onToggleSelect?: (id: string) => void, itemId?: string) => boolean;
   /** 卡片容器样式类名 */

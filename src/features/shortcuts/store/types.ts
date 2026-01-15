@@ -1,4 +1,4 @@
-import type { GridItem, ShortcutItem, ShortcutSize } from '@/types';
+import type { GridItem, ShortcutItem, CardSize } from '@/types';
 
 export const SHORTCUTS_LIMIT = 200;
 
@@ -18,10 +18,10 @@ export interface ShortcutsState {
   setShortcuts: (shortcuts: GridItem[]) => void;
   addShortcut: (shortcut: Omit<ShortcutItem, 'id'>) => boolean;
   addFolder: (name: string) => boolean;
-  addPluginCard: (pluginId: string, name: string, icon: string, size?: ShortcutSize, supportedSizes?: ShortcutSize[]) => boolean;
+  addPluginCard: (pluginId: string, name: string, icon: string, size?: CardSize, supportedSizes?: CardSize[]) => boolean;
   updateShortcut: (id: string, data: Partial<ShortcutItem>) => void;
   deleteItem: (ids: string | string[]) => void;
-  resizeItem: (id: string, size: ShortcutSize) => void;
+  resizeItem: (id: string, size: CardSize) => void;
   setEditingItem: (item: ShortcutItem | null) => void;
   moveToFolder: (itemId: string, folderId: string) => void;
   dissolveFolder: (folderId: string) => void;

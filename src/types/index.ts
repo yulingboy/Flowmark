@@ -10,8 +10,7 @@ export type { CardSize, OpenMode, Position, SearchEngine, ClockData } from './co
 export type { 
   ShortcutItem, 
   ShortcutFolder, 
-  ShortcutEntry,
-  ShortcutSize 
+  ShortcutEntry
 } from './shortcuts';
 
 // 插件类型

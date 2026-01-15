@@ -10,7 +10,7 @@ import { getItemSize, canResizeItem, GridManager, pixelToGrid, getGridSpan, TEXT
 import { useShortcutItems } from '../hooks/useShortcutItems';
 import { createDragHandlers } from '../hooks/useDragHandlers';
 import { createFolderHandlers } from '../hooks/useFolderHandlers';
-import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, ShortcutSize, GridItem } from '@/types';
+import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, CardSize, GridItem } from '@/types';
 import { isShortcutFolder, isPluginCard } from '@/types';
 import { useShortcutsStore } from '../store';
 
@@ -64,7 +64,7 @@ export function ShortcutsContainer({
    * 
    * 如果任一验证失败，拒绝操作，保持原尺寸不变
    */
-  const handleResizeItem = (item: GridItem, size: ShortcutSize) => {
+  const handleResizeItem = (item: GridItem, size: CardSize) => {
     const position = item.position || { x: 0, y: 0 };
     
     // 边界验证：检查新尺寸是否会超出网格边界

@@ -1,11 +1,11 @@
-import type { ShortcutEntry, ShortcutItem, ShortcutSize, ShortcutFolder } from '@/types';
+import type { ShortcutEntry, ShortcutItem, CardSize, ShortcutFolder } from '@/types';
 import { getFaviconUrl } from '../utils/faviconService';
 
 export const createFolder = (
   id: string,
   items: ShortcutItem[],
   name: string,
-  size: ShortcutSize = '2x2'
+  size: CardSize = '2x2'
 ): ShortcutFolder => ({
   id,
   name,

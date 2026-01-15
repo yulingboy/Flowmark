@@ -63,9 +63,3 @@ export async function getFaviconUrlAsync(url: string, size: number = DEFAULT_SIZ
 export async function preloadFavicons(urls: string[], size: number = DEFAULT_SIZE): Promise<void> {
   await Promise.allSettled(urls.map(url => getFaviconUrlAsync(url, size)));
 }
-
-// 保留空实现以兼容现有导出
-export function clearFaviconCache(): void {}
-export function getCacheStats(): { size: number; maxSize: number } {
-  return { size: 0, maxSize: 0 };
-}
