@@ -4,33 +4,43 @@ import './flip-clock.css';
 
 /** 单个翻页数字 */
 function FlipDigit({ digit, prevDigit }: { digit: string; prevDigit: string }) {
-  const [flipping, setFlipping] = useState(false);
+  const [isFlipping, setIsFlipping] = useState(false);
+  const [currentDigit, setCurrentDigit] = useState(digit);
 
   useEffect(() => {
-    if (digit !== prevDigit) {
-      setFlipping(true);
-      const timer = setTimeout(() => setFlipping(false), 600);
+    if (digit !== prevDigit && prevDigit !== undefined) {
+      setIsFlipping(true);
+      // 动画完成后更新当前数字并停止动画
+      const timer = setTimeout(() => {
+        setCurrentDigit(digit);
+        setIsFlipping(false);
+      }, 600);
       return () => clearTimeout(timer);
+    } else {
+      setCurrentDigit(digit);
     }
   }, [digit, prevDigit]);
 
   return (
     <div className="flip-digit">
       <div className="flip-digit-inner">
-        {/* 上半部分 */}
+        {/* 静态上半部分 - 显示当前数字 */}
         <div className="flip-digit-top">
-          <span>{digit}</span>
+          <span>{currentDigit}</span>
         </div>
-        {/* 下半部分 */}
+        {/* 静态下半部分 - 显示当前数字 */}
         <div className="flip-digit-bottom">
-          <span>{prevDigit}</span>
+          <span>{currentDigit}</span>
         </div>
-        {/* 翻页动画 */}
-        {flipping && (
+        
+        {/* 翻页动画层 */}
+        {isFlipping && (
           <>
+            {/* 上半部分翻下 - 显示旧数字 */}
             <div className="flip-digit-flip-top">
               <span>{prevDigit}</span>
             </div>
+            {/* 下半部分翻上 - 显示新数字 */}
             <div className="flip-digit-flip-bottom">
               <span>{digit}</span>
             </div>

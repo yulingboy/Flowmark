@@ -55,6 +55,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  z-index: 1;
 }
 
 .flip-digit-top span {
@@ -76,6 +77,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  z-index: 1;
 }
 
 .flip-digit-bottom span {
@@ -129,8 +131,8 @@
   align-items: flex-end;
   justify-content: center;
   transform-origin: bottom;
-  animation: flip-top 0.3s ease-in forwards;
-  z-index: 20;
+  animation: flip-top 0.6s ease-in-out forwards;
+  z-index: 2;
   backface-visibility: hidden;
 }
 
@@ -154,10 +156,10 @@
   align-items: flex-start;
   justify-content: center;
   transform-origin: top;
-  animation: flip-bottom 0.3s 0.15s ease-out forwards;
-  transform: rotateX(90deg);
-  z-index: 20;
+  animation: flip-bottom 0.6s ease-in-out forwards;
+  z-index: 2;
   backface-visibility: hidden;
+  transform: rotateX(90deg);
 }
 
 .flip-digit-flip-bottom span {
