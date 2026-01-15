@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { Tooltip } from 'antd';
 import { useModalBehavior } from './useModalBehavior';
 
 interface MacModalProps {
@@ -74,21 +75,24 @@ export function MacModal({
         >
           {/* 左侧按钮组 - macOS 标准顺序：红(关闭)、黄(最小化)、绿(全屏) */}
           <div className="flex gap-2" onPointerDown={(e) => e.stopPropagation()}>
-            <button 
-              onClick={onClose} 
-              className="w-3 h-3 rounded-full bg-[#ff5f57] hover:bg-[#ff4136] border-none cursor-pointer" 
-              title="关闭" 
-            />
-            <button 
-              onClick={onClose} 
-              className="w-3 h-3 rounded-full bg-[#febc2e] hover:bg-[#f5a623] border-none cursor-pointer" 
-              title="最小化" 
-            />
-            <button 
-              onClick={toggleFullscreen} 
-              className="w-3 h-3 rounded-full bg-[#28c840] hover:bg-[#1db954] border-none cursor-pointer" 
-              title={isFullscreen ? '退出全屏' : '全屏'} 
-            />
+            <Tooltip title="关闭" placement="bottom">
+              <button 
+                onClick={onClose} 
+                className="w-3 h-3 rounded-full bg-[#ff5f57] hover:bg-[#ff4136] border-none cursor-pointer" 
+              />
+            </Tooltip>
+            <Tooltip title="最小化" placement="bottom">
+              <button 
+                onClick={onClose} 
+                className="w-3 h-3 rounded-full bg-[#febc2e] hover:bg-[#f5a623] border-none cursor-pointer" 
+              />
+            </Tooltip>
+            <Tooltip title={isFullscreen ? '退出全屏' : '全屏'} placement="bottom">
+              <button 
+                onClick={toggleFullscreen} 
+                className="w-3 h-3 rounded-full bg-[#28c840] hover:bg-[#1db954] border-none cursor-pointer" 
+              />
+            </Tooltip>
           </div>
           {/* 居中标题 */}
           <span className="flex-1 text-center text-sm font-medium text-gray-700 select-none">{title}</span>

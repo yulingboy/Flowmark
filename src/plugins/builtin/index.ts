@@ -33,20 +33,10 @@ export function registerBuiltinPlugins() {
   const shortcutsStore = useShortcutsStore.getState();
   const shortcuts = shortcutsStore.shortcuts;
   
-  const hasAnyPluginCard = shortcuts.some(s => isPluginCard(s));
-  
+  // 不再自动添加插件卡片，用户需要手动从插件管理器添加
+  // 只确保系统插件存在
   builtinPlugins.forEach(plugin => {
-    // 首次运行时，为所有内置插件添加卡片
-    if (!hasAnyPluginCard) {
-      shortcutsStore.addPluginCard(
-        plugin.metadata.id,
-        plugin.metadata.name,
-        plugin.metadata.icon || '🔌',
-        plugin.defaultSize || '2x2'
-      );
-    }
-    // 系统插件始终确保存在
-    else if (plugin.isSystem) {
+    if (plugin.isSystem) {
       const exists = shortcuts.some(s => isPluginCard(s) && s.pluginId === plugin.metadata.id);
       if (!exists) {
         shortcutsStore.addPluginCard(

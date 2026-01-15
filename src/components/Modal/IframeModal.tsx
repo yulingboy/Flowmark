@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { Spin } from 'antd';
+import { Spin, Tooltip } from 'antd';
 import { useModalBehavior } from './useModalBehavior';
 import type { ModalPosition } from './types';
 
@@ -192,30 +192,34 @@ export function IframeModal({
         >
           <span className="text-sm font-medium text-gray-700 select-none truncate max-w-[70%]">{title || url}</span>
           <div className="flex gap-2" onPointerDown={(e) => e.stopPropagation()}>
-            <button 
-              onClick={handleRefresh} 
-              className="w-3 h-3 rounded-full bg-yellow-400 hover:bg-yellow-500 border-none cursor-pointer" 
-              title="刷新"
-              aria-label="刷新"
-            />
-            <button 
-              onClick={handleToggleFullscreen} 
-              className="w-3 h-3 rounded-full bg-green-400 hover:bg-green-500 border-none cursor-pointer" 
-              title={isFullscreen ? '退出全屏' : '全屏'}
-              aria-label={isFullscreen ? '退出全屏' : '全屏'}
-            />
-            <button 
-              onClick={() => window.open(url, '_blank')} 
-              className="w-3 h-3 rounded-full bg-blue-400 hover:bg-blue-500 border-none cursor-pointer" 
-              title="新标签页打开"
-              aria-label="新标签页打开"
-            />
-            <button 
-              onClick={onClose} 
-              className="w-3 h-3 rounded-full bg-red-400 hover:bg-red-500 border-none cursor-pointer" 
-              title="关闭"
-              aria-label="关闭"
-            />
+            <Tooltip title="刷新" placement="bottom">
+              <button 
+                onClick={handleRefresh} 
+                className="w-3 h-3 rounded-full bg-yellow-400 hover:bg-yellow-500 border-none cursor-pointer" 
+                aria-label="刷新"
+              />
+            </Tooltip>
+            <Tooltip title={isFullscreen ? '退出全屏' : '全屏'} placement="bottom">
+              <button 
+                onClick={handleToggleFullscreen} 
+                className="w-3 h-3 rounded-full bg-green-400 hover:bg-green-500 border-none cursor-pointer" 
+                aria-label={isFullscreen ? '退出全屏' : '全屏'}
+              />
+            </Tooltip>
+            <Tooltip title="新标签页打开" placement="bottom">
+              <button 
+                onClick={() => window.open(url, '_blank')} 
+                className="w-3 h-3 rounded-full bg-blue-400 hover:bg-blue-500 border-none cursor-pointer" 
+                aria-label="新标签页打开"
+              />
+            </Tooltip>
+            <Tooltip title="关闭" placement="bottom">
+              <button 
+                onClick={onClose} 
+                className="w-3 h-3 rounded-full bg-red-400 hover:bg-red-500 border-none cursor-pointer" 
+                aria-label="关闭"
+              />
+            </Tooltip>
           </div>
         </div>
         <div className="flex-1 relative overflow-hidden">
