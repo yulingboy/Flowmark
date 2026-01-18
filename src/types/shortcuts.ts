@@ -1,7 +1,7 @@
 /**
  * 快捷方式相关类型定义
  */
-import type { CardSize, Position, OpenMode } from './core';
+import type { CardSize, GridPosition, OpenMode } from './core';
 
 // 快捷入口项目
 export interface ShortcutItem {
@@ -10,7 +10,7 @@ export interface ShortcutItem {
   url: string;
   icon: string;
   size?: CardSize;
-  position?: Position;
+  position?: GridPosition;  // 使用网格坐标存储位置
   openMode?: OpenMode;
 }
 
@@ -21,7 +21,7 @@ export interface ShortcutFolder {
   items: ShortcutItem[];
   isFolder: true;
   size?: CardSize;
-  position?: Position;
+  position?: GridPosition;  // 使用网格坐标存储位置
 }
 
 // 快捷入口条目

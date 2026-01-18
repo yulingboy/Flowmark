@@ -1,12 +1,13 @@
 import { GridManager, pixelToGrid, gridToPixel, findValidPositionInBounds } from '@/utils/gridUtils';
 import type { GridConfig } from '@/utils/gridUtils';
-import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, CardSize, GridItem } from '@/types';
+import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, CardSize, GridItem, GridPosition } from '@/types';
 import { isShortcutFolder } from '@/types';
+import type { GridItemWithRenderPosition } from './useShortcutItems';
 
 interface FolderHandlersOptions {
-  items: GridItem[];
-  setItems: React.Dispatch<React.SetStateAction<GridItem[]>>;
-  itemsMap: Map<string, GridItem>;
+  items: GridItemWithRenderPosition[];
+  setItems: React.Dispatch<React.SetStateAction<GridItemWithRenderPosition[]>>;
+  itemsMap: Map<string, GridItemWithRenderPosition>;
   columns: number;
   rows: number;  // 添加 rows 参数
   unit: number;
@@ -43,7 +44,9 @@ export function createFolderHandlers({
       return item;
     });
     setItems(newItems);
-    onShortcutsChange?.(newItems);
+    // 移除 _renderPosition 后传递给外部回调
+    const itemsForStorage = newItems.map(({ _renderPosition, ...rest }) => rest) as GridItem[];
+    onShortcutsChange?.(itemsForStorage);
     
     const updatedFolder = newItems.find(i => i.id === folderId);
     if (updatedFolder && isShortcutFolder(updatedFolder)) {
@@ -65,7 +68,8 @@ export function createFolderHandlers({
    */
   const handleItemDragOut = (folderId: string, item: ShortcutItem) => {
     const folder = itemsMap.get(folderId);
-    const folderPos = folder?.position || { x: 0, y: 0 };
+    // 使用 _renderPosition 进行像素计算
+    const folderPos = folder?._renderPosition || { x: 0, y: 0 };
     
     // 从文件夹中移除项目
     const newItems = items.map(i => {
@@ -115,13 +119,20 @@ export function createFolderHandlers({
       return;
     }
     
-    // 将网格坐标转换为像素坐标，添加到主网格
-    const finalPos = gridToPixel(targetPos.col, targetPos.row, unit, gap);
-    const itemWithPos: ShortcutItem = { ...finalItem, position: finalPos };
+    // 存储 GridPosition，计算 PixelPosition 用于渲染
+    const finalGridPos: GridPosition = { col: targetPos.col, row: targetPos.row };
+    const finalPixelPos = gridToPixel(targetPos.col, targetPos.row, unit, gap);
+    const itemWithPos: GridItemWithRenderPosition = { 
+      ...finalItem, 
+      position: finalGridPos,
+      _renderPosition: finalPixelPos 
+    };
     
     newItems.push(itemWithPos);
     setItems(newItems);
-    onShortcutsChange?.(newItems);
+    // 移除 _renderPosition 后传递给外部回调
+    const itemsForStorage = newItems.map(({ _renderPosition, ...rest }) => rest) as GridItem[];
+    onShortcutsChange?.(itemsForStorage);
     setOpenFolder(null);  // 关闭文件夹弹窗
   };
 

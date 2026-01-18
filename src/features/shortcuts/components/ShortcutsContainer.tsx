@@ -6,7 +6,7 @@ import { ShortcutCard } from './ShortcutCard';
 import { ShortcutFolder } from './ShortcutFolder';
 import { FolderPopup } from './FolderPopup';
 import { PluginCard } from './PluginCard';
-import { getItemSize, canResizeItem, GridManager, pixelToGrid, getGridSpan, TEXT_HEIGHT } from '@/utils/gridUtils';
+import { getItemSize, canResizeItem, GridManager, getGridSpan, TEXT_HEIGHT } from '@/utils/gridUtils';
 import { useShortcutItems } from '../hooks/useShortcutItems';
 import { createDragHandlers } from '../hooks/useDragHandlers';
 import { createFolderHandlers } from '../hooks/useFolderHandlers';
@@ -65,16 +65,22 @@ export function ShortcutsContainer({
    * 如果任一验证失败，拒绝操作，保持原尺寸不变
    */
   const handleResizeItem = (item: GridItem, size: CardSize) => {
-    const position = item.position || { x: 0, y: 0 };
+    // 从 itemsMap 获取带有 _renderPosition 的完整项目
+    const fullItem = itemsMap.get(item.id);
+    if (!fullItem) return;
+    
+    // position 现在是 GridPosition (col, row)
+    const position = fullItem.position || { col: 0, row: 0 };
+    const { col, row } = position;
     
     // 边界验证：检查新尺寸是否会超出网格边界
-    if (!canResizeItem(position, size, { columns, rows, unit, gap })) {
+    // canResizeItem 需要 PixelPosition，使用 _renderPosition
+    if (!canResizeItem(fullItem._renderPosition, size, { columns, rows, unit, gap })) {
       console.warn(`Cannot resize item ${item.id} to ${size}: would overflow grid boundaries`);
       return; // 拒绝操作，保持原尺寸
     }
     
     // 碰撞验证：检查新尺寸是否会与其他卡片冲突
-    const { col, row } = pixelToGrid(position.x, position.y, unit, gap);
     const { colSpan, rowSpan } = getGridSpan(size);
     const manager = new GridManager(columns, rows, unit, gap);
     manager.initFromItems(items, item.id); // 排除当前卡片自身
@@ -87,13 +93,17 @@ export function ShortcutsContainer({
     // 验证通过，更新尺寸
     const newItems = items.map(s => (s.id === item.id ? { ...s, size } : s));
     setItems(newItems);
-    onShortcutsChange?.(newItems);
+    // 移除 _renderPosition 后传递给外部回调
+    const itemsForStorage = newItems.map(({ _renderPosition, ...rest }) => rest) as GridItem[];
+    onShortcutsChange?.(itemsForStorage);
   };
 
   const handleRemoveItem = (item: GridItem) => {
     const newItems = items.filter(s => s.id !== item.id);
     setItems(newItems);
-    onShortcutsChange?.(newItems);
+    // 移除 _renderPosition 后传递给外部回调
+    const itemsForStorage = newItems.map(({ _renderPosition, ...rest }) => rest) as GridItem[];
+    onShortcutsChange?.(itemsForStorage);
   };
 
   const hGap = gap + TEXT_HEIGHT;  // 水平间距包含文字高度
@@ -106,7 +116,8 @@ export function ShortcutsContainer({
         onDragStart={handleDragStart} onDragMove={handleDragMove} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
         <div style={{ position: 'relative', width: containerWidth, height: containerHeight }}>
           {items.map((entry) => {
-            const pos = entry.position || { x: 0, y: 0 };
+            // 使用 _renderPosition 进行渲染（PixelPosition）
+            const pos = entry._renderPosition;
             const size = getItemSize(entry, unit, gap);
             return (
               <DraggableItem key={entry.id} entry={entry} position={pos} size={size} gridConfig={{ columns, rows, unit, gap }}

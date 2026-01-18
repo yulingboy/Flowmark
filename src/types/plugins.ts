@@ -2,7 +2,7 @@
  * 插件系统相关类型定义
  */
 import type { ReactNode } from 'react';
-import type { CardSize, Position } from './core';
+import type { CardSize, GridPosition } from './core';
 
 // 插件元数据
 export interface PluginMetadata {
@@ -56,7 +56,7 @@ export interface PluginCardItem {
   name: string;
   icon: string;
   size: CardSize;
-  position?: Position;
+  position?: GridPosition;  // 使用网格坐标存储位置
   isPlugin: true;
 }
 

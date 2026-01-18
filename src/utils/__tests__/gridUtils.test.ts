@@ -6,6 +6,7 @@ import {
   getGridSpan,
   pixelToGrid,
   gridToPixel,
+  clampGridPosition,
   getItemSize,
   canResizeItem,
   findValidPositionInBounds,
@@ -112,6 +113,65 @@ describe('gridUtils', () => {
     });
   });
 
+  describe('clampGridPosition', () => {
+    const columns = 4;
+    const rows = 4;
+
+    it('应该保持有效位置不变', () => {
+      // 1x1 卡片在 (0, 0)
+      expect(clampGridPosition(0, 0, 1, 1, columns, rows)).toEqual({ col: 0, row: 0 });
+      // 1x1 卡片在 (3, 3)
+      expect(clampGridPosition(3, 3, 1, 1, columns, rows)).toEqual({ col: 3, row: 3 });
+      // 2x2 卡片在 (1, 1)
+      expect(clampGridPosition(1, 1, 2, 2, columns, rows)).toEqual({ col: 1, row: 1 });
+    });
+
+    it('应该将超出右边界的位置限制到有效范围', () => {
+      // 1x1 卡片在 col=5，应该限制到 col=3
+      expect(clampGridPosition(5, 0, 1, 1, columns, rows)).toEqual({ col: 3, row: 0 });
+      // 2x2 卡片在 col=4，应该限制到 col=2
+      expect(clampGridPosition(4, 0, 2, 2, columns, rows)).toEqual({ col: 2, row: 0 });
+    });
+
+    it('应该将超出下边界的位置限制到有效范围', () => {
+      // 1x1 卡片在 row=5，应该限制到 row=3
+      expect(clampGridPosition(0, 5, 1, 1, columns, rows)).toEqual({ col: 0, row: 3 });
+      // 2x2 卡片在 row=4，应该限制到 row=2
+      expect(clampGridPosition(0, 4, 2, 2, columns, rows)).toEqual({ col: 0, row: 2 });
+    });
+
+    it('应该将负坐标限制到 0', () => {
+      expect(clampGridPosition(-1, 0, 1, 1, columns, rows)).toEqual({ col: 0, row: 0 });
+      expect(clampGridPosition(0, -1, 1, 1, columns, rows)).toEqual({ col: 0, row: 0 });
+      expect(clampGridPosition(-5, -5, 1, 1, columns, rows)).toEqual({ col: 0, row: 0 });
+    });
+
+    it('应该同时处理多个边界超出', () => {
+      // 超出右下角
+      expect(clampGridPosition(10, 10, 1, 1, columns, rows)).toEqual({ col: 3, row: 3 });
+      // 超出左上角
+      expect(clampGridPosition(-10, -10, 1, 1, columns, rows)).toEqual({ col: 0, row: 0 });
+    });
+
+    it('应该正确处理大尺寸卡片的边界', () => {
+      // 2x4 卡片最大位置是 (2, 0)
+      expect(clampGridPosition(3, 0, 2, 4, columns, rows)).toEqual({ col: 2, row: 0 });
+      expect(clampGridPosition(0, 1, 2, 4, columns, rows)).toEqual({ col: 0, row: 0 });
+    });
+
+    it('应该处理卡片尺寸等于网格尺寸的情况', () => {
+      // 4x4 卡片只能放在 (0, 0)
+      expect(clampGridPosition(0, 0, 4, 4, columns, rows)).toEqual({ col: 0, row: 0 });
+      expect(clampGridPosition(1, 1, 4, 4, columns, rows)).toEqual({ col: 0, row: 0 });
+    });
+
+    it('应该处理卡片尺寸大于网格尺寸的边缘情况', () => {
+      // 5x5 卡片在 4x4 网格中，maxCol 和 maxRow 都是 0（通过 Math.max(0, ...)）
+      expect(clampGridPosition(0, 0, 5, 5, columns, rows)).toEqual({ col: 0, row: 0 });
+      expect(clampGridPosition(2, 2, 5, 5, columns, rows)).toEqual({ col: 0, row: 0 });
+    });
+  });
+
   describe('getItemSize', () => {
     const unit = 64;
     const gap = 16;
@@ -124,7 +184,7 @@ describe('gridUtils', () => {
         url: 'https://test.com',
         icon: '🔗',
         size: '1x1',
-        position: { x: 0, y: 0 },
+        position: { col: 0, row: 0 },
       };
       expect(getItemSize(item, unit, gap)).toEqual({
         width: unit,
@@ -139,7 +199,7 @@ describe('gridUtils', () => {
         url: 'https://test.com',
         icon: '🔗',
         size: '2x2',
-        position: { x: 0, y: 0 },
+        position: { col: 0, row: 0 },
       };
       expect(getItemSize(item, unit, gap)).toEqual({
         width: 2 * unit + hGap,
@@ -154,7 +214,7 @@ describe('gridUtils', () => {
         url: 'https://test.com',
         icon: '🔗',
         size: '2x4',
-        position: { x: 0, y: 0 },
+        position: { col: 0, row: 0 },
       };
       expect(getItemSize(item, unit, gap)).toEqual({
         width: 2 * unit + hGap,
@@ -342,7 +402,7 @@ describe('gridUtils', () => {
             url: 'https://test.com',
             icon: '🔗',
             size: '1x1',
-            position: { x: 0, y: 0 },
+            position: { col: 0, row: 0 },
           },
           {
             id: '2',
@@ -350,7 +410,7 @@ describe('gridUtils', () => {
             url: 'https://test.com',
             icon: '🔗',
             size: '2x2',
-            position: gridToPixel(1, 1, unit, gap),
+            position: { col: 1, row: 1 },
           },
         ];
         manager.initFromItems(items);
@@ -369,7 +429,7 @@ describe('gridUtils', () => {
             url: 'https://test.com',
             icon: '🔗',
             size: '1x1',
-            position: { x: 0, y: 0 },
+            position: { col: 0, row: 0 },
           },
         ];
         manager.initFromItems(items, '1');

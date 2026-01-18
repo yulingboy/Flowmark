@@ -2,8 +2,10 @@ import { useDraggable } from '@dnd-kit/core';
 import { ShortcutCard } from './ShortcutCard';
 import { ShortcutFolder } from './ShortcutFolder';
 import { PluginCard } from './PluginCard';
-import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, CardSize, Position, GridItem } from '@/types';
+import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, CardSize, GridItem } from '@/types';
+import type { PixelPosition } from '@/types';
 import { isShortcutFolder, isPluginCard } from '@/types';
+import type { GridItemWithRenderPosition } from '../hooks/useShortcutItems';
 
 interface GridConfig {
   columns: number;
@@ -13,8 +15,8 @@ interface GridConfig {
 }
 
 interface DraggableItemProps {
-  entry: GridItem;
-  position: Position;
+  entry: GridItemWithRenderPosition;
+  position: PixelPosition;
   size: { width: number; height: number };
   gridConfig: GridConfig;
   onOpen?: (folder: ShortcutFolderType) => void;

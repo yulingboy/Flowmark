@@ -1,4 +1,4 @@
-import type { CardSize, Position, GridItem } from '@/types';
+import type { CardSize, Position, GridItem, GridPosition } from '@/types';
 
 /** 卡片下方文字标签的高度（像素） */
 export const TEXT_HEIGHT = 20;
@@ -97,6 +97,42 @@ export function gridToPixel(col: number, row: number, unit: number, gap: number)
   const cellWidth = unit + hGap;
   const cellHeight = unit + TEXT_HEIGHT + gap;
   return { x: col * cellWidth, y: row * cellHeight };
+}
+
+/**
+ * 将网格坐标限制在有效边界内
+ * 
+ * 确保卡片位置不会超出网格边界，考虑卡片的尺寸（跨度）
+ * 
+ * @param col 列索引
+ * @param row 行索引
+ * @param colSpan 列跨度（卡片宽度占用的列数）
+ * @param rowSpan 行跨度（卡片高度占用的行数）
+ * @param columns 网格总列数
+ * @param rows 网格总行数
+ * @returns 限制后的网格坐标 { col, row }
+ * 
+ * 边界约束：
+ * - 0 <= col <= columns - colSpan
+ * - 0 <= row <= rows - rowSpan
+ */
+export function clampGridPosition(
+  col: number,
+  row: number,
+  colSpan: number,
+  rowSpan: number,
+  columns: number,
+  rows: number
+): GridPosition {
+  // 计算有效的最大列和行索引
+  const maxCol = Math.max(0, columns - colSpan);
+  const maxRow = Math.max(0, rows - rowSpan);
+  
+  // 将坐标限制在有效范围内
+  const clampedCol = Math.max(0, Math.min(col, maxCol));
+  const clampedRow = Math.max(0, Math.min(row, maxRow));
+  
+  return { col: clampedCol, row: clampedRow };
 }
 
 /** 网格配置接口 */
@@ -239,16 +275,12 @@ export class GridManager {
   private columns: number;
   /** 网格行数（用于边界检查） */
   private rows: number;
-  /** 单个网格单元的边长（像素） */
-  private unit: number;
-  /** 网格间距（像素） */
-  private gap: number;
 
-  constructor(columns: number, rows: number, unit: number, gap: number) {
+  constructor(columns: number, rows: number, _unit?: number, _gap?: number) {
     this.columns = columns;
     this.rows = rows;
-    this.unit = unit;
-    this.gap = gap;
+    // unit 和 gap 参数保留以保持 API 兼容性，但不再使用
+    // 因为 position 现在直接存储 GridPosition (col, row)
   }
 
   /** 生成单元格的唯一标识键 */
@@ -343,7 +375,8 @@ export class GridManager {
     this.grid.clear();
     for (const item of items) {
       if (item.id === excludeId || !item.position) continue;
-      const { col, row } = pixelToGrid(item.position.x, item.position.y, this.unit, this.gap);
+      // position 现在是 GridPosition (col, row)，直接使用
+      const { col, row } = item.position;
       const { colSpan, rowSpan } = getGridSpan(item.size || '1x1');
       this.occupy(col, row, colSpan, rowSpan);
     }

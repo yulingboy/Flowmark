@@ -8,7 +8,8 @@ import { SHORTCUTS_LIMIT } from './types';
 import type { ShortcutsState } from './types';
 import { validateAndRepairShortcuts } from './validation';
 import { createFolder, defaultShortcuts } from './defaults';
-import { GridManager, getGridSpan, gridToPixel } from '@/utils/gridUtils';
+import { GridManager, getGridSpan } from '@/utils/gridUtils';
+import { migrateShortcuts } from './migration';
 
 export const useShortcutsStore = create<ShortcutsState>()(
   persist(
@@ -69,16 +70,14 @@ export const useShortcutsStore = create<ShortcutsState>()(
           const position = gridManager.findNearestAvailable(0, 0, colSpan, rowSpan);
           
           if (position) {
-            // 找到可用位置，将网格坐标转换为像素坐标
-            const pixelPosition = gridToPixel(position.col, position.row, GRID.UNIT, GRID.GAP);
-            
+            // 直接存储网格坐标（col, row）
             const pluginCard: PluginCardItem = { 
               id: `plugin-${pluginId}`, 
               pluginId, 
               name, 
               icon, 
               size: trySize, 
-              position: pixelPosition,
+              position: { col: position.col, row: position.row },
               isPlugin: true 
             };
             set({ shortcuts: [...state.shortcuts, pluginCard] });
@@ -175,11 +174,18 @@ export const useShortcutsStore = create<ShortcutsState>()(
       partialize: (state) => ({ shortcuts: state.shortcuts }),
       onRehydrateStorage: () => (state) => {
         if (state) {
-          const result = validateAndRepairShortcuts(state.shortcuts);
+          // 使用默认网格配置进行数据迁移（将旧的像素坐标转换为网格坐标）
+          const gridConfig = { columns: GRID.COLUMNS, rows: GRID.ROWS, unit: GRID.UNIT, gap: GRID.GAP };
+          const migratedShortcuts = migrateShortcuts(state.shortcuts, gridConfig);
+          
+          // 验证并修复迁移后的数据
+          const result = validateAndRepairShortcuts(migratedShortcuts);
           if (!result.isValid) {
             console.warn('快捷方式数据已修复:', result.errors);
-            state.shortcuts = result.repairedItems;
           }
+          
+          // 更新 state 为迁移并验证后的数据
+          state.shortcuts = result.repairedItems;
         }
       },
     }

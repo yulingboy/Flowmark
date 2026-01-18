@@ -4,7 +4,7 @@
  */
 
 // 核心类型
-export type { CardSize, OpenMode, Position, SearchEngine, ClockData } from './core';
+export type { CardSize, OpenMode, Position, GridPosition, PixelPosition, SearchEngine, ClockData } from './core';
 
 // 快捷方式类型
 export type { 

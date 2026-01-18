@@ -1,12 +1,13 @@
 import type { DragStartEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
 import { GridManager, pixelToGrid, gridToPixel, getGridSpan } from '@/utils/gridUtils';
-import type { ShortcutItem, GridItem } from '@/types';
+import type { ShortcutItem, GridItem, GridPosition } from '@/types';
 import { isShortcutFolder, isPluginCard } from '@/types';
+import type { GridItemWithRenderPosition } from './useShortcutItems';
 
 interface DragHandlersOptions {
-  items: GridItem[];
-  setItems: React.Dispatch<React.SetStateAction<GridItem[]>>;
-  itemsMap: Map<string, GridItem>;
+  items: GridItemWithRenderPosition[];
+  setItems: React.Dispatch<React.SetStateAction<GridItemWithRenderPosition[]>>;
+  itemsMap: Map<string, GridItemWithRenderPosition>;
   columns: number;
   rows: number;
   unit: number;
@@ -47,7 +48,8 @@ export function createDragHandlers({
       return;
     }
 
-    const currentPos = draggedItem.position || { x: 0, y: 0 };
+    // 使用 _renderPosition 进行像素计算
+    const currentPos = draggedItem._renderPosition;
     const dragPos = { x: currentPos.x + delta.x, y: currentPos.y + delta.y };
     const dragGrid = pixelToGrid(dragPos.x, dragPos.y, unit, gap);
 
@@ -55,7 +57,8 @@ export function createDragHandlers({
     for (const item of items) {
       if (item.id === draggedItemId || !isShortcutFolder(item)) continue;
       
-      const folderPos = item.position || { x: 0, y: 0 };
+      // 使用 _renderPosition 进行像素计算
+      const folderPos = item._renderPosition;
       const folderGrid = pixelToGrid(folderPos.x, folderPos.y, unit, gap);
       const folderSpan = getGridSpan(item.size || '1x1');
       
@@ -84,7 +87,8 @@ export function createDragHandlers({
     const draggedItem = itemsMap.get(draggedItemId);
     if (!draggedItem) return;
 
-    const currentPos = draggedItem.position || { x: 0, y: 0 };
+    // 使用 _renderPosition 进行像素计算
+    const currentPos = draggedItem._renderPosition;
     const newPixelPos = { x: currentPos.x + delta.x, y: currentPos.y + delta.y };
     const targetGrid = pixelToGrid(newPixelPos.x, newPixelPos.y, unit, gap);
     const { colSpan, rowSpan } = getGridSpan(draggedItem.size || '1x1');
@@ -93,7 +97,8 @@ export function createDragHandlers({
       for (const item of items) {
         if (item.id === draggedItemId || !isShortcutFolder(item)) continue;
         
-        const folderPos = item.position || { x: 0, y: 0 };
+        // 使用 _renderPosition 进行像素计算
+        const folderPos = item._renderPosition;
         const folderGrid = pixelToGrid(folderPos.x, folderPos.y, unit, gap);
         const folderSpan = getGridSpan(item.size || '1x1');
         
@@ -113,7 +118,9 @@ export function createDragHandlers({
             });
 
           setItems(newItems);
-          onShortcutsChange?.(newItems);
+          // 移除 _renderPosition 后传递给外部回调
+          const itemsForStorage = newItems.map(({ _renderPosition, ...rest }) => rest) as GridItem[];
+          onShortcutsChange?.(itemsForStorage);
           return;
         }
       }
@@ -131,19 +138,22 @@ export function createDragHandlers({
     const canPlaceAtTarget = !isOutOfBounds && manager.canPlace(targetCol, targetRow, colSpan, rowSpan);
     
     if (!canPlaceAtTarget) {
-      const originalGrid = pixelToGrid(currentPos.x, currentPos.y, unit, gap);
+      // 无法放置，回弹到原位置
+      const originalGrid = draggedItem.position || { col: 0, row: 0 };
       const originalPos = gridToPixel(originalGrid.col, originalGrid.row, unit, gap);
       const dropPos = { x: currentPos.x + delta.x, y: currentPos.y + delta.y };
       
+      // 先设置到拖拽结束位置（用于动画起点）
       const intermediateItems = items.map(item => 
-        item.id === draggedItemId ? { ...item, position: dropPos } : item
+        item.id === draggedItemId ? { ...item, _renderPosition: dropPos } : item
       );
       setItems(intermediateItems);
       
       requestAnimationFrame(() => {
         setAnimatingItemId(draggedItemId);
+        // 动画回弹到原位置
         const finalItems = intermediateItems.map(item => 
-          item.id === draggedItemId ? { ...item, position: originalPos } : item
+          item.id === draggedItemId ? { ...item, _renderPosition: originalPos } : item
         );
         setItems(finalItems);
         setTimeout(() => setAnimatingItemId(null), 250);
@@ -151,33 +161,46 @@ export function createDragHandlers({
       return;
     }
     
-    const finalPos = gridToPixel(targetCol, targetRow, unit, gap);
+    // 计算最终的网格位置和像素位置
+    const finalGridPos: GridPosition = { col: targetCol, row: targetRow };
+    const finalPixelPos = gridToPixel(targetCol, targetRow, unit, gap);
     const dropPos = { x: currentPos.x + delta.x, y: currentPos.y + delta.y };
     
     const needsSnapAnimation = 
-      Math.abs(dropPos.x - finalPos.x) > 5 || Math.abs(dropPos.y - finalPos.y) > 5;
+      Math.abs(dropPos.x - finalPixelPos.x) > 5 || Math.abs(dropPos.y - finalPixelPos.y) > 5;
 
     if (needsSnapAnimation) {
+      // 先设置到拖拽结束位置（用于动画起点）
       const intermediateItems = items.map(item => 
-        item.id === draggedItemId ? { ...item, position: dropPos } : item
+        item.id === draggedItemId ? { ...item, _renderPosition: dropPos } : item
       );
       setItems(intermediateItems);
       
       requestAnimationFrame(() => {
         setAnimatingItemId(draggedItemId);
+        // 动画吸附到网格位置，同时更新 position 为 GridPosition
         const finalItems = intermediateItems.map(item => 
-          item.id === draggedItemId ? { ...item, position: finalPos } : item
+          item.id === draggedItemId 
+            ? { ...item, position: finalGridPos, _renderPosition: finalPixelPos } 
+            : item
         );
         setItems(finalItems);
-        onShortcutsChange?.(finalItems);
+        // 移除 _renderPosition 后传递给外部回调
+        const itemsForStorage = finalItems.map(({ _renderPosition, ...rest }) => rest) as GridItem[];
+        onShortcutsChange?.(itemsForStorage);
         setTimeout(() => setAnimatingItemId(null), 250);
       });
     } else {
+      // 直接更新位置，position 存储 GridPosition
       const newItems = items.map(item => 
-        item.id === draggedItemId ? { ...item, position: finalPos } : item
+        item.id === draggedItemId 
+          ? { ...item, position: finalGridPos, _renderPosition: finalPixelPos } 
+          : item
       );
       setItems(newItems);
-      onShortcutsChange?.(newItems);
+      // 移除 _renderPosition 后传递给外部回调
+      const itemsForStorage = newItems.map(({ _renderPosition, ...rest }) => rest) as GridItem[];
+      onShortcutsChange?.(itemsForStorage);
     }
   };
 
