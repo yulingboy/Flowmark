@@ -21,11 +21,12 @@ export default defineConfig({
     outDir: 'dist',
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
-      // 多入口配置：newtab、sidepanel 和 background service worker
+      // 多入口配置：newtab、sidepanel、background 和 content script
       input: {
         main: resolve(__dirname, 'index.html'),
         sidepanel: resolve(__dirname, 'sidepanel.html'),
         background: resolve(__dirname, 'src/background/index.ts'),
+        content: resolve(__dirname, 'src/content/index.ts'),
       },
       output: {
         // 扩展需要固定的文件名，不带 hash
@@ -33,12 +34,33 @@ export default defineConfig({
         chunkFileNames: 'assets/[name].js',
         assetFileNames: 'assets/[name].[ext]',
         // 公共依赖分块，newtab 和 sidepanel 复用
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom'],
-          'vendor-antd': ['antd', '@ant-design/icons'],
-          'vendor-utils': ['zustand', 'react-draggable'],
+        // 将 React 和 Antd 合并到一个 vendor 块中避免循环依赖
+        manualChunks: (id) => {
+          // Content script 和 background 不应该分块，需要独立打包
+          if (id.includes('src/content/') || id.includes('src/background/')) {
+            return undefined;
+          }
+          
+          // React + Antd 合并为一个 vendor 块，避免循环依赖
+          if (
+            id.includes('node_modules/react') || 
+            id.includes('node_modules/react-dom') ||
+            id.includes('node_modules/antd') || 
+            id.includes('node_modules/@ant-design')
+          ) {
+            return 'vendor';
+          }
+          
+          // 其他工具库
+          if (id.includes('node_modules/zustand') || id.includes('node_modules/react-draggable')) {
+            return 'vendor-utils';
+          }
+          
+          return undefined;
         },
       },
     },
+    // CSS 代码分割配置
+    cssCodeSplit: true,
   },
 })

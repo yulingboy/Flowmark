@@ -8,7 +8,10 @@
   },
   "permissions": [
     "storage",
-    "sidePanel"
+    "sidePanel",
+    "contextMenus",
+    "activeTab",
+    "scripting"
   ],
   "host_permissions": [
     "https://*/*",
@@ -25,5 +28,20 @@
   },
   "chrome_url_overrides": {
     "newtab": "index.html"
-  }
+  },
+  "commands": {
+    "clip-content": {
+      "suggested_key": {
+        "default": "Alt+Shift+C"
+      },
+      "description": "剪藏当前页面内容"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["assets/content.js"],
+      "css": ["assets/content.css"]
+    }
+  ]
 }

@@ -1,0 +1,36 @@
+/**
+ * 元素选择器样式
+ * 
+ * 定义元素选择模式下的高亮覆盖层和提示文字样式。
+ * 使用最高 z-index 确保始终显示在最上层。
+ */
+
+/* 高亮覆盖层样式 */
+.flowmark-picker-overlay {
+  position: absolute;
+  pointer-events: none;
+  border: 2px solid #1890ff;
+  background: rgba(24, 144, 255, 0.1);
+  z-index: 2147483647;
+  transition: all 0.1s ease;
+  box-sizing: border-box;
+  border-radius: 2px;
+}
+
+/* 提示文字样式 */
+.flowmark-picker-tooltip {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  z-index: 2147483647;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
