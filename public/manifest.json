@@ -1,19 +1,29 @@
 {
   "manifest_version": 3,
   "name": "Flowmark",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "简洁高效的浏览器起始页",
   "icons": {
     "128": "icons/icon.png"
   },
-  "chrome_url_overrides": {
-    "newtab": "index.html"
-  },
   "permissions": [
-    "storage"
+    "storage",
+    "sidePanel"
   ],
   "host_permissions": [
     "https://*/*",
     "http://*/*"
-  ]
+  ],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "action": {
+    "default_title": "打开笔记面板"
+  },
+  "background": {
+    "service_worker": "assets/background.js"
+  },
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  }
 }

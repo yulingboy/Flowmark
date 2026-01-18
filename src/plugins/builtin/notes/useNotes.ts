@@ -1,8 +1,8 @@
 import { useNotesStore } from './store';
 
 export function useNotes() {
-  const { notes, addNote, updateNote, deleteNote, clearAllNotes } = useNotesStore();
-  return { notes, addNote, updateNote, deleteNote, clearAllNotes };
+  const { notes, isLoading, addNote, updateNote, deleteNote, clearAllNotes } = useNotesStore();
+  return { notes, isLoading, addNote, updateNote, deleteNote, clearAllNotes };
 }
 
 export function formatFullTime(timestamp: number): string {

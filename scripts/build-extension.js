@@ -59,12 +59,30 @@ fs.writeFileSync(
 `
 );
 
+// 验证关键文件是否存在
+const requiredFiles = ['index.html', 'sidepanel.html', 'manifest.json', 'assets/main.js', 'assets/sidepanel.js', 'assets/background.js'];
+const missingFiles = requiredFiles.filter(f => !fs.existsSync(path.join(extDir, f)));
+
+if (missingFiles.length > 0) {
+  console.log('⚠️  警告：以下文件缺失：');
+  missingFiles.forEach(f => console.log(`   - ${f}`));
+  console.log('');
+}
+
 console.log('✅ 浏览器扩展已打包到 extension/ 目录');
+console.log('');
+console.log('📦 包含功能：');
+console.log('   - Newtab 新标签页 (index.html)');
+console.log('   - Side Panel 笔记面板 (sidepanel.html)');
 console.log('');
 console.log('📦 安装步骤：');
 console.log('1. 打开 Chrome，访问 chrome://extensions/');
 console.log('2. 开启「开发者模式」');
 console.log('3. 点击「加载已解压的扩展程序」');
 console.log('4. 选择 extension/ 目录');
+console.log('');
+console.log('🎯 使用方式：');
+console.log('   - 新标签页：打开新标签页自动加载');
+console.log('   - 笔记面板：点击工具栏扩展图标打开侧边栏');
 console.log('');
 console.log('⚠️  注意：请先在 extension/icons/ 目录添加 PNG 图标文件');

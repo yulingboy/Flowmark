@@ -1,23 +1,29 @@
 /**
- * 笔记插件弹窗组件
+ * Side Panel 笔记管理组件
  * 
- * 左右分栏布局，支持 Markdown 编辑器和导出功能
+ * 左右分栏布局，支持 Markdown 编辑器：
+ * - 左侧：可收起的笔记列表
+ * - 右侧：Markdown 编辑器（支持实时预览）
+ * - 支持导出为 Markdown 和 HTML
+ * 
+ * @module sidepanel/SidePanelNotes
  */
 
 import { useState } from 'react';
-import { Input, Button, Empty, List, Dropdown, Tooltip } from 'antd';
+import { Input, Button, Empty, List, Tooltip, Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
 import { 
   PlusOutlined, 
   DeleteOutlined, 
-  CloseOutlined,
+  MenuFoldOutlined, 
+  MenuUnfoldOutlined,
   ExportOutlined,
   FileMarkdownOutlined,
   Html5Outlined
 } from '@ant-design/icons';
 import MDEditor from '@uiw/react-md-editor';
 import { marked } from 'marked';
-import { useNotes, formatFullTime } from './useNotes';
+import { useNotes, formatFullTime } from '../plugins/builtin/notes/useNotes';
 
 const { Search } = Input;
 
@@ -80,11 +86,14 @@ function generateHtmlDocument(title: string, content: string): string {
 </html>`;
 }
 
-// 弹窗视图 - 左右分栏布局
-export function NotesModal() {
-  const { notes, addNote, updateNote, deleteNote, clearAllNotes } = useNotes();
+/**
+ * Side Panel 笔记管理组件
+ */
+export function SidePanelNotes() {
+  const { notes, isLoading, addNote, updateNote, deleteNote } = useNotes();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [collapsed, setCollapsed] = useState(false);
 
   const selectedNote = notes.find(n => n.id === selectedId);
 
@@ -94,19 +103,30 @@ export function NotesModal() {
     note.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // 新建笔记
   const handleAdd = async () => {
     const id = await addNote();
     setSelectedId(id);
   };
 
+  // 选中笔记
   const handleSelect = (id: string) => {
     setSelectedId(id);
   };
 
-  const handleDelete = (id: string) => {
+  // 删除笔记
+  const handleDelete = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     deleteNote(id);
     if (selectedId === id) {
       setSelectedId(null);
+    }
+  };
+
+  // 更新笔记标题
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (selectedNote) {
+      updateNote(selectedNote.id, { title: e.target.value });
     }
   };
 
@@ -148,122 +168,150 @@ export function NotesModal() {
     },
   ];
 
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center text-gray-500">
+        <p>加载中...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex w-full h-full" data-color-mode="light">
+    <div className="flex h-full bg-white" data-color-mode="light">
       {/* 左侧列表 */}
-      <div className="w-[240px] flex-shrink-0 border-r border-gray-200 flex flex-col bg-white">
-        {/* 搜索和新建 */}
-        <div className="p-3 border-b border-gray-100">
-          <div className="flex gap-2">
-            <Search
-              placeholder="搜索笔记"
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              allowClear
-              size="middle"
-              style={{ flex: 1 }}
+      <div 
+        className={`flex flex-col border-r border-gray-200 transition-all duration-300 ${
+          collapsed ? 'w-12' : 'w-56'
+        }`}
+      >
+        {/* 列表头部 */}
+        <div className="flex items-center justify-between p-2 border-b border-gray-100">
+          {!collapsed && (
+            <span className="text-sm font-medium text-gray-700">笔记</span>
+          )}
+          <Tooltip title={collapsed ? '展开列表' : '收起列表'}>
+            <Button
+              type="text"
+              size="small"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
             />
-            <Tooltip title="新建笔记">
+          </Tooltip>
+        </div>
+
+        {/* 搜索和新建 */}
+        {!collapsed && (
+          <div className="p-2 border-b border-gray-100">
+            <div className="flex gap-1">
+              <Search
+                placeholder="搜索"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                allowClear
+                size="small"
+                className="flex-1"
+              />
+              <Tooltip title="新建笔记">
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={<PlusOutlined />}
+                  onClick={handleAdd}
+                />
+              </Tooltip>
+            </div>
+          </div>
+        )}
+
+        {/* 收起时只显示新建按钮 */}
+        {collapsed && (
+          <div className="p-2 flex justify-center">
+            <Tooltip title="新建笔记" placement="right">
               <Button
                 type="primary"
+                size="small"
                 icon={<PlusOutlined />}
                 onClick={handleAdd}
               />
             </Tooltip>
           </div>
-        </div>
+        )}
 
         {/* 笔记列表 */}
         <div className="flex-1 overflow-y-auto">
-          {filteredNotes.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full">
-              <Empty description="暂无笔记" image={Empty.PRESENTED_IMAGE_SIMPLE} />
-            </div>
-          ) : (
-            <List
-              size="small"
-              dataSource={filteredNotes}
-              renderItem={(note) => (
-                <List.Item
-                  onClick={() => handleSelect(note.id)}
-                  className={`!px-3 !py-2 mx-2 my-1 rounded-lg cursor-pointer transition-colors group ${
-                    selectedId === note.id 
-                      ? 'bg-blue-50 border-l-2 border-l-blue-500' 
-                      : 'hover:bg-gray-50'
-                  }`}
-                  style={{ border: 'none' }}
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm truncate text-gray-700">
-                      {note.title || '未命名'}
+          {!collapsed && (
+            filteredNotes.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full py-4">
+                <Empty 
+                  description={searchQuery ? '无匹配' : '暂无笔记'} 
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                />
+              </div>
+            ) : (
+              <List
+                size="small"
+                dataSource={filteredNotes}
+                renderItem={(note) => (
+                  <List.Item
+                    onClick={() => handleSelect(note.id)}
+                    className={`!px-2 !py-1.5 mx-1 my-0.5 rounded cursor-pointer transition-colors group ${
+                      selectedId === note.id 
+                        ? 'bg-blue-50 border-l-2 border-l-blue-500' 
+                        : 'hover:bg-gray-50'
+                    }`}
+                    style={{ border: 'none' }}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm truncate text-gray-700">
+                        {note.title || '未命名'}
+                      </div>
+                      <div className="text-xs text-gray-400 truncate">
+                        {formatFullTime(note.updatedAt)}
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-400 truncate">
-                      {formatFullTime(note.updatedAt)}
-                    </div>
-                  </div>
-                  <Button
-                    type="text"
-                    size="small"
-                    danger
-                    icon={<DeleteOutlined />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(note.id);
-                    }}
-                    className="opacity-0 group-hover:opacity-100 ml-1"
-                  />
-                </List.Item>
-              )}
-            />
+                    <Button
+                      type="text"
+                      size="small"
+                      danger
+                      icon={<DeleteOutlined />}
+                      onClick={(e) => handleDelete(note.id, e)}
+                      className="opacity-0 group-hover:opacity-100 ml-1"
+                    />
+                  </List.Item>
+                )}
+              />
+            )
           )}
         </div>
 
-        {/* 底部操作 */}
-        <div className="p-3 border-t border-gray-100 flex items-center justify-between">
-          <span className="text-xs text-gray-400">{notes.length} 条笔记</span>
-          <Button
-            size="small"
-            danger
-            onClick={clearAllNotes}
-            disabled={notes.length === 0}
-          >
-            清空
-          </Button>
-        </div>
+        {/* 底部统计 */}
+        {!collapsed && (
+          <div className="px-2 py-1 border-t border-gray-100 text-xs text-gray-400 text-center">
+            {notes.length} 条
+          </div>
+        )}
       </div>
 
       {/* 右侧编辑区 */}
-      <div className="flex-1 flex flex-col bg-white overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0">
         {selectedNote ? (
           <>
             {/* 标题栏 */}
-            <div className="px-4 py-2 border-b border-gray-200 flex items-center justify-between">
+            <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-200">
               <Input
                 placeholder="未命名笔记"
                 value={selectedNote.title}
-                onChange={e => updateNote(selectedNote.id, { title: e.target.value })}
+                onChange={handleTitleChange}
                 variant="borderless"
                 className="flex-1 font-medium text-base"
               />
-              <div className="flex items-center gap-1">
-                <Dropdown 
-                  menu={{ items: exportMenuItems }} 
-                  placement="bottomRight" 
-                  trigger={['click']}
-                  getPopupContainer={(triggerNode) => triggerNode.parentElement || document.body}
-                >
-                  <Button size="small" icon={<ExportOutlined />}>
-                    导出
-                  </Button>
-                </Dropdown>
-                <Button
-                  type="text"
-                  icon={<CloseOutlined />}
-                  onClick={() => setSelectedId(null)}
-                />
-              </div>
+              <Dropdown menu={{ items: exportMenuItems }} placement="bottomRight">
+                <Button size="small" icon={<ExportOutlined />}>
+                  导出
+                </Button>
+              </Dropdown>
             </div>
-            
+
             {/* Markdown 编辑器 */}
             <div className="flex-1 overflow-hidden">
               <MDEditor
@@ -281,15 +329,15 @@ export function NotesModal() {
                 }}
               />
             </div>
-            
+
             {/* 底部状态栏 */}
-            <div className="px-4 py-2 border-t border-gray-200 flex items-center justify-between text-xs text-gray-400">
-              <span>更新：{formatFullTime(selectedNote.updatedAt)}</span>
+            <div className="px-3 py-1.5 border-t border-gray-200 text-xs text-gray-400 flex justify-between">
+              <span>{formatFullTime(selectedNote.updatedAt)}</span>
               <span>{selectedNote.content.length} 字符</span>
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="flex-1 flex flex-col items-center justify-center text-gray-400">
             <Empty description="选择或新建笔记" />
             <Button 
               type="primary" 
