@@ -45,6 +45,12 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
     position,
   });
 
+  // 卡片背景样式
+  const cardBgStyle = item.bgColor && item.bgColor !== 'transparent' 
+    ? { backgroundColor: item.bgColor } 
+    : {};
+  const cardBgClass = item.bgColor && item.bgColor !== 'transparent' ? '' : 'bg-white';
+
   const iconStyle = is1x1
     ? { className: 'max-w-full max-h-full object-cover', style: {} }
     : { className: 'object-contain', style: { width: '64px', height: '64px', maxWidth: '50%', maxHeight: '50%' } };
@@ -73,7 +79,7 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
     <>
       <button onClick={handleClick} onContextMenu={handleContextMenu}
         className={`flex flex-col items-center gap-2 cursor-pointer group w-full h-full ${className}`}>
-        <div className={`${cardContainerClassName} flex items-center justify-center`}>
+        <div className={`${cardContainerClassName} ${cardBgClass} flex items-center justify-center`} style={cardBgStyle}>
           <img src={item.icon} alt={item.name} className={iconStyle.className} style={iconStyle.style} loading="eager" draggable={false}
             onError={(e) => { const target = e.target as HTMLImageElement; target.style.display = 'none'; target.parentElement!.innerHTML = `<span class="text-gray-600 text-2xl font-bold">${item.name[0]}</span>`; }} />
           {!isPopupMode && <OpenModeIndicator />}

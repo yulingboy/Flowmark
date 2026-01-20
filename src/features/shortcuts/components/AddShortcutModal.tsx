@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Modal, Input, Switch, Button, Space } from 'antd';
+import { Modal, Input, Switch, Button, Space, ColorPicker } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
 import { getFaviconUrl } from '../utils/faviconService';
 import { extractSiteInfo } from '../utils/siteInfo';
@@ -12,7 +12,19 @@ interface AddShortcutModalProps {
   editItem?: ShortcutItem | null;
 }
 
-const BG_COLORS = ['transparent', '#ffffff', '#3b82f6', '#eab308', '#ef4444', '#6b7280', '#22c55e', '#14532d', '#fbbf24', '#78350f', '#1e3a8a'];
+/** 预设背景颜色 */
+const BG_COLORS = [
+  'transparent',
+  '#ffffff',
+  '#3b82f6',
+  '#6366f1',
+  '#ec4899',
+  '#ef4444',
+  '#f97316',
+  '#22c55e',
+  '#6b7280',
+  '#1e293b',
+];
 
 export function AddShortcutModal({ isOpen, onClose, onSave, editItem }: AddShortcutModalProps) {
   const [url, setUrl] = useState('');
@@ -29,6 +41,7 @@ export function AddShortcutModal({ isOpen, onClose, onSave, editItem }: AddShort
   useEffect(() => {
     if (editItem && isOpen) {
       setUrl(editItem.url); setName(editItem.name); setIconUrl(editItem.icon); setPreviewIcon(editItem.icon); setIsPopupMode(editItem.openMode === 'popup');
+      setSelectedBgColor(editItem.bgColor || 'transparent');
     }
   }, [editItem, isOpen]);
 
@@ -104,12 +117,29 @@ export function AddShortcutModal({ isOpen, onClose, onSave, editItem }: AddShort
         </div>
         <div className="flex items-center gap-4">
           <label className="w-20 text-sm text-gray-600 text-right shrink-0">背景颜色</label>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {BG_COLORS.map((color, i) => (
               <button key={i} onClick={() => setSelectedBgColor(color)}
-                className={`w-8 h-8 rounded border-2 cursor-pointer ${selectedBgColor === color ? 'border-blue-500' : 'border-gray-200'}`}
-                style={{ backgroundColor: color === 'transparent' ? '#f3f4f6' : color, backgroundImage: color === 'transparent' ? 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)' : 'none', backgroundSize: '8px 8px', backgroundPosition: '0 0, 0 4px, 4px -4px, -4px 0px' }} />
+                className={`w-6 h-6 rounded border-2 cursor-pointer transition-all hover:scale-110 ${selectedBgColor === color ? 'border-blue-500 ring-1 ring-blue-300' : 'border-gray-200'}`}
+                style={{ backgroundColor: color === 'transparent' ? '#f3f4f6' : color, backgroundImage: color === 'transparent' ? 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)' : 'none', backgroundSize: '6px 6px', backgroundPosition: '0 0, 0 3px, 3px -3px, -3px 0px' }} />
             ))}
+            {/* 自定义颜色回显 */}
+            {selectedBgColor && selectedBgColor !== 'transparent' && !BG_COLORS.includes(selectedBgColor) && (
+              <button
+                className="w-6 h-6 rounded border-2 border-blue-500 ring-1 ring-blue-300 cursor-pointer"
+                style={{ backgroundColor: selectedBgColor }}
+                title={selectedBgColor}
+              />
+            )}
+            <ColorPicker
+              value={selectedBgColor === 'transparent' ? '#ffffff' : selectedBgColor}
+              onChange={(color) => setSelectedBgColor(color.toHexString())}
+              size="small"
+            >
+              <button className="w-6 h-6 rounded border-2 border-dashed border-gray-300 cursor-pointer flex items-center justify-center hover:border-blue-400 transition-colors" title="自定义颜色">
+                <span className="text-gray-400 text-[10px]">+</span>
+              </button>
+            </ColorPicker>
           </div>
         </div>
         <div className="flex items-center gap-4">

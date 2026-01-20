@@ -58,12 +58,12 @@ function App() {
   }, [autoFocusSearch, showSearch]);
 
   // 保存快捷方式
-  const handleSaveShortcut = (shortcut: { id?: string; name: string; url: string; icon: string; openMode: 'tab' | 'popup' }) => {
+  const handleSaveShortcut = (shortcut: { id?: string; name: string; url: string; icon: string; openMode: 'tab' | 'popup'; bgColor?: string }) => {
     if (shortcut.id) {
-      updateShortcut(shortcut.id, { name: shortcut.name, url: shortcut.url, icon: shortcut.icon, openMode: shortcut.openMode });
+      updateShortcut(shortcut.id, { name: shortcut.name, url: shortcut.url, icon: shortcut.icon, openMode: shortcut.openMode, bgColor: shortcut.bgColor });
       message.success('快捷方式已更新');
     } else {
-      addShortcut({ name: shortcut.name, url: shortcut.url, icon: shortcut.icon, openMode: shortcut.openMode, size: '1x1' });
+      addShortcut({ name: shortcut.name, url: shortcut.url, icon: shortcut.icon, openMode: shortcut.openMode, bgColor: shortcut.bgColor, size: '1x1' });
       message.success('快捷方式已添加');
     }
   };

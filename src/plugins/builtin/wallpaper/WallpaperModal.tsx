@@ -1,11 +1,53 @@
 import { useState } from 'react';
-import { Input, Button, Badge, message, Tabs, Upload } from 'antd';
-import { CheckOutlined, LinkOutlined, ReloadOutlined, ExpandOutlined, UploadOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Input, Button, Badge, message, Tabs, Upload, ColorPicker } from 'antd';
+import { CheckOutlined, LinkOutlined, ReloadOutlined, ExpandOutlined, UploadOutlined, DeleteOutlined, BgColorsOutlined } from '@ant-design/icons';
 import { useBackgroundStore } from '@/features/background';
 import { PRESET_WALLPAPERS, WALLPAPER_CATEGORIES } from '@/constants';
 
 /** 自定义壁纸存储 key */
 const CUSTOM_WALLPAPERS_KEY = 'custom-wallpapers';
+
+/** 预设纯色/渐变背景 */
+const PRESET_COLORS = [
+  { id: 'slate', name: '石板灰', color: '#1e293b' },
+  { id: 'gray', name: '中性灰', color: '#374151' },
+  { id: 'zinc', name: '锌灰', color: '#27272a' },
+  { id: 'neutral', name: '暖灰', color: '#404040' },
+  { id: 'stone', name: '石灰', color: '#44403c' },
+  { id: 'red', name: '深红', color: '#7f1d1d' },
+  { id: 'orange', name: '深橙', color: '#7c2d12' },
+  { id: 'amber', name: '琥珀', color: '#78350f' },
+  { id: 'yellow', name: '深黄', color: '#713f12' },
+  { id: 'lime', name: '青柠', color: '#365314' },
+  { id: 'green', name: '深绿', color: '#14532d' },
+  { id: 'emerald', name: '翡翠', color: '#064e3b' },
+  { id: 'teal', name: '青色', color: '#134e4a' },
+  { id: 'cyan', name: '青蓝', color: '#164e63' },
+  { id: 'sky', name: '天蓝', color: '#0c4a6e' },
+  { id: 'blue', name: '深蓝', color: '#1e3a8a' },
+  { id: 'indigo', name: '靛蓝', color: '#312e81' },
+  { id: 'violet', name: '紫罗兰', color: '#4c1d95' },
+  { id: 'purple', name: '深紫', color: '#581c87' },
+  { id: 'fuchsia', name: '品红', color: '#701a75' },
+  { id: 'pink', name: '深粉', color: '#831843' },
+  { id: 'rose', name: '玫瑰', color: '#881337' },
+];
+
+/** 预设渐变背景 */
+const PRESET_GRADIENTS = [
+  { id: 'sunset', name: '日落', color: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)' },
+  { id: 'ocean', name: '海洋', color: 'linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%)' },
+  { id: 'forest', name: '森林', color: 'linear-gradient(135deg, #22c55e 0%, #0d9488 100%)' },
+  { id: 'aurora', name: '极光', color: 'linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%)' },
+  { id: 'fire', name: '火焰', color: 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)' },
+  { id: 'night', name: '夜空', color: 'linear-gradient(135deg, #1e293b 0%, #4c1d95 100%)' },
+  { id: 'dawn', name: '黎明', color: 'linear-gradient(135deg, #fbbf24 0%, #f472b6 100%)' },
+  { id: 'deep-sea', name: '深海', color: 'linear-gradient(135deg, #0f172a 0%, #0369a1 100%)' },
+  { id: 'lavender', name: '薰衣草', color: 'linear-gradient(135deg, #a78bfa 0%, #f0abfc 100%)' },
+  { id: 'mint', name: '薄荷', color: 'linear-gradient(135deg, #34d399 0%, #a7f3d0 100%)' },
+  { id: 'peach', name: '蜜桃', color: 'linear-gradient(135deg, #fb923c 0%, #fda4af 100%)' },
+  { id: 'cosmic', name: '宇宙', color: 'linear-gradient(135deg, #1e1b4b 0%, #7e22ce 50%, #0ea5e9 100%)' },
+];
 
 /** 获取自定义壁纸列表 */
 function getCustomWallpapers(): string[] {
@@ -23,7 +65,7 @@ function saveCustomWallpapers(urls: string[]) {
 }
 
 export function WallpaperModal() {
-  const { backgroundUrl, updateBackgroundUrl, resetBackground } = useBackgroundStore();
+  const { backgroundType, backgroundUrl, backgroundColor, updateBackgroundUrl, updateBackgroundColor, resetBackground } = useBackgroundStore();
   const [customUrl, setCustomUrl] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -125,12 +167,13 @@ export function WallpaperModal() {
     message.success('已删除');
   };
 
-  const isCurrentWallpaper = (url: string) => backgroundUrl === url;
+  const isCurrentWallpaper = (url: string) => backgroundType === 'image' && backgroundUrl === url;
+  const isCurrentColor = (color: string) => backgroundType === 'color' && backgroundColor === color;
 
   // 根据分类筛选壁纸
   const filteredWallpapers = activeCategory === 'all' 
     ? PRESET_WALLPAPERS 
-    : activeCategory === 'custom'
+    : activeCategory === 'custom' || activeCategory === 'colors'
     ? []
     : PRESET_WALLPAPERS.filter(wp => wp.category === activeCategory);
 
@@ -138,6 +181,7 @@ export function WallpaperModal() {
   const getCategoryCount = (categoryId: string) => {
     if (categoryId === 'all') return PRESET_WALLPAPERS.length;
     if (categoryId === 'custom') return customWallpapers.length;
+    if (categoryId === 'colors') return PRESET_COLORS.length + PRESET_GRADIENTS.length;
     return PRESET_WALLPAPERS.filter(wp => wp.category === categoryId).length;
   };
 
@@ -196,6 +240,29 @@ export function WallpaperModal() {
               }}
             />
           </button>
+          
+          {/* 纯色背景分类 */}
+          <button
+            onClick={() => setActiveCategory('colors')}
+            className={`w-full px-3 py-2.5 flex items-center justify-between text-left transition-all ${
+              activeCategory === 'colors' 
+                ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-500' 
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <BgColorsOutlined />
+              <span className="text-sm">纯色背景</span>
+            </div>
+            <Badge 
+              count={PRESET_COLORS.length + PRESET_GRADIENTS.length} 
+              size="small"
+              style={{ 
+                backgroundColor: activeCategory === 'colors' ? '#3b82f6' : '#e5e7eb',
+                color: activeCategory === 'colors' ? '#fff' : '#6b7280'
+              }}
+            />
+          </button>
         </div>
       </div>
 
@@ -205,22 +272,31 @@ export function WallpaperModal() {
         <div className="p-4 border-b border-gray-100 bg-white">
           <div className="flex gap-4">
             <div className="w-48 h-28 rounded-lg overflow-hidden bg-gray-100 relative group flex-shrink-0">
-              <img 
-                src={backgroundUrl} 
-                alt="当前壁纸" 
-                className="w-full h-full object-cover"
-              />
+              {backgroundType === 'color' ? (
+                <div 
+                  className="w-full h-full"
+                  style={{ background: backgroundColor }}
+                />
+              ) : (
+                <img 
+                  src={backgroundUrl} 
+                  alt="当前壁纸" 
+                  className="w-full h-full object-cover"
+                />
+              )}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
                 <span className="text-white text-xs bg-black/60 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                  当前壁纸
+                  当前背景
                 </span>
               </div>
             </div>
             <div className="flex-1 flex flex-col justify-between py-1">
               <div>
                 <div className="text-sm font-medium text-gray-700 mb-1">当前使用</div>
-                <div className="text-xs text-gray-400 truncate max-w-[280px]" title={backgroundUrl}>
-                  {backgroundUrl.startsWith('data:') ? '本地上传图片' : backgroundUrl}
+                <div className="text-xs text-gray-400 truncate max-w-[280px]" title={backgroundType === 'color' ? backgroundColor : backgroundUrl}>
+                  {backgroundType === 'color' 
+                    ? (backgroundColor.includes('gradient') ? '渐变背景' : `纯色背景 ${backgroundColor}`)
+                    : backgroundUrl.startsWith('data:') ? '本地上传图片' : backgroundUrl}
                 </div>
               </div>
               <div className="flex gap-2">
@@ -238,7 +314,87 @@ export function WallpaperModal() {
 
         {/* 壁纸网格 */}
         <div className="flex-1 overflow-y-auto p-4 bg-gray-50/30">
-          {activeCategory === 'custom' ? (
+          {activeCategory === 'colors' ? (
+            /* 纯色背景区域 */
+            <div className="space-y-6">
+              {/* 自定义颜色选择器 */}
+              <div className="bg-white rounded-xl p-4 border border-gray-100">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-gray-700">自定义颜色</span>
+                  <ColorPicker
+                    value={backgroundColor}
+                    onChange={(color) => updateBackgroundColor(color.toHexString())}
+                    showText
+                    presets={[
+                      {
+                        label: '推荐颜色',
+                        colors: PRESET_COLORS.slice(0, 12).map(c => c.color),
+                      },
+                    ]}
+                  />
+                </div>
+                <p className="text-xs text-gray-400">点击颜色选择器自定义任意颜色</p>
+              </div>
+
+              {/* 预设纯色 */}
+              <div>
+                <div className="text-sm font-medium text-gray-700 mb-3">纯色</div>
+                <div className="grid grid-cols-6 gap-2">
+                  {PRESET_COLORS.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => updateBackgroundColor(item.color)}
+                      className={`aspect-square rounded-lg transition-all hover:scale-105 hover:shadow-md relative group ${
+                        isCurrentColor(item.color) 
+                          ? 'ring-2 ring-blue-500 ring-offset-2' 
+                          : ''
+                      }`}
+                      style={{ backgroundColor: item.color }}
+                      title={item.name}
+                    >
+                      {isCurrentColor(item.color) && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <CheckOutlined style={{ color: 'white', fontSize: 14 }} />
+                        </div>
+                      )}
+                      <div className="absolute inset-x-0 bottom-0 bg-black/50 text-white text-[10px] py-0.5 text-center opacity-0 group-hover:opacity-100 transition-opacity rounded-b-lg">
+                        {item.name}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 预设渐变 */}
+              <div>
+                <div className="text-sm font-medium text-gray-700 mb-3">渐变</div>
+                <div className="grid grid-cols-4 gap-3">
+                  {PRESET_GRADIENTS.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => updateBackgroundColor(item.color)}
+                      className={`aspect-video rounded-lg transition-all hover:scale-105 hover:shadow-md relative group ${
+                        isCurrentColor(item.color) 
+                          ? 'ring-2 ring-blue-500 ring-offset-2' 
+                          : ''
+                      }`}
+                      style={{ background: item.color }}
+                      title={item.name}
+                    >
+                      {isCurrentColor(item.color) && (
+                        <div className="absolute top-1 right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                          <CheckOutlined style={{ color: 'white', fontSize: 10 }} />
+                        </div>
+                      )}
+                      <div className="absolute inset-x-0 bottom-0 bg-black/50 text-white text-xs py-1 text-center opacity-0 group-hover:opacity-100 transition-opacity rounded-b-lg">
+                        {item.name}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : activeCategory === 'custom' ? (
             /* 自定义壁纸区域 */
             <div className="space-y-4">
               {/* 添加壁纸操作区 */}

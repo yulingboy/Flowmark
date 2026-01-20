@@ -10,9 +10,15 @@ export function Background({ imageUrl, className = '' }: BackgroundProps) {
   const [hasError, setHasError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentSrc, setCurrentSrc] = useState('');
-  const { backgroundBlur, backgroundOverlay } = useBackgroundStore();
+  const { backgroundType, backgroundColor, backgroundBlur, backgroundOverlay } = useBackgroundStore();
 
   useEffect(() => {
+    // 纯色背景不需要加载图片
+    if (backgroundType === 'color') {
+      setIsLoaded(true);
+      return;
+    }
+
     setHasError(false);
     setIsLoaded(false);
 
@@ -32,11 +38,23 @@ export function Background({ imageUrl, className = '' }: BackgroundProps) {
       img.onload = null;
       img.onerror = null;
     };
-  }, [imageUrl]);
+  }, [imageUrl, backgroundType]);
+
+  // 判断是否为渐变色
+  const isGradient = backgroundColor.includes('gradient');
 
   return (
     <div className={`fixed inset-0 -z-10 overflow-hidden ${className}`}>
-      {!hasError ? (
+      {backgroundType === 'color' ? (
+        /* 纯色/渐变背景 */
+        <div 
+          className="w-full h-full transition-all duration-500"
+          style={{ 
+            background: backgroundColor,
+            filter: isGradient ? undefined : `blur(${backgroundBlur / 10}px)`,
+          }}
+        />
+      ) : !hasError ? (
         <>
           {/* 模糊占位层 - 在图片加载前显示 */}
           <div 

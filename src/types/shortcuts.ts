@@ -12,6 +12,8 @@ export interface ShortcutItem {
   size?: CardSize;
   position?: GridPosition;  // 使用网格坐标存储位置
   openMode?: OpenMode;
+  /** 图标背景颜色 */
+  bgColor?: string;
 }
 
 // 快捷入口文件夹
