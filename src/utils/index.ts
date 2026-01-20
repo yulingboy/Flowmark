@@ -28,5 +28,5 @@ export {
   isExtensionEnvironment,
   clearAllListeners,
   getListenerCount,
-} from '../extension/utils/chromeStorage';
-export type { ChromeStorageService } from '../extension/utils/chromeStorage';
+} from '@/extension/utils/chromeStorage';
+export type { ChromeStorageService } from '@/extension/utils/chromeStorage';

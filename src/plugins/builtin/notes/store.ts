@@ -9,7 +9,7 @@
 
 import { create } from 'zustand';
 import type { Note } from './types';
-import { chromeStorage } from '../../../extension/utils/chromeStorage';
+import { chromeStorage } from '@/extension/utils/chromeStorage';
 
 /**
  * 存储键名
