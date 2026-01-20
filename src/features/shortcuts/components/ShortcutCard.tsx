@@ -3,7 +3,7 @@ import type { ShortcutItem, CardSize, Position } from '@/types';
 import { isShortcutFolder } from '@/types';
 import { IframeModal, ContextMenu } from '@/components';
 import type { ContextMenuItem } from '@/components';
-import { EditOutlined, DeleteOutlined, FolderOutlined, RightOutlined, CheckOutlined, ExportOutlined, AppstoreOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, FolderOutlined, RightOutlined, ExportOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { OpenModeIndicator } from '@/components/icons';
 import { useShortcutsStore } from '../store';
 import { useCardBehavior } from '../hooks/useCardBehavior';
@@ -22,35 +22,27 @@ interface ShortcutCardProps {
   onDelete?: (item: ShortcutItem) => void;
   onResize?: (item: ShortcutItem, size: CardSize) => void;
   className?: string;
-  batchEditMode?: boolean;
-  isSelected?: boolean;
-  onToggleSelect?: (id: string) => void;
   gridConfig?: GridConfig;
   position?: Position;
 }
 
-export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, className = '', batchEditMode = false, isSelected = false, onToggleSelect, gridConfig, position }: ShortcutCardProps) {
+export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, className = '', gridConfig, position }: ShortcutCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const shortcuts = useShortcutsStore((state) => state.shortcuts);
   const moveToFolder = useShortcutsStore((state) => state.moveToFolder);
   const isPopupMode = item.openMode === 'popup';
   const is1x1 = (item.size || '1x1') === '1x1';
 
-  // 使用 useCardBehavior hook
   const {
     contextMenu,
     handleContextMenu,
     closeContextMenu,
     disabledLayouts,
-    handleBatchClick,
     cardContainerClassName,
-    selectionIndicatorClassName,
   } = useCardBehavior({
     size: item.size || '1x1',
     gridConfig,
     position,
-    batchEditMode,
-    isSelected,
   });
 
   const iconStyle = is1x1
@@ -63,7 +55,6 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
   );
 
   const handleClick = () => {
-    if (handleBatchClick(onToggleSelect, item.id)) return;
     if (onClick) { onClick(item); return; }
     if (isPopupMode) { setIsModalOpen(true); } else { window.open(item.url, '_blank'); }
   };
@@ -83,11 +74,6 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
       <button onClick={handleClick} onContextMenu={handleContextMenu}
         className={`flex flex-col items-center gap-2 cursor-pointer group w-full h-full ${className}`}>
         <div className={`${cardContainerClassName} flex items-center justify-center`}>
-          {batchEditMode && (
-            <div className={selectionIndicatorClassName}>
-              {isSelected && <CheckOutlined style={{ fontSize: 12, color: 'white', strokeWidth: 50 }} />}
-            </div>
-          )}
           <img src={item.icon} alt={item.name} className={iconStyle.className} style={iconStyle.style} loading="eager" draggable={false}
             onError={(e) => { const target = e.target as HTMLImageElement; target.style.display = 'none'; target.parentElement!.innerHTML = `<span class="text-gray-600 text-2xl font-bold">${item.name[0]}</span>`; }} />
           {!isPopupMode && <OpenModeIndicator />}

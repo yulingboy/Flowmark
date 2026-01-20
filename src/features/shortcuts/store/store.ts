@@ -16,8 +16,6 @@ export const useShortcutsStore = create<ShortcutsState>()(
     (set, get) => ({
       shortcuts: defaultShortcuts,
       editingItem: null,
-      batchEditMode: false,
-      selectedIds: new Set<string>(),
 
       setShortcuts: (shortcuts) => set({ shortcuts }),
 
@@ -95,7 +93,7 @@ export const useShortcutsStore = create<ShortcutsState>()(
 
       deleteItem: (ids) => set((state) => {
         const idSet = Array.isArray(ids) ? new Set(ids) : new Set([ids]);
-        return { shortcuts: state.shortcuts.filter((s) => !idSet.has(s.id)), selectedIds: new Set<string>() };
+        return { shortcuts: state.shortcuts.filter((s) => !idSet.has(s.id)) };
       }),
 
       resizeItem: (id, size) => set((state) => ({
@@ -124,36 +122,6 @@ export const useShortcutsStore = create<ShortcutsState>()(
             ...state.shortcuts.filter((s) => s.id !== folderId),
             ...folder.items.map((item) => ({ ...item, size: '1x1' as CardSize })),
           ],
-        };
-      }),
-
-      toggleBatchEdit: () => set((state) => ({ batchEditMode: !state.batchEditMode, selectedIds: new Set<string>() })),
-
-      toggleSelection: (id) => set((state) => {
-        const newSelected = new Set(state.selectedIds);
-        if (newSelected.has(id)) {
-          newSelected.delete(id);
-        } else {
-          newSelected.add(id);
-        }
-        return { selectedIds: newSelected };
-      }),
-
-      selectAll: () => set((state) => ({
-        selectedIds: new Set(state.shortcuts.filter((s) => !isShortcutFolder(s)).map((s) => s.id)),
-      })),
-
-      clearSelection: () => set({ selectedIds: new Set<string>() }),
-
-      batchMoveToFolder: (folderId) => set((state) => {
-        const items = state.shortcuts.filter((s) => state.selectedIds.has(s.id) && !isShortcutFolder(s)) as ShortcutItem[];
-        if (!items.length) return state;
-
-        return {
-          shortcuts: state.shortcuts
-            .filter((s) => !state.selectedIds.has(s.id))
-            .map((s) => (s.id === folderId && isShortcutFolder(s) ? { ...s, items: [...s.items, ...items] } : s)),
-          selectedIds: new Set<string>(),
         };
       }),
 

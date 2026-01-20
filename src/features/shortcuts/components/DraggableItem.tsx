@@ -27,19 +27,13 @@ interface DraggableItemProps {
   isDropTarget: boolean;
   isDragging: boolean;
   shouldAnimate: boolean;
-  batchEditMode?: boolean;
-  isSelected?: boolean;
-  onToggleSelect?: (id: string) => void;
 }
 
 export function DraggableItem({ 
   entry, position, size, gridConfig, onOpen, onEdit, onDelete, onResize, onRemove,
-  isDropTarget, isDragging, shouldAnimate, batchEditMode = false, isSelected = false, onToggleSelect,
+  isDropTarget, isDragging, shouldAnimate,
 }: DraggableItemProps) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: entry.id,
-    disabled: batchEditMode,
-  });
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({ id: entry.id });
 
   const style = {
     position: 'absolute' as const,
@@ -47,22 +41,22 @@ export function DraggableItem({
     transform: transform ? `translate(${transform.x}px, ${transform.y}px)` : undefined,
     transition: shouldAnimate ? 'left 0.2s ease-out, top 0.2s ease-out' : 'none',
     opacity: isDragging ? 0.3 : 1,
-    cursor: batchEditMode ? 'pointer' : 'grab',
+    cursor: 'grab',
     touchAction: 'none',
     zIndex: isDragging ? 1000 : 1,
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...(batchEditMode ? {} : { ...attributes, ...listeners })}>
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       {isShortcutFolder(entry) ? (
         <ShortcutFolder folder={entry} onOpen={onOpen} onResize={(folder, s) => onResize?.(folder, s)}
           isDropTarget={isDropTarget} gridConfig={gridConfig} position={position} />
       ) : isPluginCard(entry) ? (
         <PluginCard item={entry} onResize={(item, s) => onResize?.(item, s)} onRemove={(item) => onRemove?.(item)}
-          batchEditMode={batchEditMode} isSelected={isSelected} onToggleSelect={onToggleSelect} gridConfig={gridConfig} position={position} />
+          gridConfig={gridConfig} position={position} />
       ) : (
         <ShortcutCard item={entry} onEdit={onEdit} onDelete={onDelete} onResize={(item, s) => onResize?.(item, s)}
-          batchEditMode={batchEditMode} isSelected={isSelected} onToggleSelect={onToggleSelect} gridConfig={gridConfig} position={position} />
+          gridConfig={gridConfig} position={position} />
       )}
     </div>
   );

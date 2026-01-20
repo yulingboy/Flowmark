@@ -12,7 +12,6 @@ export { ShortcutsContainer } from './components/ShortcutsContainer';
 export { FolderPopup } from './components/FolderPopup';
 export { AddShortcutModal } from './components/AddShortcutModal';
 export { AddFolderModal } from './components/AddFolderModal';
-export { BatchEditToolbar } from './components/BatchEditToolbar';
 export { DraggableItem } from './components/DraggableItem';
 
 // Store

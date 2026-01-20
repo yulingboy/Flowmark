@@ -2,12 +2,12 @@ import { useEffect, useRef } from 'react';
 import { message } from 'antd';
 import { Clock } from '@/features/clock';
 import { Search, useSearchStore } from '@/features/search';
-import { ShortcutsContainer, AddShortcutModal, AddFolderModal, BatchEditToolbar, useShortcutsStore } from '@/features/shortcuts';
+import { ShortcutsContainer, AddShortcutModal, AddFolderModal, useShortcutsStore } from '@/features/shortcuts';
 import { SettingsButton, SettingsPanel, useGeneralStore } from '@/features/settings';
 import { Background, useBackgroundStore } from '@/features/background';
 import { ContextMenu, ErrorBoundary } from '@/components';
 import type { ContextMenuItem } from '@/components';
-import { PlusSquareOutlined, FolderOutlined, EditOutlined, SettingOutlined } from '@ant-design/icons';
+import { PlusSquareOutlined, FolderOutlined, SettingOutlined } from '@ant-design/icons';
 import { registerBuiltinPlugins } from '@/plugins/builtin';
 import { useModals, useKeyboardShortcuts, useContextMenu } from '@/hooks';
 
@@ -31,7 +31,7 @@ function App() {
   const { backgroundUrl } = useBackgroundStore();
   const { showClock, showSearch, showShortcuts } = useGeneralStore();
   const { autoFocusSearch } = useSearchStore();
-  const { shortcuts, setShortcuts, updateShortcut, addShortcut, addFolder, deleteItem, batchEditMode, toggleBatchEdit } = useShortcutsStore();
+  const { shortcuts, setShortcuts, updateShortcut, addShortcut, addFolder, deleteItem } = useShortcutsStore();
 
   // 键盘快捷键
   useKeyboardShortcuts({
@@ -78,7 +78,6 @@ function App() {
   const contextMenuItems: ContextMenuItem[] = [
     { icon: <PlusSquareOutlined />, label: '添加标签', onClick: modals.openAddShortcut },
     { icon: <FolderOutlined />, label: '新文件夹', onClick: modals.openAddFolder },
-    { icon: <EditOutlined />, label: '批量编辑', onClick: toggleBatchEdit },
     { icon: <SettingOutlined />, label: '设置', onClick: modals.openSettings },
   ];
 
@@ -115,8 +114,6 @@ function App() {
           </ErrorBoundary>
         </div>
       )}
-      
-      {batchEditMode && <BatchEditToolbar />}
     </div>
   );
 }

@@ -12,7 +12,6 @@ import { createDragHandlers } from '../hooks/useDragHandlers';
 import { createFolderHandlers } from '../hooks/useFolderHandlers';
 import type { ShortcutFolder as ShortcutFolderType, ShortcutItem, CardSize, GridItem } from '@/types';
 import { isShortcutFolder, isPluginCard } from '@/types';
-import { useShortcutsStore } from '../store';
 
 interface ShortcutsContainerProps {
   shortcuts: GridItem[];
@@ -34,10 +33,6 @@ export function ShortcutsContainer({
   const [activeId, setActiveId] = useState<string | null>(null);
   const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
   const [animatingItemId, setAnimatingItemId] = useState<string | null>(null);
-
-  const batchEditMode = useShortcutsStore((state) => state.batchEditMode);
-  const selectedIds = useShortcutsStore((state) => state.selectedIds);
-  const toggleSelection = useShortcutsStore((state) => state.toggleSelection);
 
   const { items, setItems, itemsMap } = useShortcutItems({ shortcuts, columns, rows, unit, gap });
 
@@ -122,8 +117,7 @@ export function ShortcutsContainer({
             return (
               <DraggableItem key={entry.id} entry={entry} position={pos} size={size} gridConfig={{ columns, rows, unit, gap }}
                 onOpen={handleFolderOpen} onEdit={onEditShortcut} onDelete={onDeleteShortcut} onResize={handleResizeItem} onRemove={handleRemoveItem}
-                isDropTarget={dragOverFolderId === entry.id} isDragging={activeId === entry.id} shouldAnimate={animatingItemId === entry.id}
-                batchEditMode={batchEditMode} isSelected={selectedIds.has(entry.id)} onToggleSelect={toggleSelection} />
+                isDropTarget={dragOverFolderId === entry.id} isDragging={activeId === entry.id} shouldAnimate={animatingItemId === entry.id} />
             );
           })}
         </div>

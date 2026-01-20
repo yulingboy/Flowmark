@@ -12,8 +12,6 @@ export interface ValidationResult {
 export interface ShortcutsState {
   shortcuts: GridItem[];
   editingItem: ShortcutItem | null;
-  batchEditMode: boolean;
-  selectedIds: Set<string>;
   
   setShortcuts: (shortcuts: GridItem[]) => void;
   addShortcut: (shortcut: Omit<ShortcutItem, 'id'>) => boolean;
@@ -25,12 +23,6 @@ export interface ShortcutsState {
   setEditingItem: (item: ShortcutItem | null) => void;
   moveToFolder: (itemId: string, folderId: string) => void;
   dissolveFolder: (folderId: string) => void;
-  
-  toggleBatchEdit: () => void;
-  toggleSelection: (id: string) => void;
-  selectAll: () => void;
-  clearSelection: () => void;
-  batchMoveToFolder: (folderId: string) => void;
   
   isAtLimit: () => boolean;
   validateAndRepair: () => ValidationResult;
