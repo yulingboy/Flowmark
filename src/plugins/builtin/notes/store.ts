@@ -9,7 +9,7 @@
 
 import { create } from 'zustand';
 import type { Note } from './types';
-import { chromeStorage } from '@/extension/utils/chromeStorage';
+import { chromeStorage } from '../../../extension/utils/chromeStorage';
 
 /**
  * 存储键名
@@ -218,7 +218,7 @@ export const useNotesStore = create<NotesState>()((set, get) => ({
  * @returns 取消订阅函数
  */
 export function initStorageListener(): () => void {
-  return chromeStorage.subscribe(STORAGE_KEY, (newValue) => {
+  return chromeStorage.subscribe(STORAGE_KEY, (newValue: unknown) => {
     // 如果是自己触发的保存，忽略
     if (isSaving) {
       return;
