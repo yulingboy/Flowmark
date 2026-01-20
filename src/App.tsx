@@ -3,12 +3,11 @@ import { message } from 'antd';
 import { Clock } from '@/features/clock';
 import { Search, useSearchStore } from '@/features/search';
 import { ShortcutsContainer, AddShortcutModal, AddFolderModal, BatchEditToolbar, useShortcutsStore } from '@/features/shortcuts';
-import { SettingsButton, SettingsPanel, WallpaperModal, useGeneralStore } from '@/features/settings';
+import { SettingsButton, SettingsPanel, useGeneralStore } from '@/features/settings';
 import { Background, useBackgroundStore } from '@/features/background';
 import { ContextMenu, ErrorBoundary } from '@/components';
 import type { ContextMenuItem } from '@/components';
-import { PlusSquareOutlined, FolderOutlined, ReloadOutlined, EditOutlined, SettingOutlined } from '@ant-design/icons';
-import { WallpaperIcon } from '@/components/icons';
+import { PlusSquareOutlined, FolderOutlined, EditOutlined, SettingOutlined } from '@ant-design/icons';
 import { registerBuiltinPlugins } from '@/plugins/builtin';
 import { useModals, useKeyboardShortcuts, useContextMenu } from '@/hooks';
 
@@ -79,7 +78,6 @@ function App() {
   const contextMenuItems: ContextMenuItem[] = [
     { icon: <PlusSquareOutlined />, label: '添加标签', onClick: modals.openAddShortcut },
     { icon: <FolderOutlined />, label: '新文件夹', onClick: modals.openAddFolder },
-    { icon: <WallpaperIcon />, label: '更换壁纸', onClick: modals.openWallpaper, rightIcon: <ReloadOutlined /> },
     { icon: <EditOutlined />, label: '批量编辑', onClick: toggleBatchEdit },
     { icon: <SettingOutlined />, label: '设置', onClick: modals.openSettings },
   ];
@@ -97,7 +95,6 @@ function App() {
       <ContextMenu isOpen={contextMenu.isOpen} position={{ x: contextMenu.x, y: contextMenu.y }} items={contextMenuItems} onClose={closeContextMenu} />
       <AddShortcutModal isOpen={modals.isAddShortcutOpen} onClose={modals.closeAddShortcut} onSave={handleSaveShortcut} editItem={modals.editingShortcut} />
       <AddFolderModal isOpen={modals.isAddFolderOpen} onClose={modals.closeAddFolder} onSave={addFolder} />
-      <WallpaperModal isOpen={modals.isWallpaperOpen} onClose={modals.closeWallpaper} />
       
       {/* 主内容 */}
       {showClock && <ErrorBoundary><Clock /></ErrorBoundary>}

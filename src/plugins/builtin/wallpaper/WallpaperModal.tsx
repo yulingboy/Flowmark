@@ -1,20 +1,128 @@
 import { useState } from 'react';
-import { Input, Button, Badge } from 'antd';
-import { CheckOutlined, LinkOutlined, ReloadOutlined, ExpandOutlined } from '@ant-design/icons';
+import { Input, Button, Badge, message, Tabs, Upload } from 'antd';
+import { CheckOutlined, LinkOutlined, ReloadOutlined, ExpandOutlined, UploadOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useBackgroundStore } from '@/features/background';
 import { PRESET_WALLPAPERS, WALLPAPER_CATEGORIES } from '@/constants';
+
+/** 自定义壁纸存储 key */
+const CUSTOM_WALLPAPERS_KEY = 'custom-wallpapers';
+
+/** 获取自定义壁纸列表 */
+function getCustomWallpapers(): string[] {
+  try {
+    const data = localStorage.getItem(CUSTOM_WALLPAPERS_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** 保存自定义壁纸列表 */
+function saveCustomWallpapers(urls: string[]) {
+  localStorage.setItem(CUSTOM_WALLPAPERS_KEY, JSON.stringify(urls));
+}
 
 export function WallpaperModal() {
   const { backgroundUrl, updateBackgroundUrl, resetBackground } = useBackgroundStore();
   const [customUrl, setCustomUrl] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [customWallpapers, setCustomWallpapers] = useState<string[]>(getCustomWallpapers);
+  const [isValidating, setIsValidating] = useState(false);
 
-  const handleCustomUrlSubmit = () => {
-    if (customUrl.trim()) {
-      updateBackgroundUrl(customUrl.trim());
-      setCustomUrl('');
+  /** 验证图片 URL 是否有效 */
+  const validateImageUrl = (url: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = url;
+    });
+  };
+
+  /** 添加远程图片 */
+  const handleAddRemoteUrl = async () => {
+    const url = customUrl.trim();
+    if (!url) return;
+
+    // 验证 URL 格式
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      message.error('请输入有效的图片链接（以 http:// 或 https:// 开头）');
+      return;
     }
+
+    setIsValidating(true);
+    const isValid = await validateImageUrl(url);
+    setIsValidating(false);
+
+    if (!isValid) {
+      message.error('无法加载该图片，请检查链接是否正确');
+      return;
+    }
+
+    // 添加到自定义壁纸列表
+    if (!customWallpapers.includes(url)) {
+      const newList = [url, ...customWallpapers];
+      setCustomWallpapers(newList);
+      saveCustomWallpapers(newList);
+    }
+
+    // 应用壁纸
+    updateBackgroundUrl(url);
+    setCustomUrl('');
+    message.success('壁纸已添加并应用');
+  };
+
+  /** 处理本地图片上传 */
+  const handleFileUpload = (file: File) => {
+    // 验证文件类型
+    if (!file.type.startsWith('image/')) {
+      message.error('请选择图片文件');
+      return false;
+    }
+
+    // 验证文件大小（最大 10MB）
+    if (file.size > 10 * 1024 * 1024) {
+      message.error('图片大小不能超过 10MB');
+      return false;
+    }
+
+    // 转换为 base64
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      
+      // 添加到自定义壁纸列表
+      if (!customWallpapers.includes(base64)) {
+        const newList = [base64, ...customWallpapers];
+        setCustomWallpapers(newList);
+        saveCustomWallpapers(newList);
+      }
+
+      // 应用壁纸
+      updateBackgroundUrl(base64);
+      message.success('壁纸已上传并应用');
+    };
+    reader.onerror = () => {
+      message.error('图片读取失败');
+    };
+    reader.readAsDataURL(file);
+
+    return false; // 阻止默认上传行为
+  };
+
+  /** 删除自定义壁纸 */
+  const handleDeleteCustomWallpaper = (url: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newList = customWallpapers.filter(u => u !== url);
+    setCustomWallpapers(newList);
+    saveCustomWallpapers(newList);
+    
+    // 如果删除的是当前壁纸，恢复默认
+    if (backgroundUrl === url) {
+      resetBackground();
+    }
+    message.success('已删除');
   };
 
   const isCurrentWallpaper = (url: string) => backgroundUrl === url;
@@ -22,11 +130,14 @@ export function WallpaperModal() {
   // 根据分类筛选壁纸
   const filteredWallpapers = activeCategory === 'all' 
     ? PRESET_WALLPAPERS 
+    : activeCategory === 'custom'
+    ? []
     : PRESET_WALLPAPERS.filter(wp => wp.category === activeCategory);
 
   // 获取分类壁纸数量
   const getCategoryCount = (categoryId: string) => {
     if (categoryId === 'all') return PRESET_WALLPAPERS.length;
+    if (categoryId === 'custom') return customWallpapers.length;
     return PRESET_WALLPAPERS.filter(wp => wp.category === categoryId).length;
   };
 
@@ -62,33 +173,29 @@ export function WallpaperModal() {
               />
             </button>
           ))}
-        </div>
-        
-        {/* 自定义壁纸入口 */}
-        <div className="p-3 border-t border-gray-100">
-          <div className="text-xs text-gray-500 mb-2 flex items-center gap-1">
-            <LinkOutlined />
-            <span>自定义链接</span>
-          </div>
-          <Input 
-            value={customUrl} 
-            onChange={(e) => setCustomUrl(e.target.value)} 
-            placeholder="输入图片 URL" 
-            onPressEnter={handleCustomUrlSubmit}
-            size="small"
-            allowClear
-            suffix={
-              <Button 
-                type="link" 
-                size="small" 
-                onClick={handleCustomUrlSubmit}
-                disabled={!customUrl.trim()}
-                className="!p-0"
-              >
-                应用
-              </Button>
-            }
-          />
+          
+          {/* 我的壁纸分类 */}
+          <button
+            onClick={() => setActiveCategory('custom')}
+            className={`w-full px-3 py-2.5 flex items-center justify-between text-left transition-all ${
+              activeCategory === 'custom' 
+                ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-500' 
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <span>📁</span>
+              <span className="text-sm">我的壁纸</span>
+            </div>
+            <Badge 
+              count={customWallpapers.length} 
+              size="small"
+              style={{ 
+                backgroundColor: activeCategory === 'custom' ? '#3b82f6' : '#e5e7eb',
+                color: activeCategory === 'custom' ? '#fff' : '#6b7280'
+              }}
+            />
+          </button>
         </div>
       </div>
 
@@ -113,7 +220,7 @@ export function WallpaperModal() {
               <div>
                 <div className="text-sm font-medium text-gray-700 mb-1">当前使用</div>
                 <div className="text-xs text-gray-400 truncate max-w-[280px]" title={backgroundUrl}>
-                  {backgroundUrl}
+                  {backgroundUrl.startsWith('data:') ? '本地上传图片' : backgroundUrl}
                 </div>
               </div>
               <div className="flex gap-2">
@@ -131,58 +238,195 @@ export function WallpaperModal() {
 
         {/* 壁纸网格 */}
         <div className="flex-1 overflow-y-auto p-4 bg-gray-50/30">
-          <div className="grid grid-cols-3 gap-3">
-            {filteredWallpapers.map((wp) => (
-              <div 
-                key={wp.id} 
-                role="button"
-                tabIndex={0}
-                onClick={() => updateBackgroundUrl(wp.url)}
-                onDoubleClick={() => setPreviewUrl(wp.url)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    updateBackgroundUrl(wp.url);
-                  }
-                }}
-                className={`group p-0 rounded-xl overflow-hidden cursor-pointer aspect-video border-2 relative transition-all hover:shadow-lg hover:-translate-y-0.5 ${
-                  isCurrentWallpaper(wp.url) 
-                    ? 'border-blue-500 ring-2 ring-blue-200 shadow-md' 
-                    : 'border-transparent hover:border-gray-200'
-                }`}
-              >
-                <img 
-                  src={wp.url} 
-                  alt={wp.name} 
-                  className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                  loading="lazy"
+          {activeCategory === 'custom' ? (
+            /* 自定义壁纸区域 */
+            <div className="space-y-4">
+              {/* 添加壁纸操作区 */}
+              <div className="bg-white rounded-xl p-4 border border-gray-100">
+                <Tabs
+                  size="small"
+                  items={[
+                    {
+                      key: 'upload',
+                      label: (
+                        <span className="flex items-center gap-1">
+                          <UploadOutlined />
+                          本地上传
+                        </span>
+                      ),
+                      children: (
+                        <div className="pt-2">
+                          <Upload.Dragger
+                            accept="image/*"
+                            showUploadList={false}
+                            beforeUpload={handleFileUpload}
+                            className="!border-dashed"
+                          >
+                            <p className="text-gray-400 mb-2">
+                              <UploadOutlined style={{ fontSize: 32 }} />
+                            </p>
+                            <p className="text-sm text-gray-600">点击或拖拽图片到此处上传</p>
+                            <p className="text-xs text-gray-400 mt-1">支持 JPG、PNG、GIF，最大 10MB</p>
+                          </Upload.Dragger>
+                        </div>
+                      ),
+                    },
+                    {
+                      key: 'url',
+                      label: (
+                        <span className="flex items-center gap-1">
+                          <LinkOutlined />
+                          远程链接
+                        </span>
+                      ),
+                      children: (
+                        <div className="pt-2">
+                          <Input.Search
+                            value={customUrl}
+                            onChange={(e) => setCustomUrl(e.target.value)}
+                            placeholder="输入图片 URL（https://...）"
+                            enterButton={isValidating ? '验证中...' : '添加'}
+                            loading={isValidating}
+                            onSearch={handleAddRemoteUrl}
+                            allowClear
+                          />
+                          <p className="text-xs text-gray-400 mt-2">
+                            💡 支持任意公开可访问的图片链接
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]}
                 />
-                
-                {/* 选中标记 */}
-                {isCurrentWallpaper(wp.url) && (
-                  <div className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
-                    <CheckOutlined style={{ color: 'white', fontSize: 12 }} />
-                  </div>
-                )}
-                
-                {/* 预览按钮 */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setPreviewUrl(wp.url);
-                  }}
-                  className="absolute top-2 left-2 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
-                >
-                  <ExpandOutlined style={{ color: 'white', fontSize: 10 }} />
-                </button>
-                
-                {/* 名称标签 */}
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-2 pt-6">
-                  <span className="text-white text-xs font-medium">{wp.name}</span>
-                </div>
               </div>
-            ))}
-          </div>
+
+              {/* 自定义壁纸列表 */}
+              {customWallpapers.length > 0 ? (
+                <div className="grid grid-cols-3 gap-3">
+                  {customWallpapers.map((url, index) => (
+                    <div 
+                      key={index}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => updateBackgroundUrl(url)}
+                      onDoubleClick={() => setPreviewUrl(url)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          updateBackgroundUrl(url);
+                        }
+                      }}
+                      className={`group p-0 rounded-xl overflow-hidden cursor-pointer aspect-video border-2 relative transition-all hover:shadow-lg hover:-translate-y-0.5 ${
+                        isCurrentWallpaper(url) 
+                          ? 'border-blue-500 ring-2 ring-blue-200 shadow-md' 
+                          : 'border-transparent hover:border-gray-200'
+                      }`}
+                    >
+                      <img 
+                        src={url} 
+                        alt={`自定义壁纸 ${index + 1}`}
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                        loading="lazy"
+                      />
+                      
+                      {/* 选中标记 */}
+                      {isCurrentWallpaper(url) && (
+                        <div className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                          <CheckOutlined style={{ color: 'white', fontSize: 12 }} />
+                        </div>
+                      )}
+                      
+                      {/* 操作按钮 */}
+                      <div className="absolute top-2 left-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPreviewUrl(url);
+                          }}
+                          className="w-6 h-6 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/70"
+                        >
+                          <ExpandOutlined style={{ color: 'white', fontSize: 10 }} />
+                        </button>
+                        <button
+                          onClick={(e) => handleDeleteCustomWallpaper(url, e)}
+                          className="w-6 h-6 bg-red-500/80 rounded-full flex items-center justify-center hover:bg-red-600"
+                        >
+                          <DeleteOutlined style={{ color: 'white', fontSize: 10 }} />
+                        </button>
+                      </div>
+                      
+                      {/* 标签 */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-2 pt-6">
+                        <span className="text-white text-xs font-medium">
+                          {url.startsWith('data:') ? '本地图片' : '远程图片'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-gray-400">
+                  <div className="text-4xl mb-3">📷</div>
+                  <div className="text-sm">还没有自定义壁纸</div>
+                  <div className="text-xs mt-1">上传本地图片或添加远程链接</div>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* 预设壁纸网格 */
+            <div className="grid grid-cols-3 gap-3">
+              {filteredWallpapers.map((wp) => (
+                <div 
+                  key={wp.id} 
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => updateBackgroundUrl(wp.url)}
+                  onDoubleClick={() => setPreviewUrl(wp.url)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      updateBackgroundUrl(wp.url);
+                    }
+                  }}
+                  className={`group p-0 rounded-xl overflow-hidden cursor-pointer aspect-video border-2 relative transition-all hover:shadow-lg hover:-translate-y-0.5 ${
+                    isCurrentWallpaper(wp.url) 
+                      ? 'border-blue-500 ring-2 ring-blue-200 shadow-md' 
+                      : 'border-transparent hover:border-gray-200'
+                  }`}
+                >
+                  <img 
+                    src={wp.url} 
+                    alt={wp.name} 
+                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  
+                  {/* 选中标记 */}
+                  {isCurrentWallpaper(wp.url) && (
+                    <div className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                      <CheckOutlined style={{ color: 'white', fontSize: 12 }} />
+                    </div>
+                  )}
+                  
+                  {/* 预览按钮 */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPreviewUrl(wp.url);
+                    }}
+                    className="absolute top-2 left-2 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                  >
+                    <ExpandOutlined style={{ color: 'white', fontSize: 10 }} />
+                  </button>
+                  
+                  {/* 名称标签 */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-2 pt-6">
+                    <span className="text-white text-xs font-medium">{wp.name}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* 底部提示 */}

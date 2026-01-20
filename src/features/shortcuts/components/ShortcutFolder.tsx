@@ -2,8 +2,7 @@ import { useState, useMemo } from 'react';
 import type { ShortcutFolder as ShortcutFolderType, CardSize, Position } from '@/types';
 import { ContextMenu } from '@/components';
 import type { ContextMenuItem } from '@/components';
-import { DeleteOutlined } from '@ant-design/icons';
-import { LayoutIcon, UnfoldIcon, EmptyFolderIcon } from '@/components/icons';
+import { DeleteOutlined, AppstoreOutlined, ExpandOutlined, FolderOutlined } from '@ant-design/icons';
 import { useShortcutsStore } from '../store';
 import { pixelToGrid, getValidSizesForPosition } from '@/utils/gridUtils';
 
@@ -58,9 +57,9 @@ export function ShortcutFolder({ folder, onOpen, onResize, className = '', isDro
   };
 
   const contextMenuItems: ContextMenuItem[] = [
-    { icon: <LayoutIcon />, label: '布局', type: 'layout', layoutOptions: ['1x1', '2x2', '2x4'], disabledLayouts,
+    { icon: <AppstoreOutlined />, label: '布局', type: 'layout', layoutOptions: ['1x1', '2x2', '2x4'], disabledLayouts,
       currentLayout: folder.size || '1x1', onLayoutSelect: (newSize) => onResize?.(folder, newSize), onClick: () => {} },
-    { icon: <UnfoldIcon />, label: '解散文件夹', onClick: () => dissolveFolder(folder.id) },
+    { icon: <ExpandOutlined />, label: '解散文件夹', onClick: () => dissolveFolder(folder.id) },
     { icon: <DeleteOutlined />, label: '删除卡片', onClick: () => deleteItem(folder.id) },
   ];
 
@@ -91,7 +90,7 @@ export function ShortcutFolder({ folder, onOpen, onResize, className = '', isDro
             </div>
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <EmptyFolderIcon className="w-8 h-8 text-white/70" />
+              <FolderOutlined className="text-white/70" style={{ fontSize: 32 }} />
             </div>
           )}
         </div>

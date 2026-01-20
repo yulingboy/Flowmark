@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from 'antd';
+import { RightOutlined } from '@ant-design/icons';
 import type { CardSize } from '@/types';
 import type { ContextMenuItem, ContextMenuProps } from './types';
 
@@ -12,7 +13,7 @@ export function ContextMenu({ isOpen, position, items, onClose, ariaLabel = '上
 
   const selectableIndices = items
     .map((item, index) => ({ item, index }))
-    .filter(({ item }) => item.type !== 'layout' && !item.disabled)
+    .filter(({ item }) => !item.disabled)
     .map(({ index }) => index);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -44,14 +45,14 @@ export function ContextMenu({ isOpen, position, items, onClose, ariaLabel = '上
         e.preventDefault();
         if (selectedIndex >= 0 && selectedIndex < items.length) {
           const item = items[selectedIndex];
-          if (item && !item.disabled && item.type !== 'layout') {
+          if (item && !item.disabled && item.type !== 'layout' && item.type !== 'submenu') {
             item.onClick();
             onClose();
           }
         }
         break;
       case 'ArrowRight':
-        if (selectedIndex >= 0 && items[selectedIndex]?.type === 'submenu') {
+        if (selectedIndex >= 0 && (items[selectedIndex]?.type === 'submenu' || items[selectedIndex]?.type === 'layout')) {
           e.preventDefault();
           setActiveSubmenu(selectedIndex);
         }
@@ -124,12 +125,12 @@ export function ContextMenu({ isOpen, position, items, onClose, ariaLabel = '上
 
   if (!isOpen) return null;
 
-  const allLayoutSizes: { size: CardSize; cols: number; rows: number }[] = [
-    { size: '1x1', cols: 1, rows: 1 },
-    { size: '1x2', cols: 1, rows: 2 },
-    { size: '2x1', cols: 2, rows: 1 },
-    { size: '2x2', cols: 2, rows: 2 },
-    { size: '2x4', cols: 2, rows: 4 },
+  const allLayoutSizes: { size: CardSize; cols: number; rows: number; label: string }[] = [
+    { size: '1x1', cols: 1, rows: 1, label: '一行一列' },
+    { size: '1x2', cols: 1, rows: 2, label: '两行一列' },
+    { size: '2x1', cols: 2, rows: 1, label: '一行两列' },
+    { size: '2x2', cols: 2, rows: 2, label: '两行两列' },
+    { size: '2x4', cols: 2, rows: 4, label: '四行两列' },
   ];
 
   const renderMenuItem = (item: ContextMenuItem, index: number) => {
@@ -143,36 +144,80 @@ export function ContextMenu({ isOpen, position, items, onClose, ariaLabel = '上
       const disabledSet = new Set(item.disabledLayouts || []);
       
       return (
-        <div key={index} className="px-4 py-3" role="presentation">
-          <div className="flex items-center gap-3 mb-2">
+        <div 
+          key={index} 
+          className="relative"
+          role="menuitem"
+          id={itemId}
+          aria-haspopup="true"
+          aria-expanded={activeSubmenu === index}
+          onMouseEnter={() => { setActiveSubmenu(index); setSelectedIndex(index); }}
+          onMouseLeave={(e) => {
+            const relatedTarget = e.relatedTarget as HTMLElement;
+            if (relatedTarget?.closest('.submenu-panel')) return;
+            setActiveSubmenu(null);
+          }}
+        >
+          <div 
+            className={`w-full px-4 py-3 flex items-center gap-3 transition-colors cursor-pointer ${
+              isSelected ? 'bg-black/10' : 'hover:bg-black/5'
+            }`}
+            tabIndex={-1}
+          >
             <span className="w-5 h-5 text-gray-600 flex items-center justify-center">{item.icon}</span>
-            <span className="text-gray-800 text-sm">{item.label}</span>
+            <span className="flex-1 text-gray-800 text-sm">{item.label}</span>
+            <span className="w-5 h-5 text-gray-500 flex items-center justify-center">
+              <RightOutlined style={{ fontSize: 12 }} />
+            </span>
           </div>
-          <div className="flex gap-2 ml-8" role="group" aria-label="布局选项">
-            {layoutSizes.map(({ size, cols, rows }) => {
-              const isDisabled = disabledSet.has(size);
-              const isCurrent = item.currentLayout === size;
-              return (
-                <Button 
-                  key={size} 
-                  size="small"
-                  type={isCurrent ? 'primary' : 'default'}
-                  disabled={isDisabled}
-                  onClick={() => { if (!isDisabled) { item.onLayoutSelect?.(size); onClose(); } }}
-                  className={`!w-8 !h-8 !p-0 ${isDisabled ? '!opacity-40 !cursor-not-allowed' : ''}`}
-                  title={isDisabled ? `${size} (超出边界)` : size}
-                  aria-pressed={isCurrent}
-                  aria-disabled={isDisabled}
-                >
-                  <div className="grid gap-0.5" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }}>
-                    {Array.from({ length: cols * rows }).map((_, i) => (
-                      <div key={i} className={`w-1.5 h-1.5 rounded-sm ${isCurrent ? 'bg-white' : isDisabled ? 'bg-gray-300' : 'bg-gray-400'}`} />
-                    ))}
+          {activeSubmenu === index && (
+            <div 
+              className="submenu-panel absolute left-full top-0 min-w-[140px] py-2 rounded-xl shadow-xl"
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.5)', marginLeft: '-4px', paddingLeft: '4px' }}
+              role="menu"
+              aria-label={item.label}
+              onMouseEnter={() => setActiveSubmenu(index)}
+              onMouseLeave={() => setActiveSubmenu(null)}
+            >
+              {layoutSizes.map(({ size, cols, rows, label }) => {
+                const isDisabled = disabledSet.has(size);
+                const isCurrent = item.currentLayout === size;
+                return (
+                  <div
+                    key={size}
+                    role="menuitem"
+                    aria-disabled={isDisabled}
+                    onClick={(e) => { 
+                      e.stopPropagation();
+                      if (!isDisabled) { 
+                        item.onLayoutSelect?.(size); 
+                        onClose(); 
+                      } 
+                    }}
+                    className={`px-4 py-2.5 flex items-center gap-3 cursor-pointer transition-colors ${
+                      isCurrent ? 'bg-blue-50' : 'hover:bg-black/5'
+                    } ${isDisabled ? 'opacity-40 cursor-not-allowed' : ''}`}
+                    title={isDisabled ? `${size} (超出边界)` : size}
+                  >
+                    <div 
+                      className={`w-6 h-6 flex items-center justify-center rounded ${
+                        isCurrent ? 'bg-blue-500' : 'bg-gray-100'
+                      }`}
+                    >
+                      <div className="grid gap-0.5" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }}>
+                        {Array.from({ length: cols * rows }).map((_, i) => (
+                          <div key={i} className={`w-1.5 h-1.5 rounded-sm ${isCurrent ? 'bg-white' : 'bg-gray-400'}`} />
+                        ))}
+                      </div>
+                    </div>
+                    <span className={`text-sm ${isCurrent ? 'text-blue-600 font-medium' : 'text-gray-700'}`}>
+                      {label}
+                    </span>
                   </div>
-                </Button>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       );
     }

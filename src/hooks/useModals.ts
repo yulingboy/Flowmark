@@ -5,7 +5,6 @@ export interface ModalsState {
   isSettingsOpen: boolean;
   isAddShortcutOpen: boolean;
   isAddFolderOpen: boolean;
-  isWallpaperOpen: boolean;
   editingShortcut: ShortcutItem | null;
 }
 
@@ -13,7 +12,6 @@ export function useModals() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAddShortcutOpen, setIsAddShortcutOpen] = useState(false);
   const [isAddFolderOpen, setIsAddFolderOpen] = useState(false);
-  const [isWallpaperOpen, setIsWallpaperOpen] = useState(false);
   const [editingShortcut, setEditingShortcut] = useState<ShortcutItem | null>(null);
 
   const openSettings = useCallback(() => setIsSettingsOpen(true), []);
@@ -33,29 +31,22 @@ export function useModals() {
   const openAddFolder = useCallback(() => setIsAddFolderOpen(true), []);
   const closeAddFolder = useCallback(() => setIsAddFolderOpen(false), []);
 
-  const openWallpaper = useCallback(() => setIsWallpaperOpen(true), []);
-  const closeWallpaper = useCallback(() => setIsWallpaperOpen(false), []);
-
   /** 检查是否有任何弹窗打开 */
-  const hasOpenModal = isSettingsOpen || isAddShortcutOpen || isAddFolderOpen || isWallpaperOpen;
+  const hasOpenModal = isSettingsOpen || isAddShortcutOpen || isAddFolderOpen;
 
   /** 关闭当前打开的弹窗（用于 Escape 键） */
   const closeCurrentModal = useCallback(() => {
     if (isSettingsOpen) setIsSettingsOpen(false);
     else if (isAddShortcutOpen) { setIsAddShortcutOpen(false); setEditingShortcut(null); }
     else if (isAddFolderOpen) setIsAddFolderOpen(false);
-    else if (isWallpaperOpen) setIsWallpaperOpen(false);
-  }, [isSettingsOpen, isAddShortcutOpen, isAddFolderOpen, isWallpaperOpen]);
+  }, [isSettingsOpen, isAddShortcutOpen, isAddFolderOpen]);
 
   return {
-    // 状态
     isSettingsOpen,
     isAddShortcutOpen,
     isAddFolderOpen,
-    isWallpaperOpen,
     editingShortcut,
     hasOpenModal,
-    // 操作
     openSettings,
     closeSettings,
     openAddShortcut,
@@ -63,8 +54,6 @@ export function useModals() {
     openEditShortcut,
     openAddFolder,
     closeAddFolder,
-    openWallpaper,
-    closeWallpaper,
     closeCurrentModal,
   };
 }

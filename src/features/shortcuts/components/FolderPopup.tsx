@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react';
 import type { ShortcutFolder as ShortcutFolderType, ShortcutItem } from '@/types';
 import { IframeModal } from '@/components';
-import { OpenModeIndicator, EmptyFolderIcon } from '@/components/icons';
+import { FolderOutlined } from '@ant-design/icons';
+import { OpenModeIndicator } from '@/components/icons';
 
 interface FolderPopupProps {
   folder: ShortcutFolderType;
@@ -107,7 +108,7 @@ export function FolderPopup({ folder, onClose, onItemsChange, onItemDragOut }: F
         ) : (
           <div className="flex items-center justify-center p-12">
             <div className="text-center">
-              <EmptyFolderIcon className="w-16 h-16 text-gray-300 mx-auto mb-3" />
+              <FolderOutlined className="text-gray-300 mx-auto mb-3" style={{ fontSize: 64 }} />
               <p className="text-gray-500 text-base font-medium">空文件夹</p>
             </div>
           </div>

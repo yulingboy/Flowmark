@@ -1,4 +1,5 @@
 import { Component, type ReactNode } from 'react';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -44,12 +45,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
       return (
         <div className="flex flex-col items-center justify-center p-8 text-center bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg">
-          <div className="w-16 h-16 mb-4 text-red-400">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
+          <div className="w-16 h-16 mb-4 text-red-400 flex items-center justify-center">
+            <ExclamationCircleOutlined style={{ fontSize: 48 }} />
           </div>
           <h3 className="text-lg font-medium text-gray-800 mb-2">出错了</h3>
           <p className="text-sm text-gray-500 mb-4 max-w-xs">

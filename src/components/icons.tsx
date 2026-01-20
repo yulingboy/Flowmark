@@ -1,41 +1,9 @@
 /**
- * 自定义 SVG 图标
+ * 自定义图标组件
  * 通用图标请直接从 @ant-design/icons 导入
  */
 
-export const WallpaperIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-    <rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="M21 15l-5-5L5 21" />
-  </svg>
-);
-
-export const OpenTabIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-    <polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
-  </svg>
-);
-
-export const LayoutIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-    <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
-    <rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
-  </svg>
-);
-
-export const UnfoldIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-    <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
-  </svg>
-);
-
-export const EmptyFolderIcon = ({ className = 'w-8 h-8' }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-    <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
-  </svg>
-);
-
-/** 新标签页打开角标 */
+/** 新标签页打开角标（品牌图标，无法用 Ant Design 替代） */
 export const OpenModeIndicator = ({ size = 'normal' }: { size?: 'small' | 'normal' }) => {
   const isSmall = size === 'small';
   return (

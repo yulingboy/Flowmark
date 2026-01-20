@@ -5,8 +5,7 @@ export type {
   SettingsTab, 
   SettingsPanelProps, 
   SettingsButtonProps, 
-  SettingRowProps, 
-  WallpaperModalProps 
+  SettingRowProps
 } from './types';
 export type { GeneralState } from './store';
 
@@ -14,7 +13,6 @@ export type { GeneralState } from './store';
 export { SettingsButton } from './components/SettingsButton';
 export { SettingsPanel } from './components/SettingsPanel';
 export { SettingRow } from './components/SettingRow';
-export { WallpaperModal } from './components/WallpaperModal';
 
 // Store
 export { useGeneralStore } from './store';

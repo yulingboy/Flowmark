@@ -24,10 +24,4 @@ export interface SettingRowProps {
   children: React.ReactNode;
 }
 
-/** 壁纸弹窗 Props */
-export interface WallpaperModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
 // GeneralState 定义在 store/types.ts 中

@@ -3,8 +3,8 @@ import type { ShortcutItem, CardSize, Position } from '@/types';
 import { isShortcutFolder } from '@/types';
 import { IframeModal, ContextMenu } from '@/components';
 import type { ContextMenuItem } from '@/components';
-import { EditOutlined, DeleteOutlined, FolderOutlined, RightOutlined } from '@ant-design/icons';
-import { OpenTabIcon, LayoutIcon, OpenModeIndicator } from '@/components/icons';
+import { EditOutlined, DeleteOutlined, FolderOutlined, RightOutlined, CheckOutlined, ExportOutlined, AppstoreOutlined } from '@ant-design/icons';
+import { OpenModeIndicator } from '@/components/icons';
 import { useShortcutsStore } from '../store';
 import { useCardBehavior } from '../hooks/useCardBehavior';
 
@@ -69,11 +69,11 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
   };
 
   const contextMenuItems: ContextMenuItem[] = [
-    { icon: <OpenTabIcon />, label: '新标签打开', onClick: () => window.open(item.url, '_blank') },
+    { icon: <ExportOutlined />, label: '新标签打开', onClick: () => window.open(item.url, '_blank') },
     { icon: <EditOutlined />, label: '编辑标签', onClick: () => onEdit?.(item) },
-    { icon: <FolderOutlined />, label: '移动至分类', type: 'submenu', rightIcon: <RightOutlined />,
+    { icon: <FolderOutlined />, label: '移动至分类', type: 'submenu', rightIcon: <RightOutlined style={{ fontSize: 12 }} />,
       submenuItems: folders.map((folder) => ({ id: folder.id, label: folder.name, onClick: () => moveToFolder(item.id, folder.id) })), onClick: () => {} },
-    { icon: <LayoutIcon />, label: '布局', type: 'layout', layoutOptions: ['1x1', '1x2', '2x1', '2x2', '2x4'], disabledLayouts,
+    { icon: <AppstoreOutlined />, label: '布局', type: 'layout', layoutOptions: ['1x1', '1x2', '2x1', '2x2', '2x4'], disabledLayouts,
       currentLayout: item.size || '1x1', onLayoutSelect: (size) => onResize?.(item, size), onClick: () => {} },
     { icon: <DeleteOutlined />, label: '删除标签', onClick: () => onDelete?.(item) },
   ];
@@ -85,7 +85,7 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
         <div className={`${cardContainerClassName} flex items-center justify-center`}>
           {batchEditMode && (
             <div className={selectionIndicatorClassName}>
-              {isSelected && <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" className="w-3 h-3"><polyline points="20 6 9 17 4 12" /></svg>}
+              {isSelected && <CheckOutlined style={{ fontSize: 12, color: 'white', strokeWidth: 50 }} />}
             </div>
           )}
           <img src={item.icon} alt={item.name} className={iconStyle.className} style={iconStyle.style} loading="eager" draggable={false}

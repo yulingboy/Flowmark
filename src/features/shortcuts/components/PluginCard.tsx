@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined, CheckOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { builtinPlugins } from '@/plugins/builtin';
 import { ContextMenu, MacModal } from '@/components';
 import type { ContextMenuItem } from '@/components';
-import { LayoutIcon } from '@/components/icons';
 import type { PluginCardItem, PluginSize, CardSize, Position } from '@/types';
 import { useCardBehavior } from '../hooks/useCardBehavior';
 
@@ -119,7 +118,7 @@ export function PluginCard({
 
   const contextMenuItems: ContextMenuItem[] = [
     {
-      icon: <LayoutIcon />,
+      icon: <AppstoreOutlined />,
       label: '布局',
       type: 'layout',
       layoutOptions,
@@ -154,11 +153,7 @@ export function PluginCard({
         <div className={cardContainerClassName}>
           {batchEditMode && (
             <div className={selectionIndicatorClassName}>
-              {isSelected && (
-                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" className="w-3 h-3">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              )}
+              {isSelected && <CheckOutlined style={{ fontSize: 12, color: 'white', strokeWidth: 50 }} />}
             </div>
           )}
           
