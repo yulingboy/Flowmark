@@ -25,8 +25,8 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         sidepanel: resolve(__dirname, 'sidepanel.html'),
-        background: resolve(__dirname, 'src/background/index.ts'),
-        content: resolve(__dirname, 'src/content/index.ts'),
+        background: resolve(__dirname, 'src/extension/background/index.ts'),
+        content: resolve(__dirname, 'src/extension/content/index.ts'),
       },
       output: {
         // 扩展需要固定的文件名，不带 hash
@@ -37,7 +37,7 @@ export default defineConfig({
         // 将 React 和 Antd 合并到一个 vendor 块中避免循环依赖
         manualChunks: (id) => {
           // Content script 和 background 不应该分块，需要独立打包
-          if (id.includes('src/content/') || id.includes('src/background/')) {
+          if (id.includes('src/extension/content/') || id.includes('src/extension/background/')) {
             return undefined;
           }
           

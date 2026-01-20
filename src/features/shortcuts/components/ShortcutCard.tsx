@@ -54,7 +54,7 @@ export function ShortcutCard({ item, onClick, onEdit, onDelete, onResize, classN
   });
 
   const iconStyle = is1x1
-    ? { className: 'w-full h-full object-cover', style: {} }
+    ? { className: 'max-w-full max-h-full object-cover', style: {} }
     : { className: 'object-contain', style: { width: '64px', height: '64px', maxWidth: '50%', maxHeight: '50%' } };
 
   const folders = useMemo(() => 

@@ -7,7 +7,7 @@
  * @module migration
  */
 
-import { chromeStorage } from './chromeStorage';
+import { chromeStorage } from '@/extension/utils/chromeStorage';
 
 /**
  * 存储键名（localStorage 和 chrome.storage 使用相同的键名）
